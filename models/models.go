@@ -8,17 +8,17 @@ import (
 
 type RecipeSchema = struct {
 	ID 				primitive.ObjectID `bson:"_id, omitempty"`
-	title			string `bson:"string field"`
-	ingredients		[]IngredientsSchema `bson:"array field"`
-	preparation		string `bson:"string field"`
-	selected		int	   `bson:"string field"`	
-	date			time.Time `bson:"date field"`
-	Version     	int    `bson:"int field"`
+	Title			string `bson:"title, omitempty"`
+	Ingredients		[]IngredientsSchema `bson:"ingredients, omitempty"`
+	Preparation		string `bson:"preparation, omitempty"`
+	Selected		int	   `bson:"selected, omitempty"`	
+	Date			time.Time `bson:"date, omitempty"`
+	Version     	int    `bson:"__v, omitempty"`
 }
 
 type IngredientsSchema = struct {
-	id				int
-	ingredient		string
-	amount			string
+	Id				string `bson:"id"`
+	Ingredient		string `bson:"ingredient"`
+	Amount			string `bson:"amount"`
 }
 
