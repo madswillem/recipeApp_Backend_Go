@@ -105,7 +105,16 @@ func getDataByID(id string)(models.RecipeSchema, primitive.ObjectID) {
 
 func GetById(c *gin.Context)  {
 	result, _ := getDataByID(c.Param("id"))
-	c.JSON(http.StatusOK, result)
+
+	c.JSON(http.StatusOK, gin.H{
+		"_id": result.ID,
+		"title": result.Title,
+		"ingredeants": result.Ingredients,
+		"preparation": result.Preparation,
+		"selected": result.Selected,
+		"date": result.Date,
+		"__v": result.Version,
+	})
 }
 
 func Select(c *gin.Context) {

@@ -21,4 +21,3 @@ type IngredientsSchema = struct {
 	Ingredient		string `bson:"ingredient"`
 	Amount			string `bson:"amount"`
 }
-
