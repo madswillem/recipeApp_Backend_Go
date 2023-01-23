@@ -16,5 +16,6 @@ func main()  {
 	r.POST("/create", controllers.AddRecipe)
 	r.GET("/get", controllers.GetAll)
 	r.GET("/getbyid/:id", controllers.GetById)
+	r.GET("/select/:id", controllers.Select)
 	r.Run()
 }
