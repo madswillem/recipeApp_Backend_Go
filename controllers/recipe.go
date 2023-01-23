@@ -80,8 +80,7 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func GetById(c *gin.Context)  {
-	id := c.Param("id")
+func getDataByID(id string)(models.RecipeSchema, primitive.ObjectID) {
 	coll := initializers.DB.Database("test").Collection("recepies")
 
 	// Declare Context type object for managing multiple API requests
@@ -101,29 +100,18 @@ func GetById(c *gin.Context)  {
 		log.Fatal("FindOne() ObjectIDFromHex ERROR:", err)
 	}
 
+	return  result, objectId;
+}
+
+func GetById(c *gin.Context)  {
+	result, _ := getDataByID(c.Param("id"))
 	c.JSON(http.StatusOK, result)
 }
 
 func Select(c *gin.Context) {
-	id := c.Param("id")
 	coll := initializers.DB.Database("test").Collection("recepies")
 
-	// Declare Context type object for managing multiple API requests
-	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
-
-	// convert id string to ObjectId
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Println("Invalid id")
-	}
-
-	// find
-	result := models.RecipeSchema{}
-	err = coll.FindOne(ctx, bson.M{"_id": objectId}).Decode(&result)
-
-	if err != nil {
-		log.Fatal("FindOne() ObjectIDFromHex ERROR:", err)
-	}
+	result, objectId := getDataByID(c.Param("id"))	
 
 	result.Selected += 1
 
