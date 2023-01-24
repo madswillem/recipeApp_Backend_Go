@@ -2,15 +2,13 @@ package controllers
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/models"
+	"rezeptapp.ml/goApp/middleware"
 )
 
 func GetAll(c *gin.Context) {
@@ -80,31 +78,9 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func getDataByID(id string)(models.RecipeSchema, primitive.ObjectID) {
-	coll := initializers.DB.Database("test").Collection("recepies")
-
-	// Declare Context type object for managing multiple API requests
-	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
-
-	// convert id string to ObjectId
-	objectId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Println("Invalid id")
-	}
-
-	// find
-	result := models.RecipeSchema{}
-	err = coll.FindOne(ctx, bson.M{"_id": objectId}).Decode(&result)
-
-	if err != nil {
-		log.Fatal("FindOne() ObjectIDFromHex ERROR:", err)
-	}
-
-	return  result, objectId;
-}
 
 func GetById(c *gin.Context)  {
-	result, _ := getDataByID(c.Param("id"))
+	result := middleware.GetDataByID(c.Param("id"))
 
 	c.JSON(http.StatusOK, gin.H{
 		"_id": result.ID,
@@ -120,11 +96,11 @@ func GetById(c *gin.Context)  {
 func Select(c *gin.Context) {
 	coll := initializers.DB.Database("test").Collection("recepies")
 
-	result, objectId := getDataByID(c.Param("id"))	
+	result := middleware.GetDataByID(c.Param("id"))	
 
 	result.Selected += 1
 
-	filter := bson.D{{"_id", objectId}}
+	filter := bson.D{{"_id", result.ID}}
 	update := bson.D{{"$set", bson.D{{"selected", result.Selected}}}}
 	res, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
