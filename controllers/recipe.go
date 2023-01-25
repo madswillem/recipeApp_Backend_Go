@@ -80,7 +80,7 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func getDataByID(id string)(models.RecipeSchema, primitive.ObjectID) {
+func getDataByID(id string)(models.RecipeSchema) {
 	coll := initializers.DB.Database("test").Collection("recepies")
 
 	// Declare Context type object for managing multiple API requests
@@ -100,11 +100,11 @@ func getDataByID(id string)(models.RecipeSchema, primitive.ObjectID) {
 		log.Fatal("FindOne() ObjectIDFromHex ERROR:", err)
 	}
 
-	return  result, objectId;
+	return  result
 }
 
 func GetById(c *gin.Context)  {
-	result, _ := getDataByID(c.Param("id"))
+	result := getDataByID(c.Param("id"))
 
 	c.JSON(http.StatusOK, gin.H{
 		"_id": result.ID,
@@ -120,11 +120,11 @@ func GetById(c *gin.Context)  {
 func Select(c *gin.Context) {
 	coll := initializers.DB.Database("test").Collection("recepies")
 
-	result, objectId := getDataByID(c.Param("id"))	
+	result:= getDataByID(c.Param("id"))	
 
 	result.Selected += 1
 
-	filter := bson.D{{"_id", objectId}}
+	filter := bson.D{{"_id", result.ID}}
 	update := bson.D{{"$set", bson.D{{"selected", result.Selected}}}}
 	res, err := coll.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
