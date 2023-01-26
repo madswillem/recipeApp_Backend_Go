@@ -78,7 +78,6 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-
 func GetById(c *gin.Context)  {
 	result := middleware.GetDataByID(c.Param("id"))
 
