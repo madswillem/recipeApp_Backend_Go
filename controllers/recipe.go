@@ -93,18 +93,11 @@ func GetById(c *gin.Context)  {
 }
 
 func Select(c *gin.Context) {
-	coll := initializers.DB.Database("test").Collection("recepies")
+	res := middleware.UpdateSelected(c.Param("id"), +1)
+	c.JSON(http.StatusOK, res)
+}
 
-	result := middleware.GetDataByID(c.Param("id"))	
-
-	result.Selected += 1
-
-	filter := bson.D{{"_id", result.ID}}
-	update := bson.D{{"$set", bson.D{{"selected", result.Selected}}}}
-	res, err := coll.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		panic(err)
-	}
-
+func Deselect(c *gin.Context) {
+	res := middleware.UpdateSelected(c.Param("id"), -1)
 	c.JSON(http.StatusOK, res)
 }

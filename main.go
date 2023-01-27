@@ -17,5 +17,6 @@ func main()  {
 	r.GET("/get", controllers.GetAll)
 	r.GET("/getbyid/:id", controllers.GetById)
 	r.GET("/select/:id", controllers.Select)
+	r.GET("/deselect/:id", controllers.Deselect)
 	r.Run()
 }
