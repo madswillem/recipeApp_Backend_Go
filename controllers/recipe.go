@@ -101,3 +101,25 @@ func Deselect(c *gin.Context) {
 	res := middleware.UpdateSelected(c.Param("id"), -1)
 	c.JSON(http.StatusOK, res)
 }
+
+func Colormode(c *gin.Context) {
+	if (c.Param("type") == "get") {
+		cookie, err := c.Cookie("type")
+
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{
+				"err": err,
+			})
+        }
+
+		c.JSON(http.StatusOK, cookie)
+	} else if (c.Param("type") == "dark") {
+		c.SetCookie("type", "dark", 999999999999999999, "/", "localhost", false, true)
+		c.Status(http.StatusAccepted)
+	} else if (c.Param("type") == "light") {
+		c.SetCookie("type", "light", 999999999999999999, "/", "localhost", false, true)
+		c.Status(http.StatusAccepted)
+	} else {
+		c.Status(http.StatusBadRequest)
+	}
+}
