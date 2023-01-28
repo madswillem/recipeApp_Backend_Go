@@ -112,7 +112,9 @@ func Colormode(c *gin.Context) {
 			})
         }
 
-		c.JSON(http.StatusOK, cookie)
+		c.JSON(http.StatusOK, gin.H{
+			"type": cookie,
+		})
 	} else if (c.Param("type") == "dark") {
 		c.SetCookie("type", "dark", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)

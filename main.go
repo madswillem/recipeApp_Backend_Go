@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"rezeptapp.ml/goApp/controllers"
 	"rezeptapp.ml/goApp/initializers"
+	"rezeptapp.ml/goApp/middleware"
 )
 
 func init()  {
@@ -13,11 +14,11 @@ func init()  {
 
 func main()  {
 	r := gin.Default()
-	r.POST("/create", controllers.AddRecipe)
-	r.GET("/get", controllers.GetAll)
-	r.GET("/getbyid/:id", controllers.GetById)
-	r.GET("/select/:id", controllers.Select)
-	r.GET("/deselect/:id", controllers.Deselect)
-	r.GET("/colormode/:type", controllers.Colormode)
+	r.POST("/create", middleware.CORSMiddleware(), controllers.AddRecipe)
+	r.GET("/get", middleware.CORSMiddleware(), controllers.GetAll)
+	r.GET("/getbyid/:id", middleware.CORSMiddleware(), controllers.GetById)
+	r.GET("/select/:id", middleware.CORSMiddleware(), controllers.Select)
+	r.GET("/deselect/:id", middleware.CORSMiddleware(), controllers.Deselect)
+	r.GET("/colormode/:type", middleware.CORSMiddleware(), controllers.Colormode)
 	r.Run()
 }
