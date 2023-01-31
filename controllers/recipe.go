@@ -81,15 +81,7 @@ func AddRecipe(c *gin.Context) {
 func GetById(c *gin.Context)  {
 	result := middleware.GetDataByID(c.Param("id"))
 
-	c.JSON(http.StatusOK, gin.H{
-		"_id": result.ID,
-		"title": result.Title,
-		"ingredeants": result.Ingredients,
-		"preparation": result.Preparation,
-		"selected": result.Selected,
-		"date": result.Date,
-		"__v": result.Version,
-	})
+	c.JSON(http.StatusOK, result)
 }
 
 func Select(c *gin.Context) {
