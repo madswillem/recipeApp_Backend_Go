@@ -47,9 +47,9 @@ func AddRecipe(c *gin.Context) {
 		Title       string        `json:"title"`
 		Ingredients []Ingredients `json:"ingredients"`
 		Preparation string        `json:"preparation"`
-		Selected    int       
+		Selected    int
 		Date        time.Time
-		Version     int 		  `bson:"__v"`
+		Version     int `bson:"__v"`
 	}
 
 	err := c.Bind(&body)
@@ -78,39 +78,41 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func GetById(c *gin.Context)  {
-	result := middleware.GetDataByID(c.Param("id"))
+func GetById(c *gin.Context) {
+	result := middleware.GetDataByID(c.Param("id"), c)
 
 	c.JSON(http.StatusOK, result)
 }
 
 func Select(c *gin.Context) {
-	res := middleware.UpdateSelected(c.Param("id"), +1)
+	res := middleware.UpdateSelected(c.Param("id"), +1, c)
+
 	c.JSON(http.StatusOK, res)
 }
 
 func Deselect(c *gin.Context) {
-	res := middleware.UpdateSelected(c.Param("id"), -1)
+	res := middleware.UpdateSelected(c.Param("id"), -1, c)
+
 	c.JSON(http.StatusOK, res)
 }
 
 func Colormode(c *gin.Context) {
-	if (c.Param("type") == "get") {
+	if c.Param("type") == "get" {
 		cookie, err := c.Cookie("type")
 
-        if err != nil {
-            c.JSON(http.StatusBadRequest, gin.H{
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
 				"err": err,
 			})
-        }
+		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"type": cookie,
 		})
-	} else if (c.Param("type") == "dark") {
+	} else if c.Param("type") == "dark" {
 		c.SetCookie("type", "dark", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)
-	} else if (c.Param("type") == "light") {
+	} else if c.Param("type") == "light" {
 		c.SetCookie("type", "light", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)
 	} else {

@@ -2,16 +2,17 @@ package middleware
 
 import (
 	"context"
-	"log"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/models"
 )
 
-func GetDataByID(id string)(models.RecipeSchema) {
+func GetDataByID(id string, c *gin.Context)(models.RecipeSchema) {
 	coll := initializers.DB.Database("test").Collection("recepies")
 
 	// Declare Context type object for managing multiple API requests
@@ -20,7 +21,7 @@ func GetDataByID(id string)(models.RecipeSchema) {
 	// convert id string to ObjectId
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		log.Println("Invalid id")
+		c.AbortWithError(http.StatusNotFound, err)
 	}
 
 	// find
@@ -28,7 +29,7 @@ func GetDataByID(id string)(models.RecipeSchema) {
 	err = coll.FindOne(ctx, bson.M{"_id": objectId}).Decode(&result)
 
 	if err != nil {
-		log.Fatal("FindOne() ObjectIDFromHex ERROR:", err)
+		c.AbortWithError(http.StatusNotFound, err)
 	}
 
 	return result
