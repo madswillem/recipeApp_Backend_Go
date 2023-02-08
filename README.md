@@ -6,3 +6,6 @@ Routes: \
 /select/:id   -to select a Recipe \
 /deselect/:id -to deselect a Recipe \
 /colormode    -to get/set the colormode(darkmode|lightmode) \
+
+# Next Update
+/recomendet   -to get recomendet recipes 
