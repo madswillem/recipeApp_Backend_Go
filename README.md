@@ -8,4 +8,6 @@ Routes: \
 /colormode    -to get/set the colormode(darkmode|lightmode) \
 
 # Next Update
-/recomendet   -to get recomendet recipes 
+/recomendet   -to get recomendet recipes \
+
+Migrate databes from Mongo DB to PostgrSQL
