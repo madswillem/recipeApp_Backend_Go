@@ -1,29 +1,24 @@
 package initializers
 
 import (
-	"context"
-	"fmt"
 	"os"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"rezeptapp.ml/goApp/models"
 )
 
-var DB *mongo.Client
+var DB *gorm.DB
 
 func ConnectToDB() {
 	var err error
-	dsn := os.Getenv("DB_CONNECTION")
+	dsn := os.Getenv("DB")
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	// Create a new client and connect to the server
-	DB, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(dsn))
-	if err != nil {
-		panic(err)
+	if err != nil || DB == nil {
+		panic("Error ")
 	}
-	// Ping the primary
-	if err := DB.Ping(context.TODO(), readpref.Primary()); err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected and pinged.")
+
+	DB.AutoMigrate(&models.RecipeSchema{})
+	DB.AutoMigrate(&models.IngredientsSchema{})
 }

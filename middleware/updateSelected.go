@@ -1,27 +1,23 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
 	"rezeptapp.ml/goApp/initializers"
+	"rezeptapp.ml/goApp/models"
 )
 
-func UpdateSelected(id string, change int, c *gin.Context)(*mongo.UpdateResult) {
-	coll := initializers.DB.Database("test").Collection("recepies")
+func UpdateSelected(id string, change int, c *gin.Context)(*gorm.DB) {
 
 	result := GetDataByID(id, c)
 
-	result.Selected += change
+	result.Version += 1
 
-	filter := bson.D{{"_id", result.ID}}
-	update := bson.D{{"$set", bson.D{{"selected", result.Selected}}}}
-	res, err := coll.UpdateOne(context.TODO(), filter, update)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+	res := initializers.DB.Model(&result).Updates(models.RecipeSchema{Selected: result.Selected + change, Version: result.Version +1})
+	if res.Error != nil {
+		c.AbortWithError(http.StatusInternalServerError, res.Error)
 	}
 
 	return res

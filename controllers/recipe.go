@@ -1,56 +1,28 @@
 package controllers
 
 import (
-	"context"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/middleware"
+	"rezeptapp.ml/goApp/models"
 )
 
 func GetAll(c *gin.Context) {
-	var results []bson.M
-	coll := initializers.DB.Database("test").Collection("recepies")
-	cursor, err := coll.Find(context.TODO(), bson.M{})
+	var recipes []models.RecipeSchema
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":      "Failed to read body",
-			"errMessage": err.Error(),
-		})
-		return
+	result := initializers.DB.Preload("Ingredients").Find(&recipes)
+
+	if result.Error != nil {
+		panic(result.Error)
 	}
 
-	if err = cursor.All(context.TODO(), &results); err != nil {
-		panic(err)
-	}
-
-	c.JSON(http.StatusOK, results)
-
-	defer cursor.Close(context.TODO())
+	c.JSON(http.StatusOK, recipes)
 }
 
 func AddRecipe(c *gin.Context) {
-
-	coll := initializers.DB.Database("test").Collection("recepies")
-
-	type Ingredients struct {
-		Id         string `json:"id"`
-		Ingredient string `json:"ingredient"`
-		Amount     string `json:"amount"`
-	}
-
-	var body struct {
-		Title       string        `json:"title"`
-		Ingredients []Ingredients `json:"ingredients"`
-		Preparation string        `json:"preparation"`
-		Selected    int
-		Date        time.Time
-		Version     int `bson:"__v"`
-	}
+	var body models.RecipeSchema
 
 	err := c.Bind(&body)
 
@@ -62,9 +34,7 @@ func AddRecipe(c *gin.Context) {
 		return
 	}
 
-	body.Date = time.Now()
-
-	result, err := coll.InsertOne(context.TODO(), body)
+	result := initializers.DB.Create(&body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
