@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,11 +12,13 @@ import (
 func GetDataByID(id string, c *gin.Context)(models.RecipeSchema) {
 	// find
 	var result models.RecipeSchema
-	err := initializers.DB.Find(&result, 10)
+	err := initializers.DB.Preload("Ingredients").Find(&result, "ID = ?", id).Error
 
-	if err.Error != nil {
-		c.AbortWithError(http.StatusNotFound, err.Error)
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
 	}
+
+	fmt.Println(result)
 
 	return result
 }

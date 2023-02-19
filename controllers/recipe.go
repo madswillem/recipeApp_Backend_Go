@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/middleware"
 	"rezeptapp.ml/goApp/models"
+	"rezeptapp.ml/goApp/tools"
 )
 
 func GetAll(c *gin.Context) {
@@ -23,6 +25,7 @@ func GetAll(c *gin.Context) {
 
 func AddRecipe(c *gin.Context) {
 	var body models.RecipeSchema
+	id := tools.NewObjectId()
 
 	err := c.Bind(&body)
 
@@ -34,13 +37,18 @@ func AddRecipe(c *gin.Context) {
 		return
 	}
 
-	result := initializers.DB.Create(&body)
+	body.ID = id
+	for i:=0; i<len(body.Ingredients); i++ {   
+		ingId := tools.NewObjectId()          // start of the execution block
+        body.Ingredients[i].ID = ingId
+    } 
+	initializers.DB.Create(&body)
+	result := initializers.DB.Save(&body)
 
-	if err != nil {
+	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error":      "Failed to read body",
-			"errMessage": err.Error(),
-			"result":     result,
+			"error":      "Databaseerror",
+			"errMessage": result.Error,
 		})
 		return
 	}
@@ -52,6 +60,24 @@ func GetById(c *gin.Context) {
 	result := middleware.GetDataByID(c.Param("id"), c)
 
 	c.JSON(http.StatusOK, result)
+}
+
+func Filter(c *gin.Context) {
+	i, err := strconv.Atoi(c.Param("id"))
+    if err != nil {
+        // ... handle error
+        panic(err)
+    }
+
+	// find
+	var result models.IngredientsSchema
+	err = initializers.DB.Preload("Recipes").Find(&result, i).Error
+
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+	}
+
+	c.JSON(http.StatusOK , result.Recipes)
 }
 
 func Select(c *gin.Context) {
