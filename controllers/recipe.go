@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"rezeptapp.ml/goApp/initializers"
@@ -28,6 +27,7 @@ func AddRecipe(c *gin.Context) {
 	id := tools.NewObjectId()
 
 	err := c.Bind(&body)
+	var recipes = make([]*models.IngredientsSchema, len(body.Ingredients))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -38,10 +38,34 @@ func AddRecipe(c *gin.Context) {
 	}
 
 	body.ID = id
-	for i:=0; i<len(body.Ingredients); i++ {   
-		ingId := tools.NewObjectId()          // start of the execution block
-        body.Ingredients[i].ID = ingId
+	for i:=0; i<len(body.Ingredients); i++ { 
+		result, err := tools.CheckIfRecipeExists(body.Ingredients[i].Ingredient)  
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":      "Failed to read body",
+				"errMessage": err.Error(),
+			})
+			return
+		}
+		if result {
+			err = initializers.DB.Find(&recipes[i], "ingredient = ?", body.Ingredients[i].Ingredient).Error
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error":      "Failed to read body",
+					"errMessage": err.Error(),
+				})
+				return
+			}
+		}
+		if !result {
+			ingId := tools.NewObjectId()          // start of the execution block
+        	body.Ingredients[i].ID = ingId
+			recipes[i] = body.Ingredients[i]
+		}	
     } 
+
+	body.Ingredients = recipes
+
 	initializers.DB.Create(&body)
 	result := initializers.DB.Save(&body)
 
@@ -63,15 +87,9 @@ func GetById(c *gin.Context) {
 }
 
 func Filter(c *gin.Context) {
-	i, err := strconv.Atoi(c.Param("id"))
-    if err != nil {
-        // ... handle error
-        panic(err)
-    }
-
 	// find
 	var result models.IngredientsSchema
-	err = initializers.DB.Preload("Recipes").Find(&result, i).Error
+	err := initializers.DB.Preload("Recipes").Find(&result, "ID = ?", c.Param("id")).Error
 
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
