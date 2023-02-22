@@ -27,7 +27,7 @@ func AddRecipe(c *gin.Context) {
 	id := tools.NewObjectId()
 
 	err := c.Bind(&body)
-	var recipes = make([]*models.IngredientsSchema, len(body.Ingredients))
+	var recipes = make([]models.IngredientsSchema, len(body.Ingredients))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -87,15 +87,48 @@ func GetById(c *gin.Context) {
 }
 
 func Filter(c *gin.Context) {
-	// find
-	var result models.IngredientsSchema
-	err := initializers.DB.Preload("Recipes").Find(&result, "ID = ?", c.Param("id")).Error
-
-	if err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
+	type Ingredients struct {
+		Ingredient		string			`json:"ingredient"`
+	} 
+	type Recipe struct {
+		Ingredients		[]Ingredients	`json:"ingredients"`
 	}
 
-	c.JSON(http.StatusOK , result.Recipes)
+	var body Recipe
+	err := c.Bind(&body)
+
+	// find
+	var ingredientNames []string
+	var recipes []models.RecipeSchema
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":      "Failed to read body",
+			"errMessage": err.Error(),
+		})
+		return
+	}
+
+	for i := 0; i < len(body.Ingredients); i++ {
+		ingredientNames = append(ingredientNames, body.Ingredients[i].Ingredient)
+	}
+
+	err = initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
+	Where("ingredients_schemas.ingredient IN ?", ingredientNames).
+	Group("recipe_schemas.id").
+	Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(ingredientNames)).
+	Preload("Ingredients").
+	Find(&recipes).Error
+
+	if err != nil {
+		panic(err.Error)
+	}
+	if len(recipes) <= 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound, "No Recipe was Found")
+		return
+	}
+
+	c.JSON(http.StatusOK , recipes)
 }
 
 func Select(c *gin.Context) {
