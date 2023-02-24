@@ -6,8 +6,9 @@ Routes: \
 /select/:id   -to select a Recipe \
 /deselect/:id -to deselect a Recipe \
 /colormode    -to get/set the colormode(darkmode|lightmode) \
+/filter       -to filter for recipes
 
 # Next Update
 /recomendet   -to get recomendet recipes \
 
-Migrate databes from Mongo DB to PostgrSQL
+extending /filter with cooking time
