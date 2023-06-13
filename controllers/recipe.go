@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm/clause"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/middleware"
 	"rezeptapp.ml/goApp/models"
@@ -13,7 +17,7 @@ import (
 func GetAll(c *gin.Context) {
 	var recipes []models.RecipeSchema
 
-	result := initializers.DB.Preload("Ingredients").Find(&recipes)
+	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Find(&recipes)
 
 	if result.Error != nil {
 		panic(result.Error)
@@ -24,10 +28,8 @@ func GetAll(c *gin.Context) {
 
 func AddRecipe(c *gin.Context) {
 	var body models.RecipeSchema
-	id := tools.NewObjectId()
 
 	err := c.Bind(&body)
-	var recipes = make([]models.IngredientsSchema, len(body.Ingredients))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -37,34 +39,15 @@ func AddRecipe(c *gin.Context) {
 		return
 	}
 
-	body.ID = id
-	for i:=0; i<len(body.Ingredients); i++ { 
-		result, err := tools.CheckIfRecipeExists(body.Ingredients[i].Ingredient)  
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error":      "Failed to read body",
-				"errMessage": err.Error(),
-			})
-			return
-		}
-		if result {
-			err = initializers.DB.Find(&recipes[i], "ingredient = ?", body.Ingredients[i].Ingredient).Error
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{
-					"error":      "Failed to read body",
-					"errMessage": err.Error(),
-				})
-				return
-			}
-		}
-		if !result {
-			ingId := tools.NewObjectId()          // start of the execution block
-        	body.Ingredients[i].ID = ingId
-			recipes[i] = body.Ingredients[i]
-		}	
-    } 
+	body.ID = tools.NewObjectId()
+	body.Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Title)
 
-	body.Ingredients = recipes
+	for i := 0; i < len(body.Ingredients); i++ {
+		body.Ingredients[i].ID = tools.NewObjectId()
+		body.Ingredients[i].Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Ingredients[i].Ingredient)
+	}
+
+	fmt.Println(body.Rating)
 
 	initializers.DB.Create(&body)
 	result := initializers.DB.Save(&body)
@@ -88,10 +71,11 @@ func GetById(c *gin.Context) {
 
 func Filter(c *gin.Context) {
 	type Ingredients struct {
-		Ingredient		string			`json:"ingredient"`
-	} 
+		Ingredient string `json:"ingredient"`
+	}
 	type Recipe struct {
-		Ingredients		[]Ingredients	`json:"ingredients"`
+		CookingTime int           `json:"cookingtime"`
+		Ingredients []Ingredients `json:"ingredients"`
 	}
 
 	var body Recipe
@@ -113,12 +97,17 @@ func Filter(c *gin.Context) {
 		ingredientNames = append(ingredientNames, body.Ingredients[i].Ingredient)
 	}
 
-	err = initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
-	Where("ingredients_schemas.ingredient IN ?", ingredientNames).
-	Group("recipe_schemas.id").
-	Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(ingredientNames)).
-	Preload("Ingredients").
-	Find(&recipes).Error
+	query := initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
+		Where("ingredients_schemas.ingredient IN ?", ingredientNames).
+		Group("recipe_schemas.id").
+		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(ingredientNames)).
+		Preload("Ingredients")
+
+	if body.CookingTime > 0 {
+		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
+	}
+
+	err = query.Find(&recipes).Error
 
 	if err != nil {
 		panic(err.Error)
@@ -128,19 +117,19 @@ func Filter(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK , recipes)
+	c.JSON(http.StatusOK, recipes)
 }
 
 func Select(c *gin.Context) {
 	res := middleware.UpdateSelected(c.Param("id"), +1, c)
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, res.Error)
 }
 
 func Deselect(c *gin.Context) {
 	res := middleware.UpdateSelected(c.Param("id"), -1, c)
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, res.Error)
 }
 
 func Colormode(c *gin.Context) {
@@ -165,4 +154,26 @@ func Colormode(c *gin.Context) {
 	} else {
 		c.Status(http.StatusBadRequest)
 	}
+}
+
+func Recomend(c *gin.Context) {
+	recipes := tools.GetRecipes(tools.GetIngredients(c))
+	res := make([]models.RecipeSchema, 5)
+
+	fmt.Println(recipes[1])
+
+	rand.Seed(time.Now().UnixNano())
+
+	if len(recipes) < 5 {
+		c.JSON(http.StatusAccepted, recipes)
+	}
+
+	for i := 0; i < 5; i++ {
+		fmt.Println(i)
+		fmt.Println(len(recipes))
+		randomNumber := rand.Intn(len(recipes) - 1)
+		res[i] = recipes[randomNumber]
+	}
+
+	c.JSON(http.StatusAccepted, res)
 }

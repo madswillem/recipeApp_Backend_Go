@@ -6,9 +6,7 @@ Routes: \
 /select/:id   -to select a Recipe \
 /deselect/:id -to deselect a Recipe \
 /colormode    -to get/set the colormode(darkmode|lightmode) \
-/filter       -to filter for recipes
+/filter       -to filter for recipes and cookingtime
 
 # Next Update
 /recomendet   -to get recomendet recipes \
-
-extending /filter with cooking time

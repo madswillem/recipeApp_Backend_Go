@@ -15,9 +15,10 @@ func init()  {
 func main()  {
 	r := gin.Default()
 	r.POST("/create", middleware.CORSMiddleware(), controllers.AddRecipe)
+	r.GET("/recommended", middleware.CORSMiddleware(), controllers.Recomend)
 	r.GET("/get", middleware.CORSMiddleware(), controllers.GetAll)
 	r.GET("/getbyid/:id", middleware.CORSMiddleware(), controllers.GetById)
-	r.POST("/filter/", middleware.CORSMiddleware(), controllers.Filter)
+	r.POST("/filter", middleware.CORSMiddleware(), controllers.Filter)
 	r.GET("/select/:id", middleware.CORSMiddleware(), controllers.Select)
 	r.GET("/deselect/:id", middleware.CORSMiddleware(), controllers.Deselect)
 	r.GET("/colormode/:type", middleware.CORSMiddleware(), controllers.Colormode)

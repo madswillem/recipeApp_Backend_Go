@@ -59,5 +59,6 @@ func NewObjectIDFromTimestamp(timestamp time.Time) ObjectID {
 }
 
 func NewObjectId() string {
-	return NewObjectIDFromTimestamp(time.Now()).Hex()
+	newID := NewObjectIDFromTimestamp(time.Now()).Hex()
+	return newID
 }
