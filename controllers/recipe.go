@@ -160,8 +160,6 @@ func Recomend(c *gin.Context) {
 	recipes := tools.GetRecipes(tools.GetIngredients(c))
 	res := make([]models.RecipeSchema, 5)
 
-	fmt.Println(recipes[1])
-
 	rand.Seed(time.Now().UnixNano())
 
 	if len(recipes) < 5 {
@@ -169,8 +167,6 @@ func Recomend(c *gin.Context) {
 	}
 
 	for i := 0; i < 5; i++ {
-		fmt.Println(i)
-		fmt.Println(len(recipes))
 		randomNumber := rand.Intn(len(recipes) - 1)
 		res[i] = recipes[randomNumber]
 	}

@@ -1,8 +1,6 @@
 package tools
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
 	"rezeptapp.ml/goApp/initializers"
@@ -60,8 +58,6 @@ func GetRecipes(returnedIngredients []string) []models.RecipeSchema {
 	if result.Error != nil {
 		// Handle the error
 	}
-
-	fmt.Println()
 
 	return recipes
 }
