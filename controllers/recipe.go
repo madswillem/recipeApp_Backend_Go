@@ -1,7 +1,6 @@
 package controllers
 
-import (
-	"fmt"
+import (	
 	"math/rand"
 	"net/http"
 	"time"
@@ -47,8 +46,6 @@ func AddRecipe(c *gin.Context) {
 		body.Ingredients[i].Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Ingredients[i].Ingredient)
 	}
 
-	fmt.Println(body.Rating)
-
 	initializers.DB.Create(&body)
 	result := initializers.DB.Save(&body)
 
@@ -64,9 +61,7 @@ func AddRecipe(c *gin.Context) {
 }
 
 func GetById(c *gin.Context) {
-	result := middleware.GetDataByID(c.Param("id"), c)
-
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, middleware.GetDataByID(c.Param("id"), c))
 }
 
 func Filter(c *gin.Context) {
@@ -81,10 +76,6 @@ func Filter(c *gin.Context) {
 	var body Recipe
 	err := c.Bind(&body)
 
-	// find
-	var ingredientNames []string
-	var recipes []models.RecipeSchema
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":      "Failed to read body",
@@ -92,6 +83,9 @@ func Filter(c *gin.Context) {
 		})
 		return
 	}
+
+	var ingredientNames []string
+	var recipes []models.RecipeSchema
 
 	for i := 0; i < len(body.Ingredients); i++ {
 		ingredientNames = append(ingredientNames, body.Ingredients[i].Ingredient)
@@ -102,7 +96,6 @@ func Filter(c *gin.Context) {
 		Group("recipe_schemas.id").
 		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(ingredientNames)).
 		Preload("Ingredients")
-
 	if body.CookingTime > 0 {
 		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
 	}
@@ -121,9 +114,7 @@ func Filter(c *gin.Context) {
 }
 
 func Select(c *gin.Context) {
-	res := middleware.UpdateSelected(c.Param("id"), +1, c)
-
-	c.JSON(http.StatusOK, res.Error)
+	c.JSON(http.StatusOK, middleware.UpdateSelected(c.Param("id"), +1, c).Error)
 }
 
 func Deselect(c *gin.Context) {
@@ -133,43 +124,30 @@ func Deselect(c *gin.Context) {
 }
 
 func Colormode(c *gin.Context) {
-	if c.Param("type") == "get" {
+	switch c.Param("type") {
+	case "get":
 		cookie, err := c.Cookie("type")
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"err": err,
-			})
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"type": cookie,
-		})
-	} else if c.Param("type") == "dark" {
+		if err != nil {c.JSON(http.StatusBadRequest, gin.H{"err": err,})}
+		c.JSON(http.StatusOK, gin.H{"type": cookie,})
+	case "dark":
 		c.SetCookie("type", "dark", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)
-	} else if c.Param("type") == "light" {
+	case "light":
 		c.SetCookie("type", "light", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)
-	} else {
+	default:
 		c.Status(http.StatusBadRequest)
 	}
 }
 
 func Recomend(c *gin.Context) {
 	recipes := tools.GetRecipes(tools.GetIngredients(c))
-	res := make([]models.RecipeSchema, 5)
+	
+	if len(recipes) < 5 {c.JSON(http.StatusAccepted, recipes)}
 
-	rand.Seed(time.Now().UnixNano())
-
-	if len(recipes) < 5 {
-		c.JSON(http.StatusAccepted, recipes)
-	}
-
-	for i := 0; i < 5; i++ {
-		randomNumber := rand.Intn(len(recipes) - 1)
-		res[i] = recipes[randomNumber]
-	}
+	rand.Seed(time.Now().UnixNano())	
+	var res [5]models.RecipeSchema
+	for i := 0; i < 5; i++ {res[i] = recipes[rand.Intn(len(recipes) - 1)]}
 
 	c.JSON(http.StatusAccepted, res)
 }

@@ -115,10 +115,6 @@ func update(rating models.RatingStruct, change int, c *gin.Context) models.Ratin
 	return result
 }
 
-func GetCurrentData() {
-	panic("unimplemented")
-}
-
 func UpdateSelected(id string, change int, c *gin.Context) *gorm.DB {
 	result := GetDataByID(id, c)
 

@@ -10,13 +10,10 @@ import (
 )
 
 func GetDataByID(id string, c *gin.Context) models.RecipeSchema {
-	// find
 	var result models.RecipeSchema
 	err := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Find(&result, "ID = ?", id).Error
 
-	if err != nil {
-		c.AbortWithError(http.StatusNotFound, err)
-	}
+	if err != nil {c.AbortWithError(http.StatusNotFound, err)}
 
 	return result
 }
