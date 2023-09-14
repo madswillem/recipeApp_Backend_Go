@@ -14,7 +14,7 @@ func getTemp(c *gin.Context) float64 {
 	url := "https://api.open-meteo.com/v1/forecast?latitude=53.5544&longitude=9.9946&current_weather=true"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "*/*")
-	req.Header.Add("User-Agent", "Thunder Client (https://www.thunderclient.com)")
+	req.Header.Add("User-Agent", "recipeapp")
 
 	res, _ := http.DefaultClient.Do(req)
 
@@ -41,7 +41,7 @@ func GetCurrentData(c *gin.Context) models.CurrentData {
 	case time.June, time.July, time.August:
 		season = "Sum"
 	case time.September, time.October, time.November:
-		season = "Aug"
+		season = "Aut"
 	default:
 		season = "non"
 	}

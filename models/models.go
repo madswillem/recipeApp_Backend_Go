@@ -6,6 +6,8 @@ type RecipeSchema struct {
 	Ingredients		[]IngredientsSchema	`json:"ingredients" gorm:"foreignKey:RecipeSchemaID"`
 	Preparation		string				`json:"preparation"`
 	CookingTime		int					`json:"cookingtime"`
+	Image			string				`json:"image"`
+	NutriScore		string				`json:"nutriscore"`
 	Selected		int					`json:"selected"`
 	Rating			RatingStruct		`json:"rating" gorm:"polymorphic:Owner"`	
 	Version     	int					`json:"__v"`

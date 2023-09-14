@@ -1,0 +1,7 @@
+<div class="content">
+  <div id="wrapper">
+      {{ range .recipes }}
+          {{ template "recipeCard.html" . }}
+      {{ end }}
+  </div>
+</div>

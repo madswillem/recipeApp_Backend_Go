@@ -3,7 +3,6 @@ package controllers
 import (	
 	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
@@ -143,11 +142,15 @@ func Colormode(c *gin.Context) {
 func Recomend(c *gin.Context) {
 	recipes := tools.GetRecipes(tools.GetIngredients(c))
 	
-	if len(recipes) < 5 {c.JSON(http.StatusAccepted, recipes)}
+	if len(recipes) <= 5 {
+		c.AbortWithStatusJSON(http.StatusAccepted, recipes)
+		return
+	}
 
-	rand.Seed(time.Now().UnixNano())	
 	var res [5]models.RecipeSchema
-	for i := 0; i < 5; i++ {res[i] = recipes[rand.Intn(len(recipes) - 1)]}
+	for i := 0; i < 5; i++ {
+		res[i] = recipes[rand.Intn(len(recipes) - 1)]
+	}
 
 	c.JSON(http.StatusAccepted, res)
 }
