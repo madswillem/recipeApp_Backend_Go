@@ -1,6 +1,8 @@
 package tools
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
 	"rezeptapp.ml/goApp/initializers"
@@ -21,7 +23,7 @@ func GetIngredients(c *gin.Context) []string {
 		Find(&ingredients)
 
 	if result.Error != nil {
-		// Handle the error
+		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	ingredientArray := make([]string, len(ingredients))
@@ -33,7 +35,7 @@ func GetIngredients(c *gin.Context) []string {
 
 	return ingredientArray
 }
-func GetRecipes(returnedIngredients []string) []models.RecipeSchema {
+func GetRecipes(c *gin.Context, returnedIngredients []string) []models.RecipeSchema {
 	var recipes []models.RecipeSchema
 
 	// Fetch recipes that contain at least one of the returned ingredients
@@ -46,7 +48,7 @@ func GetRecipes(returnedIngredients []string) []models.RecipeSchema {
 		Find(&recipes)
 
 	if result.Error != nil {
-		// Handle the error
+		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 
 	return recipes

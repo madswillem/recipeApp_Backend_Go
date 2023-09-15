@@ -140,7 +140,7 @@ func Colormode(c *gin.Context) {
 }
 
 func Recomend(c *gin.Context) {
-	recipes := tools.GetRecipes(tools.GetIngredients(c))
+	recipes := tools.GetRecipes(c, tools.GetIngredients(c))
 	
 	if len(recipes) <= 5 {
 		c.AbortWithStatusJSON(http.StatusAccepted, recipes)
