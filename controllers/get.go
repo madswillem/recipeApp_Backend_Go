@@ -1,7 +1,11 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
+	"os"
+	"path"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
@@ -20,4 +24,22 @@ func GetHome(c *gin.Context) {
 }
 func GetAccount(c *gin.Context) {
 	c.HTML(http.StatusOK, "account.html", gin.H{})
+}
+
+
+func GetImgs(c *gin.Context)  {
+	name := c.Param("filename")
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./imgs/"+name)))
+	if _, err := os.Stat(fullName); errors.Is(err, os.ErrNotExist) {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+    c.File(fullName)
+}
+func GetStyles(c *gin.Context)  {
+	name := c.Param("filename")
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./rescources/"+name)))
+	if _, err := os.Stat(fullName); errors.Is(err, os.ErrNotExist) {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+    c.File(fullName)
 }

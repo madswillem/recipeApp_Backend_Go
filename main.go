@@ -40,7 +40,7 @@ func main()  {
 	r.GET("/get/home", controllers.GetHome)
 	r.GET("/get/account", controllers.GetAccount)
 
-	r.GET("/rescources/:filename", controllers.GetRescources)
+	r.GET("/rescources/:filename", controllers.GetStyles)
 	r.GET("/imgs/:filename", controllers.GetImgs)
 	r.Run()
 }

@@ -1,4 +1,11 @@
 # Recipe App in Go 
+Frontend: \
+/             -to get Home page \
+/account      -to get Account page \
+
+/get/home     -to get content of Home page \
+/get/account  -to get content of Account page \
+
 Routes: \
 /get          -to get every Recipe \
 /create       -to create a Recipe \

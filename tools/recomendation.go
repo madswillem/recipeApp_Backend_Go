@@ -13,7 +13,7 @@ func GetIngredients(c *gin.Context) []string {
 	var ingredients []models.IngredientsSchema
 	data := GetCurrentData(c)
 
-	// Fetch the first 100 IngredientsSchema records ordered by the sum of Mon, Win, and Subzerodegree
+	// Fetch the first 100 IngredientsSchema records ordered by the sum of current Day, current Season, and Temperatur
 	result := initializers.DB.Table("ingredients_schemas").
 		Select("ingredients_schemas.*").
 		Joins("JOIN rating_structs ON rating_structs.owner_id = ingredients_schemas.id").

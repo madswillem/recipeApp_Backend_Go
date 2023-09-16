@@ -17,3 +17,8 @@ type CurrentWeather struct {
 	WeatherCode 			int 				`json:"weathercode"`
 	Time 					string 				`json:"time"`
 }
+type CurrentData struct {
+	Day				string
+	Season			string
+	Temp			string
+}

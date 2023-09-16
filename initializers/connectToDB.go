@@ -22,4 +22,6 @@ func ConnectToDB() {
 	DB.AutoMigrate(&models.RecipeSchema{})
 	DB.AutoMigrate(&models.IngredientsSchema{})
 	DB.AutoMigrate(&models.RatingStruct{})
+	DB.AutoMigrate(&models.NutritionalValue{})
+	DB.AutoMigrate(&models.DietSchema{})
 }

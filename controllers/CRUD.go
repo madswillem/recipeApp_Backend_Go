@@ -15,7 +15,7 @@ import (
 func GetAll(c *gin.Context) {
 	var recipes []models.RecipeSchema
 
-	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Find(&recipes)
+	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
 
 	if result.Error != nil {
 		panic(result.Error)
@@ -39,9 +39,13 @@ func AddRecipe(c *gin.Context) {
 
 	body.ID = tools.NewObjectId()
 	body.Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Title)
+	body.Diet.ID = tools.NewObjectId()
+	body.NutritionalValue.ID = tools.NewObjectId()
+
 
 	for i := 0; i < len(body.Ingredients); i++ {
 		body.Ingredients[i].ID = tools.NewObjectId()
+		body.Ingredients[i].NutritionalValue.ID = tools.NewObjectId()
 		body.Ingredients[i].Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Ingredients[i].Ingredient)
 	}
 
@@ -64,12 +68,11 @@ func GetById(c *gin.Context) {
 }
 
 func Filter(c *gin.Context) {
-	type Ingredients struct {
-		Ingredient string `json:"ingredient"`
-	}
 	type Recipe struct {
-		CookingTime int           `json:"cookingtime"`
-		Ingredients []Ingredients `json:"ingredients"`
+		NutriScore  	string				`json:"nutriscore"`
+		CookingTime 	int         		`json:"cookingtime"`
+		Ingredients 	[]string 			`json:"ingredients"`
+		Diet			models.DietSchema	`json:"diet"`
 	}
 
 	var body Recipe
@@ -83,20 +86,41 @@ func Filter(c *gin.Context) {
 		return
 	}
 
-	var ingredientNames []string
 	var recipes []models.RecipeSchema
 
-	for i := 0; i < len(body.Ingredients); i++ {
-		ingredientNames = append(ingredientNames, body.Ingredients[i].Ingredient)
-	}
-
 	query := initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
-		Where("ingredients_schemas.ingredient IN ?", ingredientNames).
+		Where("ingredients_schemas.ingredient IN ?", body.Ingredients).
 		Group("recipe_schemas.id").
-		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(ingredientNames)).
-		Preload("Ingredients")
-	if body.CookingTime > 0 {
+		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(body.Ingredients)).
+		Joins("JOIN diet_schemas ON diet_schemas.recipe_id = recipe_schemas.id").
+		Where("diet_schemas.vegetarien IN (?)", body.Diet.Vegetarien).
+		Preload(clause.Associations).
+		Preload("Ingredients.Rating").
+		Preload("Ingredients.NutritionalValue")
+
+	switch {
+	case body.Diet.Vegetarien:
+			query = query.Where("diet_schemas.vegetarien = ?", true)
+	case body.Diet.Vegan:
+		query = query.Where("diet_schemas.vegan = ?", true)
+	case body.Diet.LowCal:
+		query = query.Where("diet_schemas.lowcal = ?", true)
+	case body.Diet.LowCarb:
+		query = query.Where("diet_schemas.lowcarb = ?", true)
+	case body.Diet.Keto:
+		query = query.Where("diet_schemas.keto = ?", true)
+	case body.Diet.Paleo:
+		query = query.Where("diet_schemas.paleo = ?", true)
+	case body.Diet.LowFat:
+		query = query.Where("diet_schemas.lowfat = ?", true)
+	case body.Diet.FoodCombining:
+		query = query.Where("diet_schemas.food_combining = ?", true)
+	case body.Diet.WholeFood:
+		query = query.Where("diet_schemas.whole_food = ?", true)
+	case body.CookingTime > 0:
 		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
+	case body.NutriScore != "":
+		query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
 	}
 
 	err = query.Find(&recipes).Error
