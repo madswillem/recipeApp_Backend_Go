@@ -21,7 +21,7 @@ func main()  {
 	r.SetHTMLTemplate(tmpl)
 	r.NoRoute(func(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
-			"title": "test",
+			"pageTitle": "404 Page not found",
 		})
 	})
 
@@ -36,11 +36,14 @@ func main()  {
 
 	r.GET("/", controllers.RenderHome)
 	r.GET("/account", controllers.RenderAcount)
+	r.GET("/recipe/:id", controllers.RenderProductpage)
 
 	r.GET("/get/home", controllers.GetHome)
 	r.GET("/get/account", controllers.GetAccount)
+	r.GET("/get/recipe/:id", controllers.GetRecipe)
 
-	r.GET("/rescources/:filename", controllers.GetStyles)
+	r.GET("/style/:filename", controllers.GetStyles)
 	r.GET("/imgs/:filename", controllers.GetImgs)
+	
 	r.Run()
 }

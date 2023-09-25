@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="http://localhost:8080/rescources/index.css">
-    <link rel="stylesheet" href="http://localhost:8080/rescources/recipies.css">
-    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
-    <title>{{ .pageTyitle }}</title>
+    <link rel="stylesheet" href="http://localhost:8080/style/index.css">
+    <link rel="stylesheet" href="http://localhost:8080/style/recipies.css">
+    <link rel="stylesheet" href="http://localhost:8080/style/productpage.css">
+    <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+    <title>{{ .pageTitle }}</title>
 </head>
 
 <body>
     <div class="topnav">
-        <a href="/" 
+        <a 
             hx-get="/get/home"
             hx-trigger="click"
             hx-target=".content"
@@ -21,7 +22,7 @@
             placeholder="Loading...">
           <img src="http://localhost:8080/imgs/recipe.svg" alt="">
         </a>
-        <a class="icon" href="/account" 
+        <a class="icon"  
             hx-get="/get/account"
             hx-trigger="click"
             hx-target=".content"
@@ -30,7 +31,7 @@
             placeholder="Loading..."  >
             <img src="http://localhost:8080/imgs/account.svg" alt="">
         </a>
-        <a class="icon" href="/" style="float: right;">
+        <a class="icon" style="float: right;">
             <img src="http://localhost:8080/imgs/light.svg" alt="">
         </a>
     </div>

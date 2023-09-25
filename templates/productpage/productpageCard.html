@@ -1,0 +1,30 @@
+<div id="productPageCard">
+    <div id="productPageIMGContainer">
+        <img id="productPageIMG" src="https://img.chefkoch-cdn.de/rezepte/3561111533733933/bilder/1324966/crop-642x428/wassermelonen-feta-salat-mit-minze.jpg" alt="">
+    </div>
+    <div id="productPageTextContainer">
+        <p>{{ .Title }}</p>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Nutri-score-A.svg" alt="">
+        {{ template "nutritionlaValue.html" .NutritionalValue }}
+        <div id="productPageIngredients">
+            <table>
+                <thead>
+                    <tr>
+                        <th>test</th>
+                    </tr>  
+                </thead>
+                <tbody>
+                    {{ range .Ingredients }}
+                        <tr>
+                            <th>{{ .Ingredient }}</th>
+                            <th>{{ .Amount }}</th>
+                        </tr>
+                    {{ end }}
+                </tbody>
+            </table> 
+        </div>
+    </div>
+    <p id="preperation">
+        {{ .Preparation }}
+    </p>
+</div>

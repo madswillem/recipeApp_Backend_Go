@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"net/http"
-	
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
 	"rezeptapp.ml/goApp/initializers"
+	"rezeptapp.ml/goApp/middleware"
 	"rezeptapp.ml/goApp/models"
 )
 
@@ -21,6 +22,21 @@ func RenderHome(c *gin.Context) {
 }
 func RenderAcount(c *gin.Context) {
 	c.HTML(http.StatusOK, "account/index", gin.H{
-		"title": "Recipe App",
+		"pageTitle": "Recipe App",
+	})
+}
+func RenderProductpage(c *gin.Context) {
+	res := middleware.GetDataByID(c.Param("id"), c)
+
+	if res.ID == "" {
+		c.HTML(http.StatusNotFound, "404.html", gin.H{
+			"pageTitle": "404 Page not found",
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "productpage/index", gin.H{
+		"pageTitle": "Recipe App",
+		"recipe": res,
 	})
 }

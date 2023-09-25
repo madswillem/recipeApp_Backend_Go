@@ -11,7 +11,7 @@ import (
 
 func GetDataByID(id string, c *gin.Context) models.RecipeSchema {
 	var result models.RecipeSchema
-	err := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Find(&result, "ID = ?", id).Error
+	err := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&result, "ID = ?", id).Error
 
 	if err != nil {c.AbortWithError(http.StatusNotFound, err)}
 
