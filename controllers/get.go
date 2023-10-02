@@ -40,6 +40,9 @@ func GetRecipe(c *gin.Context) {
 func GetAccount(c *gin.Context) {
 	c.HTML(http.StatusOK, "account.html", gin.H{})
 }
+func GetTutorials(c *gin.Context)  {
+	c.HTML(http.StatusOK, "tutorials.html", gin.H{})
+}
 
 
 func GetImgs(c *gin.Context)  {
@@ -49,6 +52,12 @@ func GetImgs(c *gin.Context)  {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
     c.File(fullName)
+}
+func GetVideos(c *gin.Context) {
+	videoName := c.Param("filename")
+	c.Header("Content-Type", "application/vnd.apple.mpegurl")
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./videos/out/" + videoName )))
+	c.File(fullName)
 }
 func GetStyles(c *gin.Context)  {
 	name := c.Param("filename")

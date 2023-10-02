@@ -1,6 +1,6 @@
 package controllers
 
-import (	
+import (
 	"math/rand"
 	"net/http"
 

@@ -5,33 +5,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://localhost:8080/style/index.css">
-    <link rel="stylesheet" href="http://localhost:8080/style/recipies.css">
-    <link rel="stylesheet" href="http://localhost:8080/style/productpage.css">
     <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+
     <title>{{ .pageTitle }}</title>
 </head>
 
 <body>
-    <div class="topnav">
+    <div class="navbar">
         <a 
-            hx-get="/get/home"
-            hx-trigger="click"
-            hx-target=".content"
-            hx-swap="outerHTML"
-            hx-replace-url="/"
-            placeholder="Loading...">
-          <img src="http://localhost:8080/imgs/recipe.svg" alt="">
-        </a>
+          hx-get="/get/home"
+          hx-trigger="click"
+          hx-target=".content"
+          hx-swap="outerHTML"
+          hx-replace-url="/"
+          placeholder="Loading...">
+          Home
+        </a> 
         <a class="icon"  
-            hx-get="/get/account"
-            hx-trigger="click"
-            hx-target=".content"
-            hx-swap="outerHTML"
-            hx-replace-url="/account"
-            placeholder="Loading..."  >
-            <img src="http://localhost:8080/imgs/account.svg" alt="">
+          hx-get="/get/account"
+          hx-trigger="click"
+          hx-target=".content"
+          hx-swap="outerHTML"
+          hx-replace-url="/account"
+          placeholder="Loading..."  >
+          <img src="http://localhost:8080/imgs/account.svg" alt="">
         </a>
         <a class="icon" style="float: right;">
             <img src="http://localhost:8080/imgs/light.svg" alt="">
         </a>
+        <div class="dropdown">
+          <button class="dropbtn">
+            Learning
+            <i class="fa fa-caret-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <a href="/tutorials"
+              hx-get="/get/tutorials"
+              hx-trigger="click"
+              hx-target=".content"
+              hx-swap="outerHTML"
+              hx-replace-url="/tutorials"
+              placeholder="Loading..."  
+            >
+              Tutorials
+            </a>
+            <a href="#">Ingredient Database</a>
+          </div>
+      </div>
     </div>

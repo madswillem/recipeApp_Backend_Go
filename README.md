@@ -2,6 +2,8 @@
 Frontend: \
 /             -to get Home page \
 /account      -to get Account page \
+/recipe/:id   -to get page of a Recipe \
+/tutorials    -to get the page of a tutorial (Currently it always shows the same video)\
 
 /get/home     -to get content of Home page \
 /get/account  -to get content of Account page \
@@ -17,4 +19,4 @@ Routes: \
 /recomendet   -to get recomendet recipes \
 
 # Next Update
-/recomendet/ai   -to get recipes recomendet by AI \
+/recomendet/ai   -to get recipes recomendet by AI 

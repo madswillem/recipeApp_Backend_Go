@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"html/template"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"rezeptapp.ml/goApp/controllers"
@@ -36,14 +36,24 @@ func main()  {
 
 	r.GET("/", controllers.RenderHome)
 	r.GET("/account", controllers.RenderAcount)
+	r.GET("/tutorials", controllers.RenderTutorial)
 	r.GET("/recipe/:id", controllers.RenderProductpage)
 
 	r.GET("/get/home", controllers.GetHome)
 	r.GET("/get/account", controllers.GetAccount)
+	r.GET("/get/tutorials", controllers.GetTutorials)
 	r.GET("/get/recipe/:id", controllers.GetRecipe)
 
 	r.GET("/style/:filename", controllers.GetStyles)
 	r.GET("/imgs/:filename", controllers.GetImgs)
-	
+	r.GET("/videos/:filename", middleware.CORSMiddleware(), controllers.GetVideos)
+
+	r.GET("/reloadtemplates", func(c *gin.Context) {
+		tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
+		r.SetHTMLTemplate(tmpl)
+
+		c.AbortWithStatus(http.StatusOK)
+	})
+
 	r.Run()
 }
