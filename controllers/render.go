@@ -16,18 +16,18 @@ func RenderHome(c *gin.Context) {
 	if result.Error != nil {panic(result.Error)}
 
 	c.HTML(http.StatusOK, "home/index", gin.H{
-		"pageTitle": "Dait",
+		"pageTitle": "Appetaizr",
 		"recipes": recipes,
 	})
 }
 func RenderAcount(c *gin.Context) {
 	c.HTML(http.StatusOK, "account/index", gin.H{
-		"pageTitle": "Dait",
+		"pageTitle": "Appetaizr",
 	})
 }
 func RenderTutorial(c *gin.Context) {
 	c.HTML(http.StatusOK, "tutorials/index", gin.H{
-		"pageTitle": "Dait",
+		"pageTitle": "Appetaizr",
 	})
 }
 func RenderProductpage(c *gin.Context) {
@@ -41,7 +41,7 @@ func RenderProductpage(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "productpage/index", gin.H{
-		"pageTitle": "Dait",
+		"pageTitle": "Appetaizr",
 		"recipe": res,
 	})
 }
