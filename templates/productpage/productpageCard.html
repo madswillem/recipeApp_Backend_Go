@@ -10,14 +10,15 @@
             <table>
                 <thead>
                     <tr>
-                        <th>test</th>
+                        <th>Ingredient</th>
+                        <th>Amount</th>
                     </tr>  
                 </thead>
                 <tbody>
                     {{ range .Ingredients }}
                         <tr>
-                            <th>{{ .Ingredient }}</th>
-                            <th>{{ .Amount }}</th>
+                            <td>{{ .Ingredient }}</td>
+                            <td>{{ .Amount }}</td>
                         </tr>
                     {{ end }}
                 </tbody>

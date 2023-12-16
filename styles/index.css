@@ -23,9 +23,9 @@ body {
 .navbar a {
   color: var(--text);
   float: left;
-  font-size: 165%;
+  font-size: 220%;
   text-align: center;
-  padding: 14px 16px;
+  padding: 22.5px 24px;
   text-decoration: none;
 }
 
@@ -35,10 +35,10 @@ body {
 }
 
 .dropdown .dropbtn {
-  font-size: 165%;  
+  font-size: 220%;  
   border: none;
   outline: none;
-  padding: 14px 16px;
+  padding: 22.5px 24px;
   background-color: inherit;
   font-family: inherit;
   margin: 0;
@@ -83,8 +83,8 @@ body {
   float: right !important;
 }
 .navbar img {
-  margin: 12px 12px 0px 12px;
-  height: 40px;
-  width: 40px;
+  margin: 10px 10px 0px 12px;
+  height: 67px;
+  width: 67px;
   padding: 0px;
 }
