@@ -1,7 +1,16 @@
 package models
 
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
+
 type RatingStruct struct {
-	ID		  	string `gorm:"primarykey"`
+	ID		  	uint   `gorm:"primarykey"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 	OwnerTitle	string `json:"owner_title"`
 	OwnerID   	string
   	OwnerType 	string
@@ -29,9 +38,8 @@ type RatingStruct struct {
 }
 
 // constructor function
-func NewRatingStruct(id string, title string) *RatingStruct {
+func NewRatingStruct(title string) *RatingStruct {
 	return &RatingStruct{
-		ID:			     id,
 		OwnerTitle:	  title,
 		Overall:       1000,
 		Mon:           1000,

@@ -1,8 +1,8 @@
 package models
 
 type RecipeSchema struct {
-	ID        		 string 			 `json:"_id" gorm:"primarykey"`
-	Title			 string				 `json:"title" gorm:"unique"` 
+	ID        		 uint 			 	 `json:"_id" gorm:"primarykey"`
+	Title			 string				 `json:"title"` 
 	Ingredients		 []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID"`
 	Preparation		 string				 `json:"preparation"`
 	CookingTime		 int				 `json:"cookingtime"`
@@ -16,17 +16,19 @@ type RecipeSchema struct {
 }
 
 type IngredientsSchema struct {
-	ID        		 string 			 `json:"id" gorm:"primarykey"`
+	ID        		 uint 			 	 `json:"id" gorm:"primarykey"`
+	RecipeSchemaID 	 uint				 `json:"-"`
+
 	Ingredient		 string				 `json:"ingredient"` 
 	Amount			 string				 `json:"amount"` 
+	MeasurementUnit	 string				 `json:"measurement_unit"`
 	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
 	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`
-	RecipeSchemaID 	 string				 `json:"-"`
 }
 
 type DietSchema struct {
-	ID		  		 string 			 `gorm:"primarykey"`
-	RecipeID 	     string				 
+	ID		  		 uint 			 	 `gorm:"primarykey"`
+	RecipeID 	     uint				 `json:"recipe_id"`				 
 
 	Vegetarien		 bool				 `json:"vegetarien"`
 	Vegan			 bool				 `json:"vegan"`

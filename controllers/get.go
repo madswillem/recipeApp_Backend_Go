@@ -26,7 +26,7 @@ func GetHome(c *gin.Context) {
 func GetRecipe(c *gin.Context) {
 	res := middleware.GetDataByID(c.Param("id"), c)
 
-	if res.ID == "" {
+	if res.ID == 0 {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"pageTitle": "404 Page not found",
 		})

@@ -1,16 +1,26 @@
 package controllers
 
 import (
+	"errors"
 	"math/rand"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/middleware"
 	"rezeptapp.ml/goApp/models"
 	"rezeptapp.ml/goApp/tools"
 )
+
+func handleError(c *gin.Context, statusCode int, errorMessage string, err error) {
+	c.AbortWithStatusJSON(statusCode, gin.H{
+		"error":      errorMessage,
+		"errMessage": err.Error(),
+	})
+	panic(errorMessage)
+}
 
 func GetAll(c *gin.Context) {
 	var recipes []models.RecipeSchema
@@ -27,40 +37,74 @@ func GetAll(c *gin.Context) {
 func AddRecipe(c *gin.Context) {
 	var body models.RecipeSchema
 
-	err := c.Bind(&body)
+	err := c.ShouldBindJSON(&body)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":      "Failed to read body",
-			"errMessage": err.Error(),
-		})
+		handleError(c, http.StatusBadRequest, "Failed to read body", err)
+	}
+
+	body.Rating = *models.NewRatingStruct(body.Title)
+	for i := 0; i < len(body.Ingredients); i++ {
+		body.Ingredients[i].Rating = *models.NewRatingStruct(body.Ingredients[i].Ingredient)
+	}
+
+	body = CheckIfIngredientExists(c, body)
+
+	tx := initializers.DB.Begin()
+
+	if err := tx.Create(&body).Error; err != nil {
+		tx.Rollback()
+		handleError(c, http.StatusBadRequest, "Database error", err)
 		return
 	}
 
-	body.ID = tools.NewObjectId()
-	body.Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Title)
-	body.Diet.ID = tools.NewObjectId()
-	body.NutritionalValue.ID = tools.NewObjectId()
-
-
-	for i := 0; i < len(body.Ingredients); i++ {
-		body.Ingredients[i].ID = tools.NewObjectId()
-		body.Ingredients[i].NutritionalValue.ID = tools.NewObjectId()
-		body.Ingredients[i].Rating = *models.NewRatingStruct(tools.NewObjectId(), body.Ingredients[i].Ingredient)
-	}
-
-	initializers.DB.Create(&body)
-	result := initializers.DB.Save(&body)
-
-	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":      "Databaseerror",
-			"errMessage": result.Error,
-		})
+	if err := tx.Commit().Error; err != nil {
+		handleError(c, http.StatusBadRequest, "Database error", err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, body)
+}
+
+func CheckIfIngredientExists(c *gin.Context, body models.RecipeSchema) models.RecipeSchema{
+	for _, ingredient := range body.Ingredients {
+        var nutritionalValue models.NutritionalValue		
+        err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
+            Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
+            First(&nutritionalValue).Error
+
+        if err != nil {
+            if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
+                handleError(c, http.StatusBadRequest, "Database error", err)
+				return models.RecipeSchema{}
+            } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
+				CreateIngredientDBEntry(c, ingredient)
+            } else {
+                handleError(c, http.StatusInternalServerError, "Database error", err)
+				return models.RecipeSchema{}
+            }
+        } else if err == nil {
+            if ingredient.NutritionalValue.Edited {
+                handleError(c, http.StatusBadRequest, "Ingredient already exists", err)
+				return models.RecipeSchema{}
+            } else if !ingredient.NutritionalValue.Edited {
+                ingredient.NutritionalValue = nutritionalValue
+            }
+        }
+    }
+	return body
+}
+func CreateIngredientDBEntry(c *gin.Context, ingredient models.IngredientsSchema) {
+	newIngredientDBEntry := models.IngredientDBSchema{
+		Name:       ingredient.Ingredient,
+		StandardUnit: ingredient.MeasurementUnit,
+		NutritionalValue: ingredient.NutritionalValue,
+	}
+	
+	if err := initializers.DB.Create(&newIngredientDBEntry).Error; err != nil {
+		handleError(c, http.StatusBadRequest, "Database error", err)
+		return	
+	}
 }
 
 func GetById(c *gin.Context) {
@@ -69,20 +113,17 @@ func GetById(c *gin.Context) {
 
 func Filter(c *gin.Context) {
 	type Recipe struct {
-		NutriScore  	string				`json:"nutriscore"`
-		CookingTime 	int         		`json:"cookingtime"`
-		Ingredients 	[]string 			`json:"ingredients"`
-		Diet			models.DietSchema	`json:"diet"`
+		NutriScore  string            `json:"nutriscore"`
+		CookingTime int               `json:"cookingtime"`
+		Ingredients []string          `json:"ingredients"`
+		Diet        models.DietSchema `json:"diet"`
 	}
 
 	var body Recipe
-	err := c.Bind(&body)
+	err := c.ShouldBindJSON(&body)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":      "Failed to read body",
-			"errMessage": err.Error(),
-		})
+		handleError(c, http.StatusBadRequest, "Failed to read body", err)
 		return
 	}
 
@@ -93,43 +134,39 @@ func Filter(c *gin.Context) {
 		Group("recipe_schemas.id").
 		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(body.Ingredients)).
 		Joins("JOIN diet_schemas ON diet_schemas.recipe_id = recipe_schemas.id").
-		Where("diet_schemas.vegetarien IN (?)", body.Diet.Vegetarien).
 		Preload(clause.Associations).
 		Preload("Ingredients.Rating").
 		Preload("Ingredients.NutritionalValue")
 
-	switch {
-	case body.Diet.Vegetarien:
-			query = query.Where("diet_schemas.vegetarien = ?", true)
-	case body.Diet.Vegan:
-		query = query.Where("diet_schemas.vegan = ?", true)
-	case body.Diet.LowCal:
-		query = query.Where("diet_schemas.lowcal = ?", true)
-	case body.Diet.LowCarb:
-		query = query.Where("diet_schemas.lowcarb = ?", true)
-	case body.Diet.Keto:
-		query = query.Where("diet_schemas.keto = ?", true)
-	case body.Diet.Paleo:
-		query = query.Where("diet_schemas.paleo = ?", true)
-	case body.Diet.LowFat:
-		query = query.Where("diet_schemas.lowfat = ?", true)
-	case body.Diet.FoodCombining:
-		query = query.Where("diet_schemas.food_combining = ?", true)
-	case body.Diet.WholeFood:
-		query = query.Where("diet_schemas.whole_food = ?", true)
-	case body.CookingTime > 0:
-		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
-	case body.NutriScore != "":
-		query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
-	}
+		switch {
+		case body.Diet.Vegetarien:
+				query = query.Where("diet_schemas.vegetarien = ?", true)
+		case body.Diet.Vegan:
+			query = query.Where("diet_schemas.vegan = ?", true)
+		case body.Diet.LowCal:
+			query = query.Where("diet_schemas.lowcal = ?", true)
+		case body.Diet.LowCarb:
+			query = query.Where("diet_schemas.lowcarb = ?", true)
+		case body.Diet.Keto:
+			query = query.Where("diet_schemas.keto = ?", true)
+		case body.Diet.Paleo:
+			query = query.Where("diet_schemas.paleo = ?", true)
+		case body.Diet.LowFat:
+			query = query.Where("diet_schemas.lowfat = ?", true)
+		case body.Diet.FoodCombining:
+			query = query.Where("diet_schemas.food_combining = ?", true)
+		case body.Diet.WholeFood:
+			query = query.Where("diet_schemas.whole_food = ?", true)
+		case body.CookingTime > 0:
+			query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
+		case body.NutriScore != "":
+			query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
+		}
 
 	err = query.Find(&recipes).Error
 
 	if err != nil {
-		panic(err.Error)
-	}
-	if len(recipes) <= 0 {
-		c.AbortWithStatusJSON(http.StatusNotFound, "No Recipe was Found")
+		handleError(c, http.StatusInternalServerError, "Database error", err)
 		return
 	}
 
@@ -150,8 +187,10 @@ func Colormode(c *gin.Context) {
 	switch c.Param("type") {
 	case "get":
 		cookie, err := c.Cookie("type")
-		if err != nil {c.JSON(http.StatusBadRequest, gin.H{"err": err,})}
-		c.JSON(http.StatusOK, gin.H{"type": cookie,})
+		if err != nil {
+			handleError(c, http.StatusBadRequest, "Cookie error", err)
+		}
+		c.JSON(http.StatusOK, gin.H{"type": cookie})
 	case "dark":
 		c.SetCookie("type", "dark", 999999999999999999, "/", "localhost", false, true)
 		c.Status(http.StatusAccepted)
@@ -165,7 +204,7 @@ func Colormode(c *gin.Context) {
 
 func Recomend(c *gin.Context) {
 	recipes := tools.GetRecipes(c, tools.GetIngredients(c))
-	
+
 	if len(recipes) <= 5 {
 		c.AbortWithStatusJSON(http.StatusAccepted, recipes)
 		return
@@ -173,7 +212,7 @@ func Recomend(c *gin.Context) {
 
 	var res [5]models.RecipeSchema
 	for i := 0; i < 5; i++ {
-		res[i] = recipes[rand.Intn(len(recipes) - 1)]
+		res[i] = recipes[rand.Intn(len(recipes)-1)]
 	}
 
 	c.JSON(http.StatusAccepted, res)

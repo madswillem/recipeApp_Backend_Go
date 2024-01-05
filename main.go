@@ -10,12 +10,12 @@ import (
 	"rezeptapp.ml/goApp/middleware"
 )
 
-func init()  {
+func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDB()
 }
 
-func main()  {
+func main() {
 	r := gin.Default()
 	tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
 	r.SetHTMLTemplate(tmpl)
