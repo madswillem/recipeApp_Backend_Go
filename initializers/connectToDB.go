@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"rezeptapp.ml/goApp/models"
 )
 
 var DB *gorm.DB
@@ -18,10 +17,4 @@ func ConnectToDB() {
 	if err != nil || DB == nil {
 		panic("Error ")
 	}
-
-	DB.AutoMigrate(&models.RecipeSchema{})
-	DB.AutoMigrate(&models.IngredientsSchema{})
-	DB.AutoMigrate(&models.RatingStruct{})
-	DB.AutoMigrate(&models.NutritionalValue{})
-	DB.AutoMigrate(&models.DietSchema{})
 }

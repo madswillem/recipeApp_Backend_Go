@@ -1,16 +1,7 @@
 package models
 
-import (
-	"time"
-
-	"gorm.io/gorm"
-)
-
 type RatingStruct struct {
 	ID		  	uint   `gorm:"primarykey"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
 	OwnerTitle	string `json:"owner_title"`
 	OwnerID   	string
   	OwnerType 	string
@@ -38,25 +29,24 @@ type RatingStruct struct {
 }
 
 // constructor function
-func NewRatingStruct(title string) *RatingStruct {
-	return &RatingStruct{
-		OwnerTitle:	  title,
-		Overall:       1000,
-		Mon:           1000,
-		Tue:           1000,
-		Wed:           1000,
-		Thu:           1000,
-		Fri:           1000,
-		Sat:           1000,
-		Sun:           1000,
-		Win:           1000,
-		Spr:           1000,
-		Sum:           1000,
-		Aut:           1000,
-		Thirtydegree:  1000,
-		Twentiedegree: 1000,
-		Tendegree:     1000,
-		Zerodegree:    1000,
-		Subzerodegree: 1000,
-	}
+func (rating *RatingStruct) DefaultRatingStruct(title string){
+	rating.OwnerTitle = title
+
+	rating.Overall = 1000.0
+	rating.Mon = 1000.0
+	rating.Tue = 1000.0
+	rating.Wed = 1000.0
+	rating.Thu = 1000.0
+	rating.Fri = 1000.0
+	rating.Sat = 1000.0
+	rating.Sun = 1000.0
+	rating.Win = 1000.0
+	rating.Spr = 1000.0
+	rating.Sum = 1000.0
+	rating.Aut = 1000.0
+	rating.Thirtydegree = 1000.0
+	rating.Twentiedegree = 1000.0
+	rating.Tendegree = 1000.0
+	rating.Zerodegree = 1000.0
+	rating.Subzerodegree = 1000.0
 }

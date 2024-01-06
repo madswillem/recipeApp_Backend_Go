@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"rezeptapp.ml/goApp/error_handler"
 	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/middleware"
 	"rezeptapp.ml/goApp/models"
 )
 
@@ -31,12 +33,21 @@ func RenderTutorial(c *gin.Context) {
 	})
 }
 func RenderProductpage(c *gin.Context) {
-	res := middleware.GetDataByID(c.Param("id"), c)
+	i, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		return
+	}
+	
+	res := models.RecipeSchema{ID: uint(i)}
+	err = res.GetRecipeByID(c)
 
-	if res.ID == 0 {
-		c.HTML(http.StatusNotFound, "404.html", gin.H{
-			"pageTitle": "404 Page not found",
-		})
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
 		return
 	}
 

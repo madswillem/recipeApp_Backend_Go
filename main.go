@@ -8,11 +8,19 @@ import (
 	"rezeptapp.ml/goApp/controllers"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/middleware"
+	"rezeptapp.ml/goApp/models"
 )
 
 func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectToDB()
+
+	initializers.DB.AutoMigrate(&models.RecipeSchema{})
+	initializers.DB.AutoMigrate(&models.IngredientsSchema{})
+	initializers.DB.AutoMigrate(&models.RatingStruct{})
+	initializers.DB.AutoMigrate(&models.NutritionalValue{})
+	initializers.DB.AutoMigrate(&models.DietSchema{})
+	initializers.DB.AutoMigrate(&models.IngredientDBSchema{})
 }
 
 func main() {
@@ -26,7 +34,6 @@ func main() {
 	})
 
 	r.POST("/create", middleware.CORSMiddleware(), controllers.AddRecipe)
-	r.GET("/recommended", middleware.CORSMiddleware(), controllers.Recomend)
 	r.GET("/get", middleware.CORSMiddleware(), controllers.GetAll)
 	r.GET("/getbyid/:id", middleware.CORSMiddleware(), controllers.GetById)
 	r.POST("/filter", middleware.CORSMiddleware(), controllers.Filter)

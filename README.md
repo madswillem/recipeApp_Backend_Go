@@ -19,4 +19,4 @@ Routes: \
 /recomendet   -to get recomendet recipes \
 
 # Next Update
-/recomendet/ai   -to get recipes recomendet by AI 
+/recomendet   -better recomendation 

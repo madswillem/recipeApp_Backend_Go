@@ -7,8 +7,34 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"rezeptapp.ml/goApp/models"
 )
+
+type IPStruct struct{
+	Latitude 		float64 		`json:"latitude"`
+	Longitude 		float64 		`json:"longitude"`
+}
+type WeatherData struct {
+	Latitude 				float64 			`json:"latitude"`
+	Longitude 				float64 			`json:"longitude"`
+	GenerationTimeMs 		float64 			`json:"generationtime_ms"`
+	UTCOffsetSeconds 		int 				`json:"utc_offset_seconds"`
+	Timezone 				string 				`json:"timezone"`
+	TimezoneAbbreviation	string 				`json:"timezone_abbreviation"`
+	Elevation 				float64 			`json:"elevation"`
+	CurrentWeather 			CurrentWeather 		`json:"current_weather"`
+}
+type CurrentWeather struct {
+	Temperature 			float64 			`json:"temperature"`
+	WindSpeed 				float64 			`json:"windspeed"`
+	WindDirection 			float64 			`json:"winddirection"`
+	WeatherCode 			int 				`json:"weathercode"`
+	Time 					string 				`json:"time"`
+}
+type CurrentData struct {
+	Day				string
+	Season			string
+	Temp			string
+}
 
 func getTemp(c *gin.Context) float64 {
 	url := "https://api.open-meteo.com/v1/forecast?latitude=53.5544&longitude=9.9946&current_weather=true"
@@ -18,7 +44,7 @@ func getTemp(c *gin.Context) float64 {
 
 	res, _ := http.DefaultClient.Do(req)
 
-	var data models.WeatherData
+	var data WeatherData
 	err := json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -28,8 +54,8 @@ func getTemp(c *gin.Context) float64 {
 	return data.CurrentWeather.Temperature
 }
 
-func GetCurrentData(c *gin.Context) models.CurrentData {
-	var res models.CurrentData
+func GetCurrentData(c *gin.Context) CurrentData {
+	var res CurrentData
 
 	month := time.Now().Month()
 	var season string
