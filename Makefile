@@ -6,3 +6,6 @@ run_db:
 
 run:
 	go run main.go
+
+test:
+	go test -v -cover ./tests/*

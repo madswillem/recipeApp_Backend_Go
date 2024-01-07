@@ -99,10 +99,15 @@ func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) error {
 
 
 
-func (rating RatingStruct) Update(change int, c *gin.Context) RatingStruct {
+func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, error) {
 
 	result := rating
-	data := tools.GetCurrentData(c)
+	data, err := tools.GetCurrentData()
+
+	if err != nil {
+		return result, err
+	}
+
 	percentage := 10.0
 
 	switch data.Day {
@@ -174,7 +179,7 @@ func (rating RatingStruct) Update(change int, c *gin.Context) RatingStruct {
 	result.Overall = tools.CalculateAverage(arr)
 	fmt.Println(result.Overall)
 
-	return result
+	return result, err
 }
 
 

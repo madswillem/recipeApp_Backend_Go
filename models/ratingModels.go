@@ -28,7 +28,6 @@ type RatingStruct struct {
 	Subzerodegree float64 `json:"subzerodegree"`
 }
 
-// constructor function
 func (rating *RatingStruct) DefaultRatingStruct(title string){
 	rating.OwnerTitle = title
 
