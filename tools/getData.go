@@ -2,11 +2,8 @@ package tools
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type IPStruct struct{
@@ -36,7 +33,7 @@ type CurrentData struct {
 	Temp			string
 }
 
-func getTemp(c *gin.Context) float64 {
+func getTemp() (float64, error) {
 	url := "https://api.open-meteo.com/v1/forecast?latitude=53.5544&longitude=9.9946&current_weather=true"
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "*/*")
@@ -47,14 +44,13 @@ func getTemp(c *gin.Context) float64 {
 	var data WeatherData
 	err := json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		fmt.Println("Error:", err)
-		c.AbortWithStatus(http.StatusInternalServerError)
+		return 0, err
 	}
 
-	return data.CurrentWeather.Temperature
+	return data.CurrentWeather.Temperature, err
 }
 
-func GetCurrentData(c *gin.Context) CurrentData {
+func GetCurrentData() (CurrentData, error) {
 	var res CurrentData
 
 	month := time.Now().Month()
@@ -72,7 +68,11 @@ func GetCurrentData(c *gin.Context) CurrentData {
 		season = "non"
 	}
 
-	temp := getTemp(c)
+	temp, err := getTemp()
+	if err != nil {
+		return res, err
+	}
+
 	switch {
 	case temp <= 0.0:
 		res.Temp = "subzerodegree"
@@ -89,5 +89,5 @@ func GetCurrentData(c *gin.Context) CurrentData {
 	res.Season = season
 	res.Day = time.Now().Weekday().String()[:3]
 
-	return res
+	return res, err
 }

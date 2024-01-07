@@ -5,10 +5,11 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"rezeptapp.ml/goApp/error_handler"
 	"rezeptapp.ml/goApp/initializers"
 	"rezeptapp.ml/goApp/models"
-	"rezeptapp.ml/goApp/error_handler"
 )
 
 func GetAll(c *gin.Context) {
@@ -66,7 +67,17 @@ func GetById(c *gin.Context) {
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	c.JSON(http.StatusOK, response.GetRecipeByID(c))
+	err = response.GetRecipeByID(c)
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func Filter(c *gin.Context) {
