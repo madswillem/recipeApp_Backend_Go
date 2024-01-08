@@ -8,6 +8,7 @@ type IngredientsSchema struct {
 	Amount			 string				 `json:"amount"` 
 	MeasurementUnit	 string				 `json:"measurement_unit"`
 	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
+	Diet			 DietSchema			 `json:"diet" gorm:"foreignKey:RecipeSchemaID"`
 	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`
 }
 
