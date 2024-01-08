@@ -59,21 +59,19 @@ func (recipe *RecipeSchema) AddNutritionalValue(c *gin.Context) error {
         if err != nil {
             if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
 				print(ingredient.Ingredient)
-                error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
 				return err
             } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
 				err = ingredient.createIngredientDBEntry(c)
 				if err != nil {
-					error_handler.HandleError(c, http.StatusBadRequest, "Error creating ingredient", err)
 					return err
 				}
             } else {
-                error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
 				return err
             }
         } else if err == nil {
             if ingredient.NutritionalValue.Edited {
-                error_handler.HandleError(c, http.StatusBadRequest, "Ingredient already exists", err)
+				err = errors.New("ingredient already exists")
+				return err
             } else if !ingredient.NutritionalValue.Edited {
                 ingredient.NutritionalValue = nutritionalValue
             }
