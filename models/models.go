@@ -8,13 +8,14 @@ type IngredientsSchema struct {
 	Amount			 string				 `json:"amount"` 
 	MeasurementUnit	 string				 `json:"measurement_unit"`
 	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
-	Diet			 DietSchema			 `json:"diet" gorm:"foreignKey:RecipeSchemaID"`
 	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`
 }
 
 type DietSchema struct {
 	ID		  		 uint 			 	 `gorm:"primarykey"`
-	RecipeID 	     uint				 `json:"recipe_id"`				 
+	OwnerTitle	string 					 `json:"owner_title"`
+	OwnerID   	string
+  	OwnerType 	string		 
 
 	Vegetarien		 bool				 `json:"vegetarien"`
 	Vegan			 bool				 `json:"vegan"`
