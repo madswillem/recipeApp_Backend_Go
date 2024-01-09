@@ -149,7 +149,17 @@ func Select(c *gin.Context) {
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	c.JSON(http.StatusOK, response.UpdateSelected(1, c).Error)
+	err = response.UpdateSelected(1, c)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func Deselect(c *gin.Context) {
@@ -159,7 +169,17 @@ func Deselect(c *gin.Context) {
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	c.JSON(http.StatusOK, response.UpdateSelected(-1, c).Error)
+	err = response.UpdateSelected(-1, c)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func Colormode(c *gin.Context) {

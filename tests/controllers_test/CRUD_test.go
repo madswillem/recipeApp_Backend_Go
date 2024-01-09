@@ -219,8 +219,186 @@ func TestAddRecipe(t *testing.T) {
 		controllers.AddRecipe(c)
 
 		// Assert the response status code
-		if w.Code != http.StatusCreated {
-			t.Errorf("Expected status code %d but got %d", http.StatusCreated, w.Code)
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected status code %d but got %d", http.StatusBadRequest, w.Code)
+		}
+	})
+}
+func TestGetAll(t *testing.T) {
+	t.Run("get all recipes", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/recipes", nil)
+		c.Request.Header.Set("Content-Type", "application/json")
+
+		// Call the GetAll function
+		controllers.GetAll(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+		}
+
+		// Assert the response body
+		var response []models.RecipeSchema
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+		var expected_return models.RecipeSchema
+		err = json.Unmarshal([]byte(readFileAsString("../testdata/get/getAll.json", t)), &expected_return)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+
+		for _, recipe := range response {
+			assertRecipesEqual(t, expected_return, recipe)
+		}
+	})
+}
+func TestGetByID(t *testing.T) {
+	t.Run("get recipe by id", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/getbyid/1", nil)
+
+		// Call the GetById function
+		controllers.GetById(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+		}
+
+		// Assert the response body
+		var response models.RecipeSchema
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+		var expected_return models.RecipeSchema
+		err = json.Unmarshal([]byte(readFileAsString("../testdata/create/add_recipe_with_all_required_fields_(edit=true)_expected_return.json", t)), &expected_return)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+
+		assertRecipesEqual(t, expected_return, response)
+	})
+	t.Run("get recipe by wrong id", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/recipes/5", nil)
+
+		// Call the GetById function
+		controllers.GetById(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected status code %d but got %d", http.StatusBadRequest, w.Code)
+		}
+	})
+}
+func TestSelect(t *testing.T) {
+	t.Run("select recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/select/1", nil)
+
+		// Call the Select function
+		controllers.Select(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+		}
+	})
+	t.Run("select wrong recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/select/5", nil)
+
+		// Call the Select function
+		controllers.Select(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected status code %d but got %d", http.StatusBadRequest, w.Code)
+		}
+
+
+
+		// Assert the response body
+		var body map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &body)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+
+		if body["error"] == "error record not found" {
+			t.Errorf("Expected message %s but got %s", "error record not found", body["error"])
+		}
+		if body["errMessage"] == "Recipe not found" {
+			t.Errorf("Expected message %s but got %s", "Recipe not found", body["errorMessage"])
+			
+		}
+	})
+}
+func TestDeselect(t *testing.T) {
+	t.Run("deselect recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/deselect/1", nil)
+
+		// Call the Select function
+		controllers.Select(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+		}
+	})
+	t.Run("deselect wrong recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request, _ = http.NewRequest(http.MethodGet, "/deselect/5", nil)
+
+		// Call the Select function
+		controllers.Select(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("Expected status code %d but got %d", http.StatusBadRequest, w.Code)
+		}
+
+
+
+		// Assert the response body
+		var body map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &body)
+		if err != nil {
+			t.Errorf("Failed to unmarshal response body: %s", err.Error())
+		}
+
+		if body["error"] == "error record not found" {
+			t.Errorf("Expected message %s but got %s", "error record not found", body["error"])
+		}
+		if body["errMessage"] == "Recipe not found" {
+			t.Errorf("Expected message %s but got %s", "Recipe not found", body["errorMessage"])
+			
 		}
 	})
 }

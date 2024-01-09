@@ -22,7 +22,7 @@ type RecipeSchema struct {
 	Image			 string				 `json:"image"`
 	NutriScore		 string				 `json:"nutriscore"`
 	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
-	Diet			 DietSchema			 `json:"diet" gorm:"foreignKey:RecipeID"`
+	Diet			 DietSchema			 `json:"diet" gorm:"polymorphic:Owner"`
 	Selected		 int				 `json:"selected"`
 	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`	
 	Version     	 int				 `json:"__v"`
@@ -87,7 +87,6 @@ func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) error {
 	res := initializers.DB.Save(recipe)
 	err := res.Error
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
 		return err
 	}
 
