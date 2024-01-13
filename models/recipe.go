@@ -16,23 +16,49 @@ import (
 type RecipeSchema struct {
 	ID        		 uint 			 	 `json:"_id" gorm:"primarykey"`
 	Title			 string				 `json:"title"` 
-	Ingredients		 []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID"`
+	Ingredients		 []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Preparation		 string				 `json:"preparation"`
 	CookingTime		 int				 `json:"cookingtime"`
 	Image			 string				 `json:"image"`
 	NutriScore		 string				 `json:"nutriscore"`
-	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
-	Diet			 DietSchema			 `json:"diet" gorm:"polymorphic:Owner"`
+	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Diet			 DietSchema			 `json:"diet" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Selected		 int				 `json:"selected"`
-	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`	
+	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`	
 	Version     	 int				 `json:"__v"`
+}
+
+func (recipe *RecipeSchema) Delete(c *gin.Context) error {
+	exists, err := recipe.CheckIfExistsByID()
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return gorm.ErrRecordNotFound
+	}
+
+	err = initializers.DB.Delete(&recipe).Error
+	return err
+}
+
+func (recipe *RecipeSchema) Update(c *gin.Context) error {
+	err := initializers.DB.Updates(&recipe).Error
+	return err
 }
 
 func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, error) {
 	var result struct {
 		Found bool
 	}
-	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM ingredients_schemas WHERE ingredient = ?) AS found;", recipe.Title).Scan(&result).Error
+	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
+	return result.Found, err
+}
+
+func (recipe *RecipeSchema) CheckIfExistsByID() (bool, error) {
+	var result struct {
+		Found bool
+	}
+	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
 	return result.Found, err
 }
 
@@ -50,7 +76,7 @@ func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context) error {
 	return err
 }
 
-func (recipe *RecipeSchema) AddNutritionalValue(c *gin.Context) error {
+func (recipe *RecipeSchema) AddNutritionalValue() error {
 	for _, ingredient := range recipe.Ingredients {
         var nutritionalValue NutritionalValue		
         err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
@@ -58,10 +84,9 @@ func (recipe *RecipeSchema) AddNutritionalValue(c *gin.Context) error {
             First(&nutritionalValue).Error
         if err != nil {
             if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				print(ingredient.Ingredient)
 				return err
             } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
-				err = ingredient.createIngredientDBEntry(c)
+				err = ingredient.createIngredientDBEntry()
 				if err != nil {
 					return err
 				}
@@ -84,8 +109,16 @@ func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) error {
 	recipe.Selected += change
 	recipe.Rating.Update(change, c)
 
+	exists, err := recipe.CheckIfExistsByID()
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return gorm.ErrRecordNotFound
+	}
+
 	res := initializers.DB.Save(recipe)
-	err := res.Error
+	err = res.Error
 	if err != nil {
 		return err
 	}
@@ -93,8 +126,25 @@ func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) error {
 	return err
 }
 
+func (recipe *RecipeSchema) CheckForRequiredFields() error {
+	if recipe.Title == "" {
+		return errors.New("missing recipe Title")
+	}
+	if recipe.Ingredients == nil {
+		return errors.New("missing recipe ingredients")
+	}
+	if recipe.Preparation == "" {
+		return errors.New("missing recipe preparation")
+	}
+	for _, ingredient := range recipe.Ingredients {
+		err := ingredient.CheckForRequiredFields()
+		if err != nil {
+			return err
+		}
+	}
 
-
+	return nil
+}
 
 func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, error) {
 
@@ -181,7 +231,7 @@ func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, err
 
 
 
-func (ingredient *IngredientsSchema) createIngredientDBEntry(c *gin.Context) error {
+func (ingredient *IngredientsSchema) createIngredientDBEntry() error {
 	newIngredientDBEntry := IngredientDBSchema{
 		Name:       ingredient.Ingredient,
 		StandardUnit: ingredient.MeasurementUnit,
@@ -190,8 +240,21 @@ func (ingredient *IngredientsSchema) createIngredientDBEntry(c *gin.Context) err
 	
 	err := initializers.DB.Create(&newIngredientDBEntry).Error
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
+		return err
 	}
 
 	return err
+}
+
+func (ingredient *IngredientsSchema) CheckForRequiredFields() error {
+	if ingredient.Ingredient == "" {
+		return errors.New("missing ingredient")
+	}
+	if ingredient.Amount == "" {
+		return errors.New("missing amount")
+	}
+	if ingredient.MeasurementUnit == "" {
+		return errors.New("missing measurement unit")
+	}
+	return nil
 }

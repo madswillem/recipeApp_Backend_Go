@@ -32,14 +32,17 @@ func main() {
 			"pageTitle": "404 Page not found",
 		})
 	})
+	r.Use(middleware.CORSMiddleware())
 
-	r.POST("/create", middleware.CORSMiddleware(), controllers.AddRecipe)
-	r.GET("/get", middleware.CORSMiddleware(), controllers.GetAll)
-	r.GET("/getbyid/:id", middleware.CORSMiddleware(), controllers.GetById)
-	r.POST("/filter", middleware.CORSMiddleware(), controllers.Filter)
-	r.GET("/select/:id", middleware.CORSMiddleware(), controllers.Select)
-	r.GET("/deselect/:id", middleware.CORSMiddleware(), controllers.Deselect)
-	r.GET("/colormode/:type", middleware.CORSMiddleware(), controllers.Colormode)
+	r.POST("/create", controllers.AddRecipe)
+	r.GET("/get", controllers.GetAll)
+	r.GET("/getbyid/:id", controllers.GetById)
+	r.PATCH("/update/:id", controllers.UpdateRecipe)
+	r.DELETE("/delete/:id", controllers.DeleteRecipe)
+	r.POST("/filter", controllers.Filter)
+	r.GET("/select/:id", controllers.Select)
+	r.GET("/deselect/:id", controllers.Deselect)
+	r.GET("/colormode/:type", controllers.Colormode)
 
 	r.GET("/", controllers.RenderHome)
 	r.GET("/account", controllers.RenderAcount)
@@ -53,7 +56,7 @@ func main() {
 
 	r.GET("/style/:filename", controllers.GetStyles)
 	r.GET("/imgs/:filename", controllers.GetImgs)
-	r.GET("/videos/:filename", middleware.CORSMiddleware(), controllers.GetVideos)
+	r.GET("/videos/:filename", controllers.GetVideos)
 
 	r.GET("/reloadtemplates", func(c *gin.Context) {
 		tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))

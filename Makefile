@@ -8,4 +8,7 @@ run:
 	go run main.go
 
 test:
-	go test -v -cover ./tests/*
+	go test -v -cover ./tests/*_test.go
+
+tidy:
+	go mod tidy

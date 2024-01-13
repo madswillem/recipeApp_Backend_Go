@@ -1,4 +1,4 @@
-package tools_test
+package tests
 
 import (
 	"testing"
