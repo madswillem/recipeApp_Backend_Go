@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -30,7 +31,15 @@ func AddRecipe(c *gin.Context) {
 	err := c.ShouldBindJSON(&body)
 
 	if err != nil {
+		print(err)
 		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", err)
+		return
+	}
+
+	err = body.CheckForRequiredFields()
+	if err != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "Missing required fields", err)
+		return
 	}
 
 	body.Rating.DefaultRatingStruct(body.Title)
@@ -38,7 +47,7 @@ func AddRecipe(c *gin.Context) {
 		body.Ingredients[i].Rating.DefaultRatingStruct(body.Ingredients[i].Ingredient)
 	}
 
-	err = body.AddNutritionalValue(c)
+	err = body.AddNutritionalValue()
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
 		return
@@ -60,10 +69,53 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func GetById(c *gin.Context) {
+func UpdateRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		return
+	}
+
+	var body models.RecipeSchema
+	body.ID = uint(i)
+
+	c.ShouldBindJSON(&body)
+	
+	err = body.Update(c)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
+		return
+	}
+}
+
+func DeleteRecipe(c *gin.Context) {
+	i, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		return
+	}
+	response := models.RecipeSchema{ID: uint(i)}
+	err = response.Delete(c)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+		} else {
+			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		}
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func GetById(c *gin.Context) {
+	i, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		errMessage := strings.Join([]string{"id", c.Param("id"), "is not a number"}, " ")
+		error_handler.HandleError(c, http.StatusBadRequest, errMessage, err)
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
