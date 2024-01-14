@@ -27,7 +27,7 @@ func GetHome(c *gin.Context) {
 func GetRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	res := models.RecipeSchema{ID: uint(i)}

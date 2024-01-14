@@ -25,41 +25,41 @@ type RecipeSchema struct {
 	Version     	 int				 `json:"__v"`
 }
 
-func (recipe *RecipeSchema) Delete(c *gin.Context) error {
-	exists, err := recipe.CheckIfExistsByID()
-	if err != nil {
-		return err
+func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
+	exists, apiErr := recipe.CheckIfExistsByID()
+	if apiErr != nil {
+		return apiErr
 	}
 	if !exists {
-		return gorm.ErrRecordNotFound
+		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
 	}
 
-	err = initializers.DB.Delete(&recipe).Error
-	return err
+	err := initializers.DB.Delete(&recipe).Error
+	return error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
-func (recipe *RecipeSchema) Update(c *gin.Context) error {
+func (recipe *RecipeSchema) Update(c *gin.Context) *error_handler.APIError {
 	err := initializers.DB.Updates(&recipe).Error
-	return err
+	return error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
-func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, error) {
+func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, *error_handler.APIError) {
 	var result struct {
 		Found bool
 	}
 	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
-	return result.Found, err
+	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
-func (recipe *RecipeSchema) CheckIfExistsByID() (bool, error) {
+func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) {
 	var result struct {
 		Found bool
 	}
 	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
-	return result.Found, err
+	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
-func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]bool) error {
+func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]bool) *error_handler.APIError {
 	req := initializers.DB
 	if reqData["ingredients"] || reqData["everything"] {
 		req = req.Preload("Ingredients")
@@ -83,16 +83,16 @@ func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]boo
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+			return error_handler.New("recipe not found", http.StatusNotFound, err)
 		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+			return error_handler.New("database error", http.StatusInternalServerError, err)
 		}
 	}
 
-	return err
+	return nil
 }
 
-func (recipe *RecipeSchema) AddNutritionalValue() error {
+func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 	for _, ingredient := range recipe.Ingredients {
         var nutritionalValue NutritionalValue		
         err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
@@ -100,19 +100,18 @@ func (recipe *RecipeSchema) AddNutritionalValue() error {
             First(&nutritionalValue).Error
         if err != nil {
             if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				return err
+				return error_handler.New("ingredient not found", http.StatusNotFound, err)
             } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
-				err = ingredient.createIngredientDBEntry()
+				err := ingredient.createIngredientDBEntry()
 				if err != nil {
 					return err
 				}
             } else {
-				return err
+				return error_handler.New("database error", http.StatusInternalServerError, err)
             }
         } else if err == nil {
             if ingredient.NutritionalValue.Edited {
-				err = errors.New("ingredient already exists")
-				return err
+				return error_handler.New("ingredient already exists", http.StatusBadRequest, err)
             } else if !ingredient.NutritionalValue.Edited {
                 ingredient.NutritionalValue = nutritionalValue
             }
@@ -121,48 +120,47 @@ func (recipe *RecipeSchema) AddNutritionalValue() error {
 	return nil
 }
 
-func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) error {
+func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) *error_handler.APIError {
 	recipe.Selected += change
 	recipe.Rating.Update(change, c)
 
-	exists, err := recipe.CheckIfExistsByID()
-	if err != nil {
-		return err
+	exists, apiErr := recipe.CheckIfExistsByID()
+	if apiErr != nil {
+		return apiErr
 	}
 	if !exists {
-		return gorm.ErrRecordNotFound
+		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
 	}
 
-	res := initializers.DB.Save(recipe)
-	err = res.Error
+	err := initializers.DB.Save(recipe).Error
 	if err != nil {
-		return err
+		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 
-	return err
+	return nil
 }
 
-func (recipe *RecipeSchema) CheckForRequiredFields() error {
+func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
 	if recipe.Title == "" {
-		return errors.New("missing recipe Title")
+		return error_handler.New("missing required field", http.StatusBadRequest, errors.New("missing recipe title"))
 	}
 	if recipe.Ingredients == nil {
-		return errors.New("missing recipe ingredients")
+		return error_handler.New("missing recipe ingredients", http.StatusBadRequest, errors.New("missing recipe ingredients"))
 	}
 	if recipe.Preparation == "" {
-		return errors.New("missing recipe preparation")
+		return error_handler.New("missing recipe ingredients", http.StatusBadRequest, errors.New("missing recipe preparation"))
 	}
 	for _, ingredient := range recipe.Ingredients {
 		err := ingredient.CheckForRequiredFields()
 		if err != nil {
-			return err
+			return error_handler.New("missing required field", http.StatusBadRequest, err)
 		}
 	}
 
 	return nil
 }
 
-func (recipe *RecipeSchema) Create() error {
+func (recipe *RecipeSchema) Create() *error_handler.APIError {
 	err := recipe.CheckForRequiredFields()
 	if err != nil {
 		return err
@@ -182,11 +180,11 @@ func (recipe *RecipeSchema) Create() error {
 
 	if err := tx.Create(&recipe).Error; err != nil {
 		tx.Rollback()
-		return err
+		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		return err
+		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 
 	return err

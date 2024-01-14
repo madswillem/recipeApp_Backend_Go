@@ -35,7 +35,7 @@ func RenderTutorial(c *gin.Context) {
 func RenderProductpage(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	
@@ -48,13 +48,13 @@ func RenderProductpage(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	err = res.GetRecipeByID(c, reqData)
+	getErr := res.GetRecipeByID(c, reqData)
 
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+	if getErr != nil {
+		if getErr.Errors[0] == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		}
 		return
 	}

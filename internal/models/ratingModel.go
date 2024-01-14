@@ -1,12 +1,10 @@
 package models
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 )
 
@@ -141,32 +139,4 @@ func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, err
 	fmt.Println(result.Overall)
 
 	return result, err
-}
-
-func (ingredient *IngredientsSchema) createIngredientDBEntry() error {
-	newIngredientDBEntry := IngredientDBSchema{
-		Name:       ingredient.Ingredient,
-		StandardUnit: ingredient.MeasurementUnit,
-		NutritionalValue: ingredient.NutritionalValue,
-	}
-	
-	err := initializers.DB.Create(&newIngredientDBEntry).Error
-	if err != nil {
-		return err
-	}
-
-	return err
-}
-
-func (ingredient *IngredientsSchema) CheckForRequiredFields() error {
-	if ingredient.Ingredient == "" {
-		return errors.New("missing ingredient")
-	}
-	if ingredient.Amount == "" {
-		return errors.New("missing amount")
-	}
-	if ingredient.MeasurementUnit == "" {
-		return errors.New("missing measurement unit")
-	}
-	return nil
 }
