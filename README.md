@@ -9,14 +9,14 @@ Frontend: \
 /get/account  -to get content of Account page \
 
 Routes: \
-/get          -to get every Recipe \
-/create       -to create a Recipe \
-/getbyid      -to get a Recipe by id \
-/select/:id   -to select a Recipe \
-/deselect/:id -to deselect a Recipe \
-/colormode    -to get/set the colormode(darkmode|lightmode) \
-/filter       -to filter for recipes and cookingtime
-/recomendet   -to get recomendet recipes \
+GET    /get          -to get every Recipe \
+POST   /create       -to create a Recipe \
+GET    /getbyid/:id  -to get a Recipe by id \
+DELETE /delete/:id   -to delete a Recipe by id \
+GET    /select/:id   -to select a Recipe \
+GET    /deselect/:id -to deselect a Recipe \
+GET    /colormode    -to get/set the colormode(darkmode|lightmode) \
+POST   /filter       -to filter for recipes and cookingtime
 
 # Next Update
 /recomendet   -better recomendation 

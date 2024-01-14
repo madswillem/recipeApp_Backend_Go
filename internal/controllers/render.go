@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"rezeptapp.ml/goApp/error_handler"
-	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
 func RenderHome(c *gin.Context) {
@@ -35,18 +35,26 @@ func RenderTutorial(c *gin.Context) {
 func RenderProductpage(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	
 	res := models.RecipeSchema{ID: uint(i)}
-	err = res.GetRecipeByID(c)
+	reqData := map[string]bool{
+		"ingredients":      true,
+		"ingredient_nutri": true,
+		"ingredient_rate":  true,
+		"rating":           true,
+		"nutritionalvalue": true,
+		"diet":             true,
+	}
+	getErr := res.GetRecipeByID(c, reqData)
 
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+	if getErr != nil {
+		if getErr.Errors[0] == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		}
 		return
 	}

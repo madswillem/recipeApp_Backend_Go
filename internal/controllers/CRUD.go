@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"rezeptapp.ml/goApp/error_handler"
-	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
 func GetAll(c *gin.Context) {
@@ -19,7 +19,7 @@ func GetAll(c *gin.Context) {
 	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
 
 	if result.Error != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", result.Error)
+		error_handler.HandleError(c, http.StatusBadRequest, "Database error", []error{result.Error})
 	}
 
 	c.JSON(http.StatusOK, recipes)
@@ -28,42 +28,16 @@ func GetAll(c *gin.Context) {
 func AddRecipe(c *gin.Context) {
 	var body models.RecipeSchema
 
-	err := c.ShouldBindJSON(&body)
+	binderr := c.ShouldBindJSON(&body)
+	if binderr != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", []error{binderr})
+		return
+	}
 
+	err := body.Create()
 	if err != nil {
-		print(err)
-		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", err)
-		return
-	}
-
-	err = body.CheckForRequiredFields()
-	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Missing required fields", err)
-		return
-	}
-
-	body.Rating.DefaultRatingStruct(body.Title)
-	for i := 0; i < len(body.Ingredients); i++ {
-		body.Ingredients[i].Rating.DefaultRatingStruct(body.Ingredients[i].Ingredient)
-	}
-
-	err = body.AddNutritionalValue()
-	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
-		return
-	}
-
-	tx := initializers.DB.Begin()
-
-	if err := tx.Create(&body).Error; err != nil {
-		tx.Rollback()
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
-		return
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", err)
-		return
+		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
+		return	
 	}
 
 	c.JSON(http.StatusCreated, body)
@@ -72,22 +46,18 @@ func AddRecipe(c *gin.Context) {
 func UpdateRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 
 	var body models.RecipeSchema
-	body.ID = uint(i)
-
 	c.ShouldBindJSON(&body)
+
+	body.ID = uint(i)
 	
-	err = body.Update(c)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
-		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
-		}
+	updateErr := body.Update(c)
+	if updateErr != nil {
+		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
 		return
 	}
 }
@@ -95,17 +65,13 @@ func UpdateRecipe(c *gin.Context) {
 func DeleteRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	err = response.Delete(c)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
-		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
-		}
+	deleteErr := response.Delete(c)
+	if deleteErr != nil {
+		error_handler.HandleError(c, deleteErr.Code, deleteErr.Message, deleteErr.Errors)
 		return
 	}
 	c.Status(http.StatusOK)
@@ -115,17 +81,25 @@ func GetById(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		errMessage := strings.Join([]string{"id", c.Param("id"), "is not a number"}, " ")
-		error_handler.HandleError(c, http.StatusBadRequest, errMessage, err)
+		error_handler.HandleError(c, http.StatusBadRequest, errMessage, []error{err})
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	err = response.GetRecipeByID(c)
+	reqData := map[string]bool{
+		"ingredients":      true,
+		"ingredient_nutri": true,
+		"ingredient_rate":  true,
+		"rating":           true,
+		"nutritionalvalue": true,
+		"diet":             true,
+	}
+	getErr := response.GetRecipeByID(c, reqData)
 
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
+	if getErr != nil {
+		if getErr.Errors[0] == gorm.ErrRecordNotFound {
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
 		}
 		return
 	}
@@ -144,7 +118,7 @@ func Filter(c *gin.Context) {
 	err := c.ShouldBindJSON(&body)
 
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", []error{err})
 		return
 	}
 
@@ -187,7 +161,7 @@ func Filter(c *gin.Context) {
 	err = query.Find(&recipes).Error
 
 	if err != nil {
-		error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
+		error_handler.HandleError(c, http.StatusInternalServerError, "Database error", []error{err})
 		return
 	}
 
@@ -197,17 +171,13 @@ func Filter(c *gin.Context) {
 func Select(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	err = response.UpdateSelected(1, c)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
-		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
-		}
+	selectedErr := response.UpdateSelected(1, c)
+	if selectedErr != nil {
+		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
 	}
 
@@ -217,17 +187,13 @@ func Select(c *gin.Context) {
 func Deselect(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", err)
+		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	response := models.RecipeSchema{ID: uint(i)}
-	err = response.UpdateSelected(-1, c)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, http.StatusNotFound, "Recipe not found", err)
-		} else {
-			error_handler.HandleError(c, http.StatusInternalServerError, "Database error", err)
-		}
+	selectedErr := response.UpdateSelected(-1, c)
+	if selectedErr != nil {
+		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
 	}
 
@@ -239,7 +205,7 @@ func Colormode(c *gin.Context) {
 	case "get":
 		cookie, err := c.Cookie("type")
 		if err != nil {
-			error_handler.HandleError(c, http.StatusBadRequest, "Cookie error", err)
+			error_handler.HandleError(c, http.StatusBadRequest, "Cookie error", []error{err})
 		}
 		c.JSON(http.StatusOK, gin.H{"type": cookie})
 	case "dark":
