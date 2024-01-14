@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"rezeptapp.ml/goApp/controllers"
-	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/middleware"
-	"rezeptapp.ml/goApp/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/controllers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/middleware"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
 func init() {

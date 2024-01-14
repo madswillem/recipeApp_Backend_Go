@@ -1,5 +1,5 @@
 // tests/controllers_test/CRUD_test.go
-package tests
+package test
 
 import (
 	"bytes"
@@ -14,13 +14,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/assert/v2"
-	"github.com/stretchr/testify/require"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"rezeptapp.ml/goApp/controllers"
-	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/controllers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
@@ -171,26 +169,37 @@ func TestAddRecipe(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 
 			completeRequestFilePath, err := filepath.Abs(tc.requestBody)
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatal(err)
+			}
 
 			c.Request = httptest.NewRequest(http.MethodPost, "/create", strings.NewReader(readFileAsString(completeRequestFilePath, t)))
 			c.Request.Header.Set("Content-Type", "application/json")
 
 			controllers.AddRecipe(c)
 
-			assert.Equal(t, tc.expectedStatus, w.Code)
+			if w.Code != tc.expectedStatus {
+				t.Errorf("Expected status code %d but got %d. \n Body: %s", tc.expectedStatus, w.Code, w.Body.String())
+			}
 
 			if tc.expectedBody != "" {
 				var response models.RecipeSchema
-				require.NoError(t, json.NewDecoder(w.Body).Decode(&response), "Failed to decode response body")
+				err = json.NewDecoder(w.Body).Decode(&response)
+				if err != nil {
+					t.Fatal(err)
+				}
 
 				completeExpectedFilePath, err := filepath.Abs(tc.expectedBody)
-				require.NoError(t, err)
+				if err != nil {
+					t.Fatal(err)
+				}
 
 				var expectedReturn models.RecipeSchema
 				expectedBody := readFileAsString(completeExpectedFilePath, t)
 				err = json.Unmarshal([]byte(expectedBody), &expectedReturn)
-				require.NoError(t, err)
+				if err != nil {
+					t.Fatal(err)
+				}
 
 				assertRecipesEqual(t, expectedReturn, response)
 			}

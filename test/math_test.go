@@ -1,9 +1,9 @@
-package tests
+package test
 
 import (
 	"testing"
 
-	"rezeptapp.ml/goApp/tools"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 )
 func TestCalculateAverage(t *testing.T) {
 	t.Run("average positive numbers", func(t *testing.T) {

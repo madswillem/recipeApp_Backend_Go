@@ -10,9 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/clause"
-	"rezeptapp.ml/goApp/error_handler"
-	"rezeptapp.ml/goApp/initializers"
-	"rezeptapp.ml/goApp/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
 func GetHome(c *gin.Context) {
@@ -31,7 +31,15 @@ func GetRecipe(c *gin.Context) {
 		return
 	}
 	res := models.RecipeSchema{ID: uint(i)}
-	res.GetRecipeByID(c)
+	reqData := map[string]bool{
+		"ingredients":      true,
+		"ingredient_nutri": true,
+		"ingredient_rate":  true,
+		"rating":           true,
+		"nutritionalvalue": true,
+		"diet":             true,
+	}
+	res.GetRecipeByID(c, reqData)
 
 	if res.ID == 0 {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{

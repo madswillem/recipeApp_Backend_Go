@@ -5,10 +5,10 @@ run_db:
 	sudo systemctl start postgresql
 
 run:
-	go run main.go
+	go run cmd/main.go
 
 test:
-	go test -v -cover ./tests/*_test.go
+	go test -v -cover ./test/*_test.go
 
 tidy:
 	go mod tidy
