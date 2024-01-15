@@ -25,8 +25,8 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
-	r.SetHTMLTemplate(tmpl)
+	//tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
+	//r.SetHTMLTemplate(tmpl)
 	r.NoRoute(func(c *gin.Context) {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"pageTitle": "404 Page not found",

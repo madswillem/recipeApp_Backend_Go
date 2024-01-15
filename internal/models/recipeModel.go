@@ -35,12 +35,22 @@ func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
 	}
 
 	err := initializers.DB.Delete(&recipe).Error
-	return error_handler.New("database error", http.StatusInternalServerError, err)
+	if err != nil {
+		return error_handler.New("database error", http.StatusInternalServerError, err)
+	}
+	return nil
 }
 
-func (recipe *RecipeSchema) Update(c *gin.Context) *error_handler.APIError {
-	err := initializers.DB.Updates(&recipe).Error
-	return error_handler.New("database error", http.StatusInternalServerError, err)
+func (recipe *RecipeSchema) Update() *error_handler.APIError {
+	err := initializers.DB.Updates(&recipe).First(&recipe).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
+		} else {
+			return error_handler.New("database error", http.StatusInternalServerError, err)
+		}
+	}
+	return nil
 }
 
 func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, *error_handler.APIError) {
@@ -56,7 +66,10 @@ func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) 
 		Found bool
 	}
 	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
-	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
+	if err != nil {
+		return false, error_handler.New("database error", http.StatusInternalServerError, err)
+	}
+	return result.Found, nil
 }
 
 func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]bool) *error_handler.APIError {
@@ -100,7 +113,7 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
             First(&nutritionalValue).Error
         if err != nil {
             if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				return error_handler.New("ingredient not found", http.StatusNotFound, err)
+				return error_handler.New("ingredient not found please add nutritional value and set edited to true", http.StatusBadRequest, err)
             } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
 				err := ingredient.createIngredientDBEntry()
 				if err != nil {
@@ -122,7 +135,10 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 
 func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) *error_handler.APIError {
 	recipe.Selected += change
-	recipe.Rating.Update(change, c)
+	apiErr := recipe.Rating.Update(change)
+	if apiErr != nil {
+		return apiErr
+	}
 
 	exists, apiErr := recipe.CheckIfExistsByID()
 	if apiErr != nil {
