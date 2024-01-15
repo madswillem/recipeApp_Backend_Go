@@ -51,12 +51,10 @@ func main() {
 
 	r.GET("/get/home", controllers.GetHome)
 	r.GET("/get/account", controllers.GetAccount)
-	r.GET("/get/tutorials", controllers.GetTutorials)
 	r.GET("/get/recipe/:id", controllers.GetRecipe)
 
 	r.GET("/style/:filename", controllers.GetStyles)
 	r.GET("/imgs/:filename", controllers.GetImgs)
-	r.GET("/videos/:filename", controllers.GetVideos)
 
 	r.GET("/reloadtemplates", func(c *gin.Context) {
 		tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
