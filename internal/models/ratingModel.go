@@ -1,10 +1,11 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 )
 
@@ -58,13 +59,13 @@ func (rating *RatingStruct) DefaultRatingStruct(title string){
 	rating.Subzerodegree = 1000.0
 }
 
-func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, error) {
+func (rating RatingStruct) Update(change int) (*error_handler.APIError) {
 
 	result := rating
 	data, err := tools.GetCurrentData()
 
 	if err != nil {
-		return result, err
+		return error_handler.New("fatal internal error", http.StatusInternalServerError, err)
 	}
 
 	percentage := 10.0
@@ -85,7 +86,7 @@ func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, err
 	case "Sun":
 		result.Sun += tools.PercentageCalculator(result.Sun*float64(change), percentage)
 	default:
-		c.AbortWithStatus(http.StatusInternalServerError)
+		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error")) 
 	}
 
 	switch data.Season {
@@ -98,7 +99,7 @@ func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, err
 	case "Aut":
 		result.Aut += tools.PercentageCalculator(result.Aut*float64(change), percentage)
 	default:
-		c.AbortWithStatus(http.StatusInternalServerError)
+		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error")) 
 	}
 
 	switch data.Temp {
@@ -138,5 +139,5 @@ func (rating RatingStruct) Update(change int, c *gin.Context) (RatingStruct, err
 	result.Overall = tools.CalculateAverage(arr)
 	fmt.Println(result.Overall)
 
-	return result, err
+	return nil
 }

@@ -55,7 +55,7 @@ func UpdateRecipe(c *gin.Context) {
 
 	body.ID = uint(i)
 	
-	updateErr := body.Update(c)
+	updateErr := body.Update()
 	if updateErr != nil {
 		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
 		return

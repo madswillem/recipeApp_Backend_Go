@@ -324,6 +324,7 @@ func TestSelect(t *testing.T) {
 		// Assert the response status code
 		if w.Code != http.StatusOK {
 			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+			fmt.Println(w.Body.String())
 		}
 	})
 	t.Run("select wrong recipe", func(t *testing.T) {
@@ -415,7 +416,7 @@ func TestDeleteRecipe(t *testing.T) {
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
 
-		c.Request, _ = http.NewRequest(http.MethodGet, "/delete", nil)
+		c.Request, _ = http.NewRequest(http.MethodDelete, "/delete", nil)
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 		// Call the Delete function
@@ -424,6 +425,7 @@ func TestDeleteRecipe(t *testing.T) {
 		// Assert the response status code
 		if w.Code != http.StatusOK {
 			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+			fmt.Println(w.Body.String())
 		}
 	})
 	t.Run("delete wrong recipe", func(t *testing.T) {
@@ -431,7 +433,7 @@ func TestDeleteRecipe(t *testing.T) {
 		w := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(w)
 
-		c.Request, _ = http.NewRequest(http.MethodGet, "/delete", nil)
+		c.Request, _ = http.NewRequest(http.MethodDelete, "/delete", nil)
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "200"}}
 
 		// Call the Delete function
@@ -440,6 +442,59 @@ func TestDeleteRecipe(t *testing.T) {
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {
 			t.Errorf("Expected status code %d but got %d", http.StatusNotFound, w.Code)
+		}
+	})
+}
+func TestUpdateRecipe(t *testing.T) {
+	initTestDB()
+	t.Run("update recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		// Create a new request with the updated recipe
+		updatedRecipe := make(map[string]interface{})
+		updatedRecipe["title"] = "Updated Recipe"
+		jsonBody, err := json.Marshal(updatedRecipe)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		c.Request, _ = http.NewRequest(http.MethodPatch, "/update", bytes.NewReader(jsonBody))
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "2"}}
+
+		// Call the Update function
+		controllers.UpdateRecipe(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status code %d but got %d", http.StatusOK, w.Code)
+			fmt.Println(w.Body.String())
+		}
+	})
+	t.Run("delete wrong recipe", func(t *testing.T) {
+		// Initialize the gin context
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		// Create a new request with the updated recipe
+		updatedRecipe := make(map[string]interface{})
+		updatedRecipe["title"] = "Updated Wrong Recipe"
+		jsonBody, err := json.Marshal(updatedRecipe)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		c.Request, _ = http.NewRequest(http.MethodPatch, "/update", bytes.NewReader(jsonBody))
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "5"}}
+
+		// Call the Update function
+		controllers.UpdateRecipe(c)
+
+		// Assert the response status code
+		if w.Code != http.StatusNotFound {
+			t.Errorf("Expected status code %d but got %d", http.StatusNotFound, w.Code)
+			fmt.Println(w.Body.String())
 		}
 	})
 }
