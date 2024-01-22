@@ -5,6 +5,7 @@ import (
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 )
+
 func TestCalculateAverage(t *testing.T) {
 	t.Run("average positive numbers", func(t *testing.T) {
 		avg := tools.CalculateAverage([]float64{1, 2, 3, 4, 5})

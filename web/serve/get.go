@@ -1,4 +1,4 @@
-package controllers
+package serve
 
 import (
 	"errors"
@@ -9,18 +9,20 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"gorm.io/gorm/clause"
 )
 
 func GetHome(c *gin.Context) {
 	var recipes []models.RecipeSchema
 	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Find(&recipes)
-	if result.Error != nil {panic(result.Error)}
+	if result.Error != nil {
+		panic(result.Error)
+	}
 
-	c.HTML(http.StatusOK, "home.html", gin.H{
+	c.HTML(http.StatusOK, "construction/content", gin.H{
 		"recipes": recipes,
 	})
 }
@@ -39,7 +41,7 @@ func GetRecipe(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	res.GetRecipeByID(c, reqData)
+	res.GetRecipeByID(reqData)
 
 	if res.ID == 0 {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
@@ -48,27 +50,35 @@ func GetRecipe(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "productpage.html", gin.H{
+	c.HTML(http.StatusOK, "construction/content", gin.H{
 		"recipe": res,
 	})
 }
 func GetAccount(c *gin.Context) {
-	c.HTML(http.StatusOK, "account.html", gin.H{})
+	c.HTML(http.StatusOK, "construction/content", gin.H{})
 }
 
-func GetImgs(c *gin.Context)  {
+func GetImgs(c *gin.Context) {
 	name := c.Param("filename")
-	fullName := filepath.Join(filepath.FromSlash(path.Clean("./imgs/"+name)))
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./web/imgs/" + name)))
 	if _, err := os.Stat(fullName); errors.Is(err, os.ErrNotExist) {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
-    c.File(fullName)
+	c.File(fullName)
 }
-func GetStyles(c *gin.Context)  {
+func GetStyles(c *gin.Context) {
 	name := c.Param("filename")
-	fullName := filepath.Join(filepath.FromSlash(path.Clean("./styles/"+name)))
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./web/styles/" + name)))
 	if _, err := os.Stat(fullName); errors.Is(err, os.ErrNotExist) {
 		c.AbortWithStatus(http.StatusNotFound)
 	}
-    c.File(fullName)
+	c.File(fullName)
+}
+func GetScripts(c *gin.Context) {
+	name := c.Param("filename")
+	fullName := filepath.Join(filepath.FromSlash(path.Clean("./web/scripts/" + name)))
+	if _, err := os.Stat(fullName); errors.Is(err, os.ErrNotExist) {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+	c.File(fullName)
 }

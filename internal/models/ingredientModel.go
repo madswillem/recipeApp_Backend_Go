@@ -9,23 +9,23 @@ import (
 )
 
 type IngredientsSchema struct {
-	ID        		 uint 			 	 `json:"id" gorm:"primarykey"`
-	RecipeSchemaID 	 uint				 `json:"-"`
+	ID             uint `json:"id" gorm:"primarykey"`
+	RecipeSchemaID uint `json:"-"`
 
-	Ingredient		 string				 `json:"ingredient"` 
-	Amount			 string				 `json:"amount"` 
-	MeasurementUnit	 string				 `json:"measurement_unit"`
-	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner"`
-	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner"`
+	Ingredient       string           `json:"ingredient"`
+	Amount           string           `json:"amount"`
+	MeasurementUnit  string           `json:"measurement_unit"`
+	NutritionalValue NutritionalValue `json:"nutritional_value" gorm:"polymorphic:Owner"`
+	Rating           RatingStruct     `json:"rating" gorm:"polymorphic:Owner"`
 }
 
 func (ingredient *IngredientsSchema) createIngredientDBEntry() *error_handler.APIError {
 	newIngredientDBEntry := IngredientDBSchema{
-		Name:       ingredient.Ingredient,
-		StandardUnit: ingredient.MeasurementUnit,
+		Name:             ingredient.Ingredient,
+		StandardUnit:     ingredient.MeasurementUnit,
 		NutritionalValue: ingredient.NutritionalValue,
 	}
-	
+
 	err := initializers.DB.Create(&newIngredientDBEntry).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
