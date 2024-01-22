@@ -1,34 +1,36 @@
-package controllers
+package serve
 
 import (
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func RenderHome(c *gin.Context) {
 	var recipes []models.RecipeSchema
 	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
-	if result.Error != nil {panic(result.Error)}
+	if result.Error != nil {
+		panic(result.Error)
+	}
 
-	c.HTML(http.StatusOK, "home/index", gin.H{
+	c.HTML(http.StatusOK, "construction/index", gin.H{
 		"pageTitle": "Appetaizr",
-		"recipes": recipes,
+		//		"recipes":   recipes,
 	})
 }
 func RenderAcount(c *gin.Context) {
-	c.HTML(http.StatusOK, "account/index", gin.H{
+	c.HTML(http.StatusOK, "construction/index", gin.H{
 		"pageTitle": "Appetaizr",
 	})
 }
 func RenderTutorial(c *gin.Context) {
-	c.HTML(http.StatusOK, "tutorials/index", gin.H{
+	c.HTML(http.StatusOK, "construction/index", gin.H{
 		"pageTitle": "Appetaizr",
 	})
 }
@@ -38,7 +40,7 @@ func RenderProductpage(c *gin.Context) {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
-	
+
 	res := models.RecipeSchema{ID: uint(i)}
 	reqData := map[string]bool{
 		"ingredients":      true,
@@ -48,7 +50,7 @@ func RenderProductpage(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	getErr := res.GetRecipeByID(c, reqData)
+	getErr := res.GetRecipeByID(reqData)
 
 	if getErr != nil {
 		if getErr.Errors[0] == gorm.ErrRecordNotFound {
@@ -59,8 +61,8 @@ func RenderProductpage(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "productpage/index", gin.H{
+	c.HTML(http.StatusOK, "construction/index", gin.H{
 		"pageTitle": "Appetaizr",
-		"recipe": res,
+		//		"recipe":    res,
 	})
 }

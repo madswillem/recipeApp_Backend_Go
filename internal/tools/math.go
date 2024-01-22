@@ -26,5 +26,3 @@ func CalculateAverage(numbers []float64) float64 {
 
 	return sum / float64(count)
 }
-
-

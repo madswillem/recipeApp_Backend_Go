@@ -9,6 +9,7 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/middleware"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"github.com/madswillem/recipeApp_Backend_Go/web/serve"
 )
 
 func init() {
@@ -25,10 +26,10 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	//tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
-	//r.SetHTMLTemplate(tmpl)
+	tmpl := template.Must(template.New("main").ParseGlob("web/templates/**/*"))
+	r.SetHTMLTemplate(tmpl)
 	r.NoRoute(func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "404.html", gin.H{
+		c.HTML(http.StatusNotFound, "404/index", gin.H{
 			"pageTitle": "404 Page not found",
 		})
 	})
@@ -44,20 +45,21 @@ func main() {
 	r.GET("/deselect/:id", controllers.Deselect)
 	r.GET("/colormode/:type", controllers.Colormode)
 
-	r.GET("/", controllers.RenderHome)
-	r.GET("/account", controllers.RenderAcount)
-	r.GET("/tutorials", controllers.RenderTutorial)
-	r.GET("/recipe/:id", controllers.RenderProductpage)
+	r.GET("/", serve.RenderHome)
+	r.GET("/account", serve.RenderAcount)
+	r.GET("/tutorials", serve.RenderTutorial)
+	r.GET("/recipe/:id", serve.RenderProductpage)
 
-	r.GET("/get/home", controllers.GetHome)
-	r.GET("/get/account", controllers.GetAccount)
-	r.GET("/get/recipe/:id", controllers.GetRecipe)
+	r.GET("/get/home", serve.GetHome)
+	r.GET("/get/account", serve.GetAccount)
+	r.GET("/get/recipe/:id", serve.GetRecipe)
 
-	r.GET("/style/:filename", controllers.GetStyles)
-	r.GET("/imgs/:filename", controllers.GetImgs)
+	r.GET("/style/:filename", serve.GetStyles)
+	r.GET("/imgs/:filename", serve.GetImgs)
+	r.GET("/scripts/:filename", serve.GetScripts)
 
 	r.GET("/reloadtemplates", func(c *gin.Context) {
-		tmpl := template.Must(template.New("main").ParseGlob("templates/**/*"))
+		tmpl := template.Must(template.New("main").ParseGlob("web/templates/**/*"))
 		r.SetHTMLTemplate(tmpl)
 
 		c.AbortWithStatus(http.StatusOK)

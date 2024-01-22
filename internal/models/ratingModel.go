@@ -10,10 +10,10 @@ import (
 )
 
 type RatingStruct struct {
-	ID		  	uint   `gorm:"primarykey"`
-	OwnerTitle	string `json:"owner_title"`
-	OwnerID   	string
-  	OwnerType 	string
+	ID         uint   `gorm:"primarykey"`
+	OwnerTitle string `json:"owner_title"`
+	OwnerID    string
+	OwnerType  string
 
 	Overall float64 `json:"overall"`
 
@@ -37,7 +37,7 @@ type RatingStruct struct {
 	Subzerodegree float64 `json:"subzerodegree"`
 }
 
-func (rating *RatingStruct) DefaultRatingStruct(title string){
+func (rating *RatingStruct) DefaultRatingStruct(title string) {
 	rating.OwnerTitle = title
 
 	rating.Overall = 1000.0
@@ -59,7 +59,7 @@ func (rating *RatingStruct) DefaultRatingStruct(title string){
 	rating.Subzerodegree = 1000.0
 }
 
-func (rating RatingStruct) Update(change int) (*error_handler.APIError) {
+func (rating RatingStruct) Update(change int) *error_handler.APIError {
 
 	result := rating
 	data, err := tools.GetCurrentData()
@@ -86,7 +86,7 @@ func (rating RatingStruct) Update(change int) (*error_handler.APIError) {
 	case "Sun":
 		result.Sun += tools.PercentageCalculator(result.Sun*float64(change), percentage)
 	default:
-		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error")) 
+		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error"))
 	}
 
 	switch data.Season {
@@ -99,7 +99,7 @@ func (rating RatingStruct) Update(change int) (*error_handler.APIError) {
 	case "Aut":
 		result.Aut += tools.PercentageCalculator(result.Aut*float64(change), percentage)
 	default:
-		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error")) 
+		return error_handler.New("fatal internal error", http.StatusInternalServerError, errors.New("fatal internal error"))
 	}
 
 	switch data.Temp {
@@ -134,7 +134,7 @@ func (rating RatingStruct) Update(change int) (*error_handler.APIError) {
 		result.Tendegree,
 		result.Zerodegree,
 		result.Subzerodegree,
-	};
+	}
 
 	result.Overall = tools.CalculateAverage(arr)
 	fmt.Println(result.Overall)

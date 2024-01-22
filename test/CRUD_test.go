@@ -14,11 +14,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/controllers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
@@ -257,7 +257,6 @@ func TestGetByID(t *testing.T) {
 		var err error
 		c.Request, err = http.NewRequest(http.MethodGet, "/getbyid", nil)
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
-		
 
 		if err != nil {
 			t.Fatal(err)

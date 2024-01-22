@@ -5,24 +5,24 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"gorm.io/gorm"
 )
 
 type RecipeSchema struct {
-	ID        		 uint 			 	 `json:"_id" gorm:"primarykey"`
-	Title			 string				 `json:"title"` 
-	Ingredients		 []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Preparation		 string				 `json:"preparation"`
-	CookingTime		 int				 `json:"cookingtime"`
-	Image			 string				 `json:"image"`
-	NutriScore		 string				 `json:"nutriscore"`
+	ID               uint                `json:"_id" gorm:"primarykey"`
+	Title            string              `json:"title"`
+	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Preparation      string              `json:"preparation"`
+	CookingTime      int                 `json:"cookingtime"`
+	Image            string              `json:"image"`
+	NutriScore       string              `json:"nutriscore"`
 	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Diet			 DietSchema			 `json:"diet" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Selected		 int				 `json:"selected"`
-	Rating			 RatingStruct		 `json:"rating" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`	
-	Version     	 int				 `json:"__v"`
+	Diet             DietSchema          `json:"diet" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Selected         int                 `json:"selected"`
+	Rating           RatingStruct        `json:"rating" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Version          int                 `json:"__v"`
 }
 
 func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
@@ -72,7 +72,7 @@ func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) 
 	return result.Found, nil
 }
 
-func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]bool) *error_handler.APIError {
+func (recipe *RecipeSchema) GetRecipeByID(reqData map[string]bool) *error_handler.APIError {
 	req := initializers.DB
 	if reqData["ingredients"] || reqData["everything"] {
 		req = req.Preload("Ingredients")
@@ -107,29 +107,29 @@ func (recipe *RecipeSchema) GetRecipeByID(c *gin.Context, reqData map[string]boo
 
 func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 	for _, ingredient := range recipe.Ingredients {
-        var nutritionalValue NutritionalValue		
-        err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
-            Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
-            First(&nutritionalValue).Error
-        if err != nil {
-            if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
+		var nutritionalValue NutritionalValue
+		err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
+			Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
+			First(&nutritionalValue).Error
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
 				return error_handler.New("ingredient not found please add nutritional value and set edited to true", http.StatusBadRequest, err)
-            } else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
+			} else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
 				err := ingredient.createIngredientDBEntry()
 				if err != nil {
 					return err
 				}
-            } else {
+			} else {
 				return error_handler.New("database error", http.StatusInternalServerError, err)
-            }
-        } else if err == nil {
-            if ingredient.NutritionalValue.Edited {
+			}
+		} else if err == nil {
+			if ingredient.NutritionalValue.Edited {
 				return error_handler.New("ingredient already exists", http.StatusBadRequest, err)
-            } else if !ingredient.NutritionalValue.Edited {
-                ingredient.NutritionalValue = nutritionalValue
-            }
-        }
-    }
+			} else if !ingredient.NutritionalValue.Edited {
+				ingredient.NutritionalValue = nutritionalValue
+			}
+		}
+	}
 	return nil
 }
 

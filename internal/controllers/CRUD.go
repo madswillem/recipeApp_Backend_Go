@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func GetAll(c *gin.Context) {
@@ -37,7 +37,7 @@ func AddRecipe(c *gin.Context) {
 	err := body.Create()
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
-		return	
+		return
 	}
 
 	c.JSON(http.StatusCreated, body)
@@ -54,7 +54,7 @@ func UpdateRecipe(c *gin.Context) {
 	c.ShouldBindJSON(&body)
 
 	body.ID = uint(i)
-	
+
 	updateErr := body.Update()
 	if updateErr != nil {
 		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
@@ -93,7 +93,7 @@ func GetById(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	getErr := response.GetRecipeByID(c, reqData)
+	getErr := response.GetRecipeByID(reqData)
 
 	if getErr != nil {
 		if getErr.Errors[0] == gorm.ErrRecordNotFound {
@@ -133,30 +133,30 @@ func Filter(c *gin.Context) {
 		Preload("Ingredients.Rating").
 		Preload("Ingredients.NutritionalValue")
 
-		switch {
-		case body.Diet.Vegetarien:
-				query = query.Where("diet_schemas.vegetarien = ?", true)
-		case body.Diet.Vegan:
-			query = query.Where("diet_schemas.vegan = ?", true)
-		case body.Diet.LowCal:
-			query = query.Where("diet_schemas.lowcal = ?", true)
-		case body.Diet.LowCarb:
-			query = query.Where("diet_schemas.lowcarb = ?", true)
-		case body.Diet.Keto:
-			query = query.Where("diet_schemas.keto = ?", true)
-		case body.Diet.Paleo:
-			query = query.Where("diet_schemas.paleo = ?", true)
-		case body.Diet.LowFat:
-			query = query.Where("diet_schemas.lowfat = ?", true)
-		case body.Diet.FoodCombining:
-			query = query.Where("diet_schemas.food_combining = ?", true)
-		case body.Diet.WholeFood:
-			query = query.Where("diet_schemas.whole_food = ?", true)
-		case body.CookingTime > 0:
-			query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
-		case body.NutriScore != "":
-			query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
-		}
+	switch {
+	case body.Diet.Vegetarien:
+		query = query.Where("diet_schemas.vegetarien = ?", true)
+	case body.Diet.Vegan:
+		query = query.Where("diet_schemas.vegan = ?", true)
+	case body.Diet.LowCal:
+		query = query.Where("diet_schemas.lowcal = ?", true)
+	case body.Diet.LowCarb:
+		query = query.Where("diet_schemas.lowcarb = ?", true)
+	case body.Diet.Keto:
+		query = query.Where("diet_schemas.keto = ?", true)
+	case body.Diet.Paleo:
+		query = query.Where("diet_schemas.paleo = ?", true)
+	case body.Diet.LowFat:
+		query = query.Where("diet_schemas.lowfat = ?", true)
+	case body.Diet.FoodCombining:
+		query = query.Where("diet_schemas.food_combining = ?", true)
+	case body.Diet.WholeFood:
+		query = query.Where("diet_schemas.whole_food = ?", true)
+	case body.CookingTime > 0:
+		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
+	case body.NutriScore != "":
+		query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
+	}
 
 	err = query.Find(&recipes).Error
 
