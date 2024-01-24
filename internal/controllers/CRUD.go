@@ -107,14 +107,8 @@ func GetById(c *gin.Context) {
 }
 
 func Filter(c *gin.Context) {
-	type Recipe struct {
-		NutriScore  string            `json:"nutriscore"`
-		CookingTime int               `json:"cookingtime"`
-		Ingredients []string          `json:"ingredients"`
-		Diet        models.DietSchema `json:"diet"`
-	}
 
-	var body Recipe
+	var body models.Filter
 	err := c.ShouldBindJSON(&body)
 
 	if err != nil {
@@ -125,13 +119,16 @@ func Filter(c *gin.Context) {
 	var recipes []models.RecipeSchema
 
 	query := initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
-		Where("ingredients_schemas.ingredient IN ?", body.Ingredients).
+		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
 		Group("recipe_schemas.id").
-		Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(body.Ingredients)).
-		Joins("JOIN diet_schemas ON diet_schemas.recipe_id = recipe_schemas.id").
 		Preload(clause.Associations).
 		Preload("Ingredients.Rating").
 		Preload("Ingredients.NutritionalValue")
+
+	if body.Ingredients != nil {
+		query = query.Where("ingredients_schemas.ingredient IN ?", body.Ingredients).
+			Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(body.Ingredients))
+	}
 
 	switch {
 	case body.Diet.Vegetarien:
@@ -156,6 +153,11 @@ func Filter(c *gin.Context) {
 		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
 	case body.NutriScore != "":
 		query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
+	}
+
+	if body.SearchText != "" {
+		query.Joins("JOIN rating_structs ON recipe_schemas.id = rating_structs.owner_id")
+		query, _ = body.AddFullTextSearchToQuery(query)
 	}
 
 	err = query.Find(&recipes).Error
