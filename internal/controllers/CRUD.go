@@ -15,13 +15,11 @@ import (
 
 func GetAll(c *gin.Context) {
 	var recipes []models.RecipeSchema
-
 	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
 
 	if result.Error != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "Database error", []error{result.Error})
 	}
-
 	c.JSON(http.StatusOK, recipes)
 }
 
@@ -116,54 +114,9 @@ func Filter(c *gin.Context) {
 		return
 	}
 
-	var recipes []models.RecipeSchema
-
-	query := initializers.DB.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
-		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
-		Group("recipe_schemas.id").
-		Preload(clause.Associations).
-		Preload("Ingredients.Rating").
-		Preload("Ingredients.NutritionalValue")
-
-	if body.Ingredients != nil {
-		query = query.Where("ingredients_schemas.ingredient IN ?", body.Ingredients).
-			Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(body.Ingredients))
-	}
-
-	switch {
-	case body.Diet.Vegetarien:
-		query = query.Where("diet_schemas.vegetarien = ?", true)
-	case body.Diet.Vegan:
-		query = query.Where("diet_schemas.vegan = ?", true)
-	case body.Diet.LowCal:
-		query = query.Where("diet_schemas.lowcal = ?", true)
-	case body.Diet.LowCarb:
-		query = query.Where("diet_schemas.lowcarb = ?", true)
-	case body.Diet.Keto:
-		query = query.Where("diet_schemas.keto = ?", true)
-	case body.Diet.Paleo:
-		query = query.Where("diet_schemas.paleo = ?", true)
-	case body.Diet.LowFat:
-		query = query.Where("diet_schemas.lowfat = ?", true)
-	case body.Diet.FoodCombining:
-		query = query.Where("diet_schemas.food_combining = ?", true)
-	case body.Diet.WholeFood:
-		query = query.Where("diet_schemas.whole_food = ?", true)
-	case body.CookingTime > 0:
-		query = query.Where("recipe_schemas.cooking_time <= ?", body.CookingTime)
-	case body.NutriScore != "":
-		query = query.Where("recipe_schemas.nutri_score = ?", body.NutriScore)
-	}
-
-	if body.SearchText != "" {
-		query.Joins("JOIN rating_structs ON recipe_schemas.id = rating_structs.owner_id")
-		query, _ = body.AddFullTextSearchToQuery(query)
-	}
-
-	err = query.Find(&recipes).Error
-
-	if err != nil {
-		error_handler.HandleError(c, http.StatusInternalServerError, "Database error", []error{err})
+	recipes, apiErr := body.Filter()
+	if apiErr != nil {
+		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return
 	}
 

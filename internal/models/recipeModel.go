@@ -2,11 +2,13 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +17,7 @@ type RecipeSchema struct {
 	Title            string              `json:"title"`
 	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Preparation      string              `json:"preparation"`
+	Cuisine          string              `json:"cusine"`
 	CookingTime      int                 `json:"cookingtime"`
 	Image            string              `json:"image"`
 	NutriScore       string              `json:"nutriscore"`
@@ -205,3 +208,97 @@ func (recipe *RecipeSchema) Create() *error_handler.APIError {
 
 	return err
 }
+
+func (recipe *RecipeSchema) AddToGroup() *error_handler.APIError {	
+	err, groups := GetAllRecipeGroups()
+	if err != nil {
+		return err
+	}
+	if len(groups) < 1 {
+		GroupNew(recipe)
+		return nil
+	}
+	sortedGroups := make([]SimiliarityGroupRecipe, len(groups))
+
+	for num, group := range groups {
+		sortedGroups[num].Group = group
+		sortedGroups[num].Similarity, err = recipe.GetSimilarityWithGroup(group)
+	}
+
+	sortedGroups = SortSimilarity(sortedGroups)
+	fmt.Println(sortedGroups)
+
+	return nil
+}
+
+func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {
+	//Ings
+	sameIngs := make([]bool, len(recipe.Ingredients))
+	sameAvrgIngs := make([]bool, len(group.AvrgIngredients))
+
+	for i, ingredient := range recipe.Ingredients {
+		for y, avrgIngredient := range group.AvrgIngredients {
+			if ingredient.Ingredient == avrgIngredient.Name {
+				sameIngs[i] = true
+				sameAvrgIngs[y] = true
+				break
+			}
+		}
+	}
+
+	var allIngs []float64
+	for _, ing := range sameIngs {
+		if !ing {
+			allIngs = append(allIngs, 0)
+		}
+	}
+	for i, avrging := range sameAvrgIngs {
+		if avrging {
+			allIngs = append(allIngs, group.AvrgIngredients[i].Percentige/float64(len(group.Recipes)))
+		}
+		if !avrging {
+			allIngs = append(allIngs, 1-group.AvrgIngredients[i].Percentige/float64(len(group.Recipes)))
+		}
+	}
+	simIngs := tools.CalculateAverage(allIngs)
+
+	// Cuisine
+	arrCuisine := make([]float64, len(group.AvrgCuisine))
+	for i, cuisine := range group.AvrgCuisine {
+		if cuisine.Name == recipe.Cuisine {
+			arrCuisine[i] = cuisine.Percentige / float64(len(group.Recipes))
+		}
+		if cuisine.Name != recipe.Cuisine {
+			arrCuisine[i] = 1 - cuisine.Percentige/float64(len(group.Recipes))
+		}
+	}
+	simCuisine := tools.CalculateAverage(arrCuisine)
+	// Diet
+	sumDiet := 1.0
+	switch {
+	case !recipe.Diet.Vegetarien:
+		sumDiet += group.AvrgVegetarien / float64(len(group.Recipes))
+	case !recipe.Diet.Vegan:
+		sumDiet += group.AvrgVegan / float64(len(group.Recipes))
+	case !recipe.Diet.LowCal:
+		sumDiet += group.AvrgLowCal / float64(len(group.Recipes))
+	case !recipe.Diet.LowCarb:
+		sumDiet += group.AvrgLowCarb / float64(len(group.Recipes))
+	case !recipe.Diet.Keto:
+		sumDiet += group.AvrgKeto / float64(len(group.Recipes))
+	case !recipe.Diet.Paleo:
+		sumDiet += group.AvrgPaleo / float64(len(group.Recipes))
+	case !recipe.Diet.LowFat:
+		sumDiet += group.AvrgLowFat / float64(len(group.Recipes))
+	case !recipe.Diet.FoodCombining:
+		sumDiet += group.AvrgFoodCombining / float64(len(group.Recipes))
+	case !recipe.Diet.WholeFood:
+		sumDiet += group.AvrgWholeFood / float64(len(group.Recipes))
+	}
+	sim := sumDiet
+	sim += simIngs * 5.0
+	sim += simCuisine * 4
+	sim /= 10
+	return sim, nil
+}
+
