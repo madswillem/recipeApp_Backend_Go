@@ -129,8 +129,11 @@ func Select(c *gin.Context) {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
+	middleware_user, _ := c.MustGet("user").(models.UserModel)
+	
 	response := models.RecipeSchema{ID: uint(i)}
-	selectedErr := response.UpdateSelected(1, c)
+	
+	selectedErr := response.UpdateSelected(1, &middleware_user)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
@@ -145,8 +148,9 @@ func Deselect(c *gin.Context) {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
+	middleware_user, _ := c.MustGet("user").(models.UserModel)
 	response := models.RecipeSchema{ID: uint(i)}
-	selectedErr := response.UpdateSelected(-1, c)
+	selectedErr := response.UpdateSelected(-1, &middleware_user)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return

@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -136,7 +135,7 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 	return nil
 }
 
-func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) *error_handler.APIError {
+func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_handler.APIError {
 	recipe.Selected += change
 	apiErr := recipe.Rating.Update(change)
 	if apiErr != nil {
@@ -155,6 +154,11 @@ func (recipe *RecipeSchema) UpdateSelected(change int, c *gin.Context) *error_ha
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
+	
+	if user.ID == 0 {
+		return nil
+	}
+	user.AddRecipeToGroup(recipe)
 
 	return nil
 }
@@ -208,29 +212,6 @@ func (recipe *RecipeSchema) Create() *error_handler.APIError {
 
 	return err
 }
-
-func (recipe *RecipeSchema) AddToGroup() *error_handler.APIError {	
-	err, groups := GetAllRecipeGroups()
-	if err != nil {
-		return err
-	}
-	if len(groups) < 1 {
-		GroupNew(recipe)
-		return nil
-	}
-	sortedGroups := make([]SimiliarityGroupRecipe, len(groups))
-
-	for num, group := range groups {
-		sortedGroups[num].Group = group
-		sortedGroups[num].Similarity, err = recipe.GetSimilarityWithGroup(group)
-	}
-
-	sortedGroups = SortSimilarity(sortedGroups)
-	fmt.Println(sortedGroups)
-
-	return nil
-}
-
 func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {
 	//Ings
 	sameIngs := make([]bool, len(recipe.Ingredients))

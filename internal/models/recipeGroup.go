@@ -92,7 +92,7 @@ func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema) {
 	group.Recipes = append(group.Recipes, recipe.ID)
 }
 
-func GroupNew(recipe *RecipeSchema) {
+func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 	new := RecipeGroupSchema{}
 	new.Recipes = append(new.Recipes, recipe.ID)
 	for _, ing := range recipe.Ingredients {
@@ -110,6 +110,8 @@ func GroupNew(recipe *RecipeSchema) {
 		case recipe.Diet.FoodCombining: new.AvrgFoodCombining = 1
 		case recipe.Diet.WholeFood: new.AvrgWholeFood = 1
 	}
+
+	return new
 }
 type SimiliarityGroupRecipe struct {
 	Group RecipeGroupSchema

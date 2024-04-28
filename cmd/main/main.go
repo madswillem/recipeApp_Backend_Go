@@ -43,8 +43,8 @@ func main() {
 	r.PATCH("/update/:id", controllers.UpdateRecipe)
 	r.DELETE("/delete/:id", controllers.DeleteRecipe)
 	r.POST("/filter", controllers.Filter)
-	r.GET("/select/:id", controllers.Select)
-	r.GET("/deselect/:id", controllers.Deselect)
+	r.GET("/select/:id", middleware.User, controllers.Select)
+	r.GET("/deselect/:id", middleware.User, controllers.Deselect)
 	r.GET("/colormode/:type", controllers.Colormode)
 
 	r.GET("/", serve.RenderHome)
