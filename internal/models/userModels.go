@@ -90,6 +90,8 @@ func (user *UserModel) GetAllRecipeGroups() ([]RecipeGroupSchema, *error_handler
 	return recipeGroups, nil
 }
 func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.APIError {	
+	fmt.Println("Recipe: ")
+	fmt.Println(recipe)
 	groups, err := user.GetAllRecipeGroups()
 	if err != nil {
 		return err

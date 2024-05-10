@@ -78,7 +78,7 @@ func main() {
 	})
 	r.GET("/get_user", func(c *gin.Context) {
 		var users []models.UserModel
-		err := initializers.DB.Model(&models.UserModel{}).Preload(clause.Associations).Find(&users).Error
+		err := initializers.DB.Model(&models.UserModel{}).Preload(clause.Associations).Preload("RecipeGroups.Recipes").Find(&users).Error
 		if err != nil {
 			error_handler.HandleError(c, http.StatusBadRequest, "Database error", []error{err})
 		}

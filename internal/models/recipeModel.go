@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ type RecipeSchema struct {
 	Selected         int                 `json:"selected"`
 	Rating           RatingStruct        `json:"rating" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Version          int                 `json:"__v"`
+	RecipeGroup	 []*RecipeGroupSchema`gorm:"many2many:recipe_recipegroups"` 
 }
 
 func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
@@ -136,18 +138,22 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 }
 
 func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_handler.APIError {
-	recipe.Selected += change
-	apiErr := recipe.Rating.Update(change)
+	apiErr := recipe.GetRecipeByID(nil)
 	if apiErr != nil {
 		return apiErr
 	}
-
+	recipe.Selected += change
 	exists, apiErr := recipe.CheckIfExistsByID()
 	if apiErr != nil {
 		return apiErr
 	}
 	if !exists {
 		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
+	}
+
+	apiErr = recipe.Rating.Update(change)
+	if apiErr != nil {
+		return apiErr
 	}
 
 	err := initializers.DB.Save(recipe).Error
@@ -158,6 +164,7 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_h
 	if user.ID == 0 {
 		return nil
 	}
+	fmt.Println(recipe)
 	user.AddRecipeToGroup(recipe)
 
 	return nil

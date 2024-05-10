@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
@@ -10,7 +11,7 @@ import (
 type RecipeGroupSchema struct {
 	ID                uint   `gorm:"primarykey"`
 	UserID		  uint
-	Recipes           []uint `gorm:"type:int[]"` 
+	Recipes           []*RecipeSchema  `gorm:"many2many:recipe_recipegroups"` 
 	AvrgIngredients   []Avrg `gorm:"foreignKey:GroupID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	AvrgCuisine       []Avrg `gorm:"foreignKey:GroupID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	AvrgVegetarien    float64
@@ -89,12 +90,13 @@ func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema) {
 	case recipe.Diet.WholeFood:
 		group.AvrgWholeFood += 1
 	}
-	group.Recipes = append(group.Recipes, recipe.ID)
+	group.Recipes = append(group.Recipes, recipe)
+	group.Update()
 }
 
 func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 	new := RecipeGroupSchema{}
-	new.Recipes = append(new.Recipes, recipe.ID)
+	new.Recipes = append(new.Recipes, recipe)
 	for _, ing := range recipe.Ingredients {
 		new.AvrgIngredients = append(new.AvrgIngredients, Avrg{Name: ing.Ingredient, Percentige: 1})
 	}
@@ -110,6 +112,8 @@ func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 		case recipe.Diet.FoodCombining: new.AvrgFoodCombining = 1
 		case recipe.Diet.WholeFood: new.AvrgWholeFood = 1
 	}
+	fmt.Println("New Group: ")
+	fmt.Println(recipe)
 
 	return new
 }

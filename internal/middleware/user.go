@@ -12,8 +12,7 @@ func User(c *gin.Context) {
 	cookie, err := c.Cookie("user")
 	if err != nil || cookie == "" {
 		user.Create("unkwon")
-		println("WHY")
-		c.SetCookie("user", user.Cookie, 31536000, "/", "localhost:8080", false, true)
+		c.SetCookie("user", user.Cookie, 31536000, "/", "localhost", false, true)
 	} else {
 		println(cookie)
 		user.Cookie = cookie
