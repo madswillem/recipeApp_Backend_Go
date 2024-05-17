@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
@@ -112,8 +111,6 @@ func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 		case recipe.Diet.FoodCombining: new.AvrgFoodCombining = 1
 		case recipe.Diet.WholeFood: new.AvrgWholeFood = 1
 	}
-	fmt.Println("New Group: ")
-	fmt.Println(recipe)
 
 	return new
 }

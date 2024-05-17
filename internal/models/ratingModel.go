@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
@@ -137,7 +136,6 @@ func (rating RatingStruct) Update(change int) *error_handler.APIError {
 	}
 
 	result.Overall = tools.CalculateAverage(arr)
-	fmt.Println(result.Overall)
 
 	return nil
 }

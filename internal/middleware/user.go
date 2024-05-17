@@ -14,7 +14,6 @@ func User(c *gin.Context) {
 		user.Create("unkwon")
 		c.SetCookie("user", user.Cookie, 31536000, "/", "localhost", false, true)
 	} else {
-		println(cookie)
 		user.Cookie = cookie
 		err := user.GetByCookie()
 		if err != nil {

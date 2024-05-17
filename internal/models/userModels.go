@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -81,17 +80,14 @@ func (user *UserModel) Update() *error_handler.APIError{
 
 }
 func (user *UserModel) GetAllRecipeGroups() ([]RecipeGroupSchema, *error_handler.APIError) {
-	var temp_user UserModel
-	if err := initializers.DB.Preload("RecipeGroups").First(&temp_user, user.ID).Error; err != nil {
+	var group []RecipeGroupSchema
+	if err := initializers.DB.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
 	    return []RecipeGroupSchema{}, error_handler.New("Database error", http.StatusInternalServerError, err)
 	}
 
-	recipeGroups := user.RecipeGroups
-	return recipeGroups, nil
+	return group, nil
 }
 func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.APIError {	
-	fmt.Println("Recipe: ")
-	fmt.Println(recipe)
 	groups, err := user.GetAllRecipeGroups()
 	if err != nil {
 		return err
@@ -105,10 +101,19 @@ func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.API
 	for num, group := range groups {
 		sortedGroups[num].Group = group
 		sortedGroups[num].Similarity, err = recipe.GetSimilarityWithGroup(group)
+		if err != nil {
+			return err
+		}
 	}
 
 	sortedGroups = SortSimilarity(sortedGroups)
-	fmt.Println(sortedGroups)
 
-	return nil
+	if sortedGroups[0].Similarity <= 90.0 {
+		sortedGroups[0].Group.AddRecipeToGroup(recipe)
+		user.RecipeGroups = append(user.RecipeGroups, GroupNew(recipe))
+		return user.Update()
+	}
+
+	sortedGroups[0].Group.AddRecipeToGroup(recipe)
+	return user.Update()
 }

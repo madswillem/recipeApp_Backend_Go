@@ -9,7 +9,7 @@ import (
 func TestGetSimialrity(t *testing.T) {
 	testGroup := models.RecipeGroupSchema{
 		ID:      1,
-		Recipes: []uint{8, 5, 0, 4, 6, 3, 7, 1, 34, 45, 76, 96, 100, 224},
+		Recipes: []*models.RecipeSchema{{ID: 0}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10}, {ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}},
 		AvrgIngredients: []models.Avrg{
 			{Name: "flower", Percentige: 14},
 			{Name: "water", Percentige: 14},

@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"fmt"
+	"math"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -138,7 +138,7 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 }
 
 func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_handler.APIError {
-	apiErr := recipe.GetRecipeByID(nil)
+	apiErr := recipe.GetRecipeByID(map[string]bool{"everything": true})
 	if apiErr != nil {
 		return apiErr
 	}
@@ -164,10 +164,9 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_h
 	if user.ID == 0 {
 		return nil
 	}
-	fmt.Println(recipe)
-	user.AddRecipeToGroup(recipe)
+	apiErr = user.AddRecipeToGroup(recipe)
 
-	return nil
+	return apiErr
 }
 
 func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
@@ -262,7 +261,7 @@ func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (flo
 	}
 	simCuisine := tools.CalculateAverage(arrCuisine)
 	// Diet
-	sumDiet := 1.0
+	sumDiet := 0.0
 	switch {
 	case !recipe.Diet.Vegetarien:
 		sumDiet += group.AvrgVegetarien / float64(len(group.Recipes))
@@ -286,7 +285,12 @@ func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (flo
 	sim := sumDiet
 	sim += simIngs * 5.0
 	sim += simCuisine * 4
-	sim /= 10
+	sim /= 10.0
+
+	if math.IsNaN(sim) {
+		return 0.0, error_handler.New("Similarity is not a number", http.StatusInternalServerError, nil)
+	}
+
 	return sim, nil
 }
 
