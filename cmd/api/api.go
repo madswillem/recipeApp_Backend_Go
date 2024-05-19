@@ -44,5 +44,6 @@ func main() {
 	r.GET("/deselect/:id", controllers.Deselect)
 	r.GET("/colormode/:type", controllers.Colormode)
 
+	r.PATCH("/account/update", middleware.User, controllers.UpadateUser)
 	r.Run()
 }

@@ -16,8 +16,13 @@ type UserModel struct {
 	gorm.Model
 	LastLogin	time.Time
 	RecipeGroups	[]RecipeGroupSchema `gorm:"foreignKey:UserID;"`
+	Settings 	UserSettings `gorm:"embedded;embeddedPrefix:setting_"`
 	Cookie		string
 	IP		string
+}
+type UserSettings struct {
+	Allergies	[]*IngredientDBSchema `gorm:"many2many:user_allergies"`
+	Diet		DietSchema `gorm:"polymorphic:Owner"`
 }
 
 func (user *UserModel) GetByCookie() *error_handler.APIError{

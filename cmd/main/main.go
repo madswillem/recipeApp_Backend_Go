@@ -47,6 +47,8 @@ func main() {
 	r.GET("/deselect/:id", middleware.User, controllers.Deselect)
 	r.GET("/colormode/:type", controllers.Colormode)
 
+	r.PATCH("/account/update", middleware.User, controllers.UpadateUser)
+
 	r.GET("/", serve.RenderHome)
 	r.GET("/account", serve.RenderAcount)
 	r.GET("/tutorials", serve.RenderTutorial)
