@@ -122,3 +122,39 @@ func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.API
 	sortedGroups[0].Group.AddRecipeToGroup(recipe)
 	return user.Update()
 }
+// Using query to extend an existing query like a search to show recipes similar to your intrests
+func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError, []RecipeSchema) {
+	var recipes []RecipeSchema
+	query =	query.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
+		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
+		Group("recipe_schemas.id").
+		Preload(clause.Associations).
+		Preload("Ingredients.Rating").
+		Preload("Ingredients.NutritionalValue")
+
+	switch {
+		case user.Settings.Diet.Vegetarien:
+			query = query.Where("diet_schemas.vegetarien = ?", true)
+		case user.Settings.Diet.Vegan:
+			query = query.Where("diet_schemas.vegan = ?", true)
+		case user.Settings.Diet.LowCal:
+			query = query.Where("diet_schemas.lowcal = ?", true)
+		case user.Settings.Diet.LowCarb:
+			query = query.Where("diet_schemas.lowcarb = ?", true)
+		case user.Settings.Diet.Keto:
+			query = query.Where("diet_schemas.keto = ?", true)
+		case user.Settings.Diet.Paleo:
+			query = query.Where("diet_schemas.paleo = ?", true)
+		case user.Settings.Diet.LowFat:
+			query = query.Where("diet_schemas.lowfat = ?", true)
+		case user.Settings.Diet.FoodCombining:
+			query = query.Where("diet_schemas.food_combining = ?", true)
+		case user.Settings.Diet.WholeFood:
+			query = query.Where("diet_schemas.whole_food = ?", true)
+	}
+	err := query.Find(&recipes).Error
+	if err != nil {
+		return error_handler.New("Database error", http.StatusInternalServerError, err), nil
+	}
+	return nil, recipes
+}
