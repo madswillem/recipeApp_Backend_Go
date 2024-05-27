@@ -125,6 +125,7 @@ func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.API
 // Using query to extend an existing query like a search to show recipes similar to your intrests
 func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError, []RecipeSchema) {
 	var recipes []RecipeSchema
+	//Get recipes 
 	query =	query.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
 		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
 		Group("recipe_schemas.id").
@@ -156,5 +157,30 @@ func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError
 	if err != nil {
 		return error_handler.New("Database error", http.StatusInternalServerError, err), nil
 	}
+
+	groups, apiErr := user.GetAllRecipeGroups()
+	if apiErr != nil {
+		return apiErr, nil
+	}
+
+	var similarity []SimiliarityGroupRecipe
+	for _, recipe := range recipes {
+		for _, group := range groups {
+			sim, apiErr := recipe.GetSimilarityWithGroup(group)
+			if err != nil {
+				return apiErr, nil
+			}
+			similarity = append(similarity, SimiliarityGroupRecipe{Recipe: recipe, Group: group, Similarity: sim})
+		}	
+	}
+	
+	for i, sim := range similarity {
+		if sim.Similarity < 80.0 {
+			similarity[i] = similarity[len(similarity)-1]
+			similarity = similarity[:len(similarity)-1]
+		}
+	}
+
+	
 	return nil, recipes
 }

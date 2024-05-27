@@ -116,6 +116,7 @@ func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 }
 type SimiliarityGroupRecipe struct {
 	Group RecipeGroupSchema
+	Recipe RecipeSchema
 	Similarity float64
 }
 func SortSimilarity( groups []SimiliarityGroupRecipe ) []SimiliarityGroupRecipe {

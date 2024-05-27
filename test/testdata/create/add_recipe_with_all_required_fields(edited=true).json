@@ -78,5 +78,6 @@
       "food_combining": false,
       "whole_food": false
     },
-    "cookingTime": 60
+    "cookingTime": 60,
+    "cuisine": "italien"
 }

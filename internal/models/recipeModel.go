@@ -17,7 +17,7 @@ type RecipeSchema struct {
 	Title            string              `json:"title"`
 	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Preparation      string              `json:"preparation"`
-	Cuisine          string              `json:"cusine"`
+	Cuisine          string              `json:"cuisine"`
 	CookingTime      int                 `json:"cookingtime"`
 	Image            string              `json:"image"`
 	NutriScore       string              `json:"nutriscore"`
