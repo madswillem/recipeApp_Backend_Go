@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
+	"gorm.io/gorm"
 )
 
 type RecipeGroupSchema struct {
-	ID                uint   `gorm:"primarykey"`
-	UserID		  uint
+	BaseModel
+	UserID		  	  uint
 	Recipes           []*RecipeSchema  `gorm:"many2many:recipe_recipegroups"` 
 	AvrgIngredients   []Avrg `gorm:"foreignKey:GroupID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	AvrgCuisine       []Avrg `gorm:"foreignKey:GroupID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
@@ -32,22 +32,22 @@ type Avrg struct {
 }
 
 func (group *RecipeGroupSchema) GetRecipeGroupByID(reqData map[string]bool) *error_handler.APIError {
-	err := initializers.DB.Find(&group, "ID = ?", group.ID).Error
+	err := group.query.Find(&group, "ID = ?", group.ID).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 	return nil
 }
-func GetAllRecipeGroups() (*error_handler.APIError, []RecipeGroupSchema) {
+func GetAllRecipeGroups(db *gorm.DB) (*error_handler.APIError, []RecipeGroupSchema) {
 	var groups []RecipeGroupSchema
-	err := initializers.DB.Find(&groups).Error
+	err := db.Find(&groups).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err), nil
 	}
 	return nil, groups
 }
-func (groups *RecipeGroupSchema) Update() *error_handler.APIError {
-	err := initializers.DB.Save(&groups).Error
+func (group *RecipeGroupSchema) Update() *error_handler.APIError {
+	err := group.query.Save(&group).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}

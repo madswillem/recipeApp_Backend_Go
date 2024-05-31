@@ -1,4 +1,4 @@
-// tests/controllers_test/CRUD_test.go
+// tests/s_test/CRUD_test.go
 package test
 
 import (
@@ -14,9 +14,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/controllers"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/server"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -97,34 +96,31 @@ func readFileAsString(filePath string, t *testing.T) string {
 
 	return buf.String()
 }
-func initTestDB() {
+
+func innitTestDB() *gorm.DB {
 	db, err := gorm.Open(postgres.Open("host=127.0.0.1 user=mads password=1234 dbname=test  port=5432 sslmode=disable"), &gorm.Config{})
+	migrate(db)
+
 
 	if err != nil || db == nil {
 		panic("Error ")
 	}
-
-	initializers.DB = db
+	return db
 }
-func migrateTestDB() {
-	initializers.DB.Migrator().DropTable(&models.RecipeSchema{})
-	initializers.DB.Migrator().DropTable(&models.IngredientsSchema{})
-	initializers.DB.Migrator().DropTable(&models.RatingStruct{})
-	initializers.DB.Migrator().DropTable(&models.NutritionalValue{})
-	initializers.DB.Migrator().DropTable(&models.DietSchema{})
-	initializers.DB.Migrator().DropTable(&models.IngredientDBSchema{})
 
-	initializers.DB.AutoMigrate(&models.RecipeSchema{})
-	initializers.DB.AutoMigrate(&models.IngredientsSchema{})
-	initializers.DB.AutoMigrate(&models.RatingStruct{})
-	initializers.DB.AutoMigrate(&models.NutritionalValue{})
-	initializers.DB.AutoMigrate(&models.DietSchema{})
-	initializers.DB.AutoMigrate(&models.IngredientDBSchema{})
+func migrate(db *gorm.DB) {
+	db.AutoMigrate(&models.RecipeSchema{})
+	db.AutoMigrate(&models.RecipeGroupSchema{})
+	db.AutoMigrate(&models.Avrg{})
+	db.AutoMigrate(&models.IngredientsSchema{})
+	db.AutoMigrate(&models.RatingStruct{})
+	db.AutoMigrate(&models.NutritionalValue{})
+	db.AutoMigrate(&models.DietSchema{})
+	db.AutoMigrate(&models.IngredientDBSchema{})
 }
 
 func TestAddRecipe(t *testing.T) {
-	initTestDB()
-	migrateTestDB()
+	s := server.Server{DB: innitTestDB()}
 
 	type testCase struct {
 		name           string
@@ -176,7 +172,7 @@ func TestAddRecipe(t *testing.T) {
 			c.Request = httptest.NewRequest(http.MethodPost, "/create", strings.NewReader(readFileAsString(completeRequestFilePath, t)))
 			c.Request.Header.Set("Content-Type", "application/json")
 
-			controllers.AddRecipe(c)
+			s.AddRecipe(c)
 
 			if w.Code != tc.expectedStatus {
 				t.Errorf("Expected status code %d but got %d. \n Body: %s", tc.expectedStatus, w.Code, w.Body.String())
@@ -207,7 +203,7 @@ func TestAddRecipe(t *testing.T) {
 	}
 }
 func TestGetAll(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
 	t.Run("get all recipes", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -217,7 +213,7 @@ func TestGetAll(t *testing.T) {
 		c.Request.Header.Set("Content-Type", "application/json")
 
 		// Call the GetAll function
-		controllers.GetAll(c)
+		s.GetAll(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -248,7 +244,8 @@ func TestGetAll(t *testing.T) {
 	})
 }
 func TestGetByID(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
+	
 	t.Run("get recipe by id", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -263,7 +260,7 @@ func TestGetByID(t *testing.T) {
 		}
 
 		// Call the GetById function
-		controllers.GetById(c)
+		s.GetById(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -299,7 +296,7 @@ func TestGetByID(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "200"}}
 
 		// Call the GetById function
-		controllers.GetById(c)
+		s.GetById(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {
@@ -308,7 +305,7 @@ func TestGetByID(t *testing.T) {
 	})
 }
 func TestSelect(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
 	t.Run("select recipe", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -318,7 +315,7 @@ func TestSelect(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 		// Call the Select function
-		controllers.Select(c)
+		s.Select(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -335,7 +332,7 @@ func TestSelect(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "200"}}
 
 		// Call the Select function
-		controllers.Select(c)
+		s.Select(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {
@@ -359,7 +356,7 @@ func TestSelect(t *testing.T) {
 	})
 }
 func TestDeselect(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
 	t.Run("deselect recipe", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -369,7 +366,7 @@ func TestDeselect(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 		// Call the Select function
-		controllers.Select(c)
+		s.Select(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -385,7 +382,7 @@ func TestDeselect(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "200"}}
 
 		// Call the Select function
-		controllers.Select(c)
+		s.Select(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {
@@ -409,7 +406,7 @@ func TestDeselect(t *testing.T) {
 	})
 }
 func TestDeleteRecipe(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
 	t.Run("delete recipe", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -419,7 +416,7 @@ func TestDeleteRecipe(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 		// Call the Delete function
-		controllers.DeleteRecipe(c)
+		s.DeleteRecipe(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -436,7 +433,7 @@ func TestDeleteRecipe(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "200"}}
 
 		// Call the Delete function
-		controllers.DeleteRecipe(c)
+		s.DeleteRecipe(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {
@@ -445,7 +442,7 @@ func TestDeleteRecipe(t *testing.T) {
 	})
 }
 func TestUpdateRecipe(t *testing.T) {
-	initTestDB()
+	s := server.Server{DB: innitTestDB()}
 	t.Run("update recipe", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()
@@ -463,7 +460,7 @@ func TestUpdateRecipe(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "2"}}
 
 		// Call the Update function
-		controllers.UpdateRecipe(c)
+		s.UpdateRecipe(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusOK {
@@ -488,7 +485,7 @@ func TestUpdateRecipe(t *testing.T) {
 		c.Params = gin.Params{gin.Param{Key: "id", Value: "5"}}
 
 		// Call the Update function
-		controllers.UpdateRecipe(c)
+		s.UpdateRecipe(c)
 
 		// Assert the response status code
 		if w.Code != http.StatusNotFound {

@@ -6,14 +6,13 @@ import (
 	"time"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type UserModel struct {
-	gorm.Model
+	BaseModel
 	LastLogin	time.Time
 	RecipeGroups	[]RecipeGroupSchema `gorm:"foreignKey:UserID;"`
 	Settings 	UserSettings `gorm:"embedded;embeddedPrefix:setting_"`
@@ -26,7 +25,7 @@ type UserSettings struct {
 }
 
 func (user *UserModel) GetByCookie() *error_handler.APIError{
-	err := initializers.DB.Preload(clause.Associations).First(&user, "Cookie = ?", user.Cookie).Error
+	err := user.query.Preload(clause.Associations).First(&user, "Cookie = ?", user.Cookie).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return error_handler.New("user not found", http.StatusNotFound, err)
@@ -38,12 +37,12 @@ func (user *UserModel) GetByCookie() *error_handler.APIError{
 	return nil
 
 }
-func CheckIfExistsByCookie(cookie string) bool {
+func (user *UserModel) CheckIfExistsByCookie() bool {
 	var result struct {
 		Found bool
 		Error error_handler.APIError
 	}
-	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = ?) AS found;", cookie).Scan(&result).Error
+	err := user.query.Raw("SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = ?) AS found;", user.Cookie).Scan(&result).Error
 	if err != nil {
 		error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -54,12 +53,12 @@ func (user *UserModel) Create(ip string) *error_handler.APIError{
 	user.IP = ip
 	for {
 		user.Cookie = tools.RandomString(20)
-		if !CheckIfExistsByCookie(user.Cookie) {
+		if !user.CheckIfExistsByCookie() {
 			break
 		}
 	}
 
-	tx := initializers.DB.Begin()
+	tx := user.query.Begin()
 
 	if err := tx.Create(&user).Error; err != nil {
 		tx.Rollback()
@@ -73,7 +72,7 @@ func (user *UserModel) Create(ip string) *error_handler.APIError{
 	return nil
 }
 func (user *UserModel) Update() *error_handler.APIError{
-	err := initializers.DB.Updates(&user).First(&user).Error
+	err := user.query.Updates(&user).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
@@ -86,7 +85,7 @@ func (user *UserModel) Update() *error_handler.APIError{
 }
 func (user *UserModel) GetAllRecipeGroups() ([]RecipeGroupSchema, *error_handler.APIError) {
 	var group []RecipeGroupSchema
-	if err := initializers.DB.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
+	if err := user.query.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
 	    return []RecipeGroupSchema{}, error_handler.New("Database error", http.StatusInternalServerError, err)
 	}
 

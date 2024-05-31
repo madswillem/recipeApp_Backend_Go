@@ -8,8 +8,23 @@ import (
 
 func TestGetSimialrity(t *testing.T) {
 	testGroup := models.RecipeGroupSchema{
-		ID:      1,
-		Recipes: []*models.RecipeSchema{{ID: 0}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10}, {ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}},
+		BaseModel: models.BaseModel{ID: 1},
+		Recipes:[]*models.RecipeSchema{
+			{BaseModel: models.BaseModel{ID: 1}},
+			{BaseModel: models.BaseModel{ID: 2}},
+			{BaseModel: models.BaseModel{ID: 3}},
+			{BaseModel: models.BaseModel{ID: 4}},
+			{BaseModel: models.BaseModel{ID: 5}},
+			{BaseModel: models.BaseModel{ID: 6}},
+			{BaseModel: models.BaseModel{ID: 7}},
+			{BaseModel: models.BaseModel{ID: 8}},
+			{BaseModel: models.BaseModel{ID: 9}},
+			{BaseModel: models.BaseModel{ID: 10}},
+			{BaseModel: models.BaseModel{ID: 11}},
+			{BaseModel: models.BaseModel{ID: 12}},
+			{BaseModel: models.BaseModel{ID: 13}},
+			{BaseModel: models.BaseModel{ID: 14}},
+		},
 		AvrgIngredients: []models.Avrg{
 			{Name: "flower", Percentige: 14},
 			{Name: "water", Percentige: 14},
@@ -33,7 +48,7 @@ func TestGetSimialrity(t *testing.T) {
 	}
 
 	testRecipe := models.RecipeSchema{
-		ID: 1,
+		BaseModel: models.BaseModel{ID: 1},
 		Ingredients: []models.IngredientsSchema{
 			{Ingredient: "flower"},
 			{Ingredient: "water"},

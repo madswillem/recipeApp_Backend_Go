@@ -1,4 +1,4 @@
-package controllers
+package server
 
 import (
 	"net/http"
@@ -7,15 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-func GetAll(c *gin.Context) {
+func (s *Server) GetAll(c *gin.Context) {
 	var recipes []models.RecipeSchema
-	result := initializers.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
+	result := s.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
 
 	if result.Error != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "Database error", []error{result.Error})
@@ -23,7 +22,7 @@ func GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
-func AddRecipe(c *gin.Context) {
+func (s *Server) AddRecipe(c *gin.Context) {
 	var body models.RecipeSchema
 
 	binderr := c.ShouldBindJSON(&body)
@@ -41,7 +40,7 @@ func AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
-func UpdateRecipe(c *gin.Context) {
+func (s *Server) UpdateRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
@@ -60,14 +59,16 @@ func UpdateRecipe(c *gin.Context) {
 	}
 }
 
-func DeleteRecipe(c *gin.Context) {
+func (s *Server) DeleteRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
-	response := models.RecipeSchema{ID: uint(i)}
-	deleteErr := response.Delete(c)
+	response := models.RecipeSchema{}
+	response.ID = uint(i)
+
+	deleteErr := response.Delete()
 	if deleteErr != nil {
 		error_handler.HandleError(c, deleteErr.Code, deleteErr.Message, deleteErr.Errors)
 		return
@@ -75,14 +76,16 @@ func DeleteRecipe(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func GetById(c *gin.Context) {
+func (s *Server) GetById(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		errMessage := strings.Join([]string{"id", c.Param("id"), "is not a number"}, " ")
 		error_handler.HandleError(c, http.StatusBadRequest, errMessage, []error{err})
 		return
 	}
-	response := models.RecipeSchema{ID: uint(i)}
+	response := models.RecipeSchema{}
+	response.ID = uint(i)
+
 	reqData := map[string]bool{
 		"ingredients":      true,
 		"ingredient_nutri": true,
@@ -104,7 +107,7 @@ func GetById(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func Filter(c *gin.Context) {
+func (s *Server) Filter(c *gin.Context) {
 
 	var body models.Filter
 	err := c.ShouldBindJSON(&body)
@@ -123,7 +126,7 @@ func Filter(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
-func Select(c *gin.Context) {
+func (s *Server) Select(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
@@ -131,7 +134,8 @@ func Select(c *gin.Context) {
 	}
 	middleware_user, _ := c.MustGet("user").(models.UserModel)
 	
-	response := models.RecipeSchema{ID: uint(i)}
+	response := models.RecipeSchema{}
+	response.ID = uint(i)
 	
 	selectedErr := response.UpdateSelected(1, &middleware_user)
 	if selectedErr != nil {
@@ -142,14 +146,17 @@ func Select(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func Deselect(c *gin.Context) {
+func (s *Server) Deselect(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
 	middleware_user, _ := c.MustGet("user").(models.UserModel)
-	response := models.RecipeSchema{ID: uint(i)}
+
+	response := models.RecipeSchema{}
+	response.ID = uint(i)
+
 	selectedErr := response.UpdateSelected(-1, &middleware_user)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
@@ -159,7 +166,7 @@ func Deselect(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func Colormode(c *gin.Context) {
+func (s *Server) Colormode(c *gin.Context) {
 	switch c.Param("type") {
 	case "get":
 		cookie, err := c.Cookie("type")

@@ -1,0 +1,2686 @@
+[
+    {
+        "title": "Classic Spaghetti Carbonara",
+        "ingredients": [
+            {
+                "ingredient": "Spaghetti",
+                "amount": "400",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 1480,
+                    "kj": 6192,
+                    "fat": 6,
+                    "saturated_fat": 1.6,
+                    "carbohydrate": 296,
+                    "sugar": 12,
+                    "protein": 56,
+                    "salt": 2
+                }
+            },
+            {
+                "ingredient": "Pancetta",
+                "amount": "150",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 519,
+                    "kj": 2171,
+                    "fat": 46.5,
+                    "saturated_fat": 15,
+                    "carbohydrate": 1.5,
+                    "sugar": 0.5,
+                    "protein": 18,
+                    "salt": 3
+                }
+            },
+            {
+                "ingredient": "Eggs",
+                "amount": "4",
+                "measurement_unit": "large",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 320,
+                    "kj": 1340,
+                    "fat": 22,
+                    "saturated_fat": 7,
+                    "carbohydrate": 2,
+                    "sugar": 2,
+                    "protein": 28,
+                    "salt": 0.4
+                }
+            },
+            {
+                "ingredient": "Parmesan cheese",
+                "amount": "100",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 431,
+                    "kj": 1803,
+                    "fat": 28,
+                    "saturated_fat": 18,
+                    "carbohydrate": 4,
+                    "sugar": 0,
+                    "protein": 38,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Garlic",
+                "amount": "2",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 9,
+                    "kj": 37,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 5.9
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0.2,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 1.4,
+                    "sugar": 0,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Cook the spaghetti according to package directions until al dente. Reserve 1 cup of pasta water, then drain the pasta. \n2. While the pasta cooks, heat a large skillet over medium heat and add the pancetta. Cook until crispy, then remove from heat and set aside. \n3. In a bowl, whisk together the eggs and grated Parmesan cheese until well combined. \n4. Return the skillet with pancetta to low heat. Add the minced garlic and cook until fragrant, about 1 minute. \n5. Add the cooked pasta to the skillet and toss to combine with the pancetta and garlic. \n6. Remove the skillet from heat and quickly pour in the egg and cheese mixture, tossing rapidly to create a creamy sauce. If the sauce is too thick, add a little reserved pasta water until desired consistency is reached. \n7. Season with salt and freshly ground black pepper to taste. Serve immediately with extra Parmesan cheese on top, if desired.",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 30,
+        "cuisine": "italian"
+    },
+    {
+        "title": "Chicken Tikka Masala",
+        "ingredients": [
+            {
+                "ingredient": "Chicken breast",
+                "amount": "500",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 550,
+                    "kj": 2301,
+                    "fat": 6,
+                    "saturated_fat": 1.5,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 110,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Plain yogurt",
+                "amount": "150",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 90,
+                    "kj": 377,
+                    "fat": 4,
+                    "saturated_fat": 2.5,
+                    "carbohydrate": 6,
+                    "sugar": 6,
+                    "protein": 8,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Tomato puree",
+                "amount": "200",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 70,
+                    "kj": 293,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 16,
+                    "sugar": 12,
+                    "protein": 3,
+                    "salt": 0.6
+                }
+            },
+            {
+                "ingredient": "Onion",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 40,
+                    "kj": 167,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 9,
+                    "sugar": 4,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Garlic cloves",
+                "amount": "3",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1.5,
+                    "sugar": 0.5,
+                    "protein": 0.7,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Ginger root",
+                "amount": "1",
+                "measurement_unit": "tbsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0.2,
+                    "protein": 0.1,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Heavy cream",
+                "amount": "100",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 340,
+                    "kj": 1421,
+                    "fat": 36,
+                    "saturated_fat": 23,
+                    "carbohydrate": 3,
+                    "sugar": 3,
+                    "protein": 2,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Garam masala",
+                "amount": "2",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 10,
+                    "kj": 42,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Cumin",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 8,
+                    "kj": 33,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 0.4,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Coriander powder",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0.3,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.5,
+                    "sugar": 0,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Paprika",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0.3,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 0.3,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 6
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "0.5",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 3,
+                    "kj": 12,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.8,
+                    "sugar": 0,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. In a bowl, mix the chicken with the yogurt, half of the garlic, ginger, garam masala, cumin, coriander powder, paprika, and salt. Let it marinate for at least 30 minutes. \n2. Heat oil in a large pan over medium heat. Add the chopped onion and the remaining garlic and ginger. Cook until the onion is translucent. \n3. Add the marinated chicken to the pan and cook until the chicken is browned and cooked through. \n4. Stir in the tomato puree and bring to a simmer. Cook for about 10-15 minutes, until the sauce thickens slightly. \n5. Stir in the heavy cream and cook for an additional 5 minutes. Season with salt and black pepper to taste. \n6. Serve hot with rice or naan bread.",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 60,
+        "cuisine": "Indian"
+    },
+    {
+        "title": "Mama's Spaghetti Bolognese Spezial",
+        "ingredients": [
+            {
+                "ingredient": "Ground beef",
+                "amount": "500",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 290,
+                    "kj": 1213,
+                    "fat": 20,
+                    "saturated_fat": 10,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 30,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Dried pasta (spaghetti)",
+                "amount": "250",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 350,
+                    "kj": 1464,
+                    "fat": 1.5,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 70,
+                    "sugar": 3,
+                    "protein": 12,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Chopped tomatoes (canned)",
+                "amount": "400",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 110,
+                    "kj": 463,
+                    "fat": 1,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 25,
+                    "sugar": 18,
+                    "protein": 2,
+                    "salt": 0.8
+                }
+            },
+            {
+                "ingredient": "Onion",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 40,
+                    "kj": 167,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 9,
+                    "sugar": 4,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Garlic cloves",
+                "amount": "2",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 4,
+                    "kj": 16,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 0.1
+                }
+            }
+        ],
+        "preparation": "1. Brown the ground beef in a large pan over medium heat. Drain off any excess fat. \n2. Add chopped onion and garlic to the pan and cook until softened, about 5 minutes. \n3. Stir in the chopped tomatoes, bring to a simmer, and cook for 20 minutes, or until slightly thickened. Season with salt and pepper to taste. \n4. While the sauce simmers, cook the pasta according to package directions. \n5. Drain the pasta and toss it with the bolognese sauce. Serve hot with grated parmesan cheese (optional).",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 40,
+        "cuisine": "italian"
+    },
+    {
+        "title": "Vegetarian Stuffed Peppers",
+        "ingredients": [
+            {
+                "ingredient": "Bell peppers",
+                "amount": "4",
+                "measurement_unit": "large",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 120,
+                    "kj": 502,
+                    "fat": 1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 24,
+                    "sugar": 16,
+                    "protein": 4,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Quinoa",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 222,
+                    "kj": 930,
+                    "fat": 3.6,
+                    "saturated_fat": 0.4,
+                    "carbohydrate": 39,
+                    "sugar": 1.6,
+                    "protein": 8,
+                    "salt": 0.01
+                }
+            },
+            {
+                "ingredient": "Black beans (canned)",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 218,
+                    "kj": 912,
+                    "fat": 0.9,
+                    "saturated_fat": 0.2,
+                    "carbohydrate": 40.8,
+                    "sugar": 0.5,
+                    "protein": 14.5,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Corn kernels (canned)",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 132,
+                    "kj": 552,
+                    "fat": 1.4,
+                    "saturated_fat": 0.2,
+                    "carbohydrate": 29,
+                    "sugar": 6,
+                    "protein": 4,
+                    "salt": 0.8
+                }
+            },
+            {
+                "ingredient": "Diced tomatoes (canned)",
+                "amount": "400",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 80,
+                    "kj": 335,
+                    "fat": 0.4,
+                    "saturated_fat": 0,
+                    "carbohydrate": 18,
+                    "sugar": 12,
+                    "protein": 2.8,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "Cheddar cheese, shredded",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 455,
+                    "kj": 1904,
+                    "fat": 37,
+                    "saturated_fat": 24,
+                    "carbohydrate": 1,
+                    "sugar": 0.5,
+                    "protein": 28,
+                    "salt": 1.5
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 375°F (190°C). Cut the tops off the bell peppers and remove the seeds and membranes. Place the peppers in a baking dish. \n2. Cook the quinoa according to package directions. \n3. In a large bowl, mix the cooked quinoa, black beans, corn, diced tomatoes, and half of the shredded cheese. Season with salt and pepper to taste. \n4. Stuff the peppers with the quinoa mixture. Top with the remaining shredded cheese. \n5. Cover the baking dish with foil and bake for 30 minutes. Remove the foil and bake for an additional 10 minutes, or until the cheese is melted and the peppers are tender. \n6. Serve hot, garnished with fresh herbs if desired.",
+        "diet": {
+            "vegetarien": true,
+            "vegan": false,
+            "lowcal": true,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 60,
+        "cuisine": "american"
+    },
+    {
+        "title": "Shrimp Scampi",
+        "ingredients": [
+            {
+                "ingredient": "Shrimp",
+                "amount": "500",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 300,
+                    "kj": 1255,
+                    "fat": 5,
+                    "saturated_fat": 1.5,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 60,
+                    "salt": 2
+                }
+            },
+            {
+                "ingredient": "Butter",
+                "amount": "100",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 717,
+                    "kj": 3000,
+                    "fat": 81,
+                    "saturated_fat": 51,
+                    "carbohydrate": 0.1,
+                    "sugar": 0.1,
+                    "protein": 0.9,
+                    "salt": 1.7
+                }
+            },
+            {
+                "ingredient": "Garlic cloves",
+                "amount": "4",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 16,
+                    "kj": 67,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 4,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Lemon juice",
+                "amount": "60",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 14,
+                    "kj": 59,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 4.4,
+                    "sugar": 1.2,
+                    "protein": 0.3,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Dried pasta (linguine)",
+                "amount": "250",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 350,
+                    "kj": 1464,
+                    "fat": 1.5,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 70,
+                    "sugar": 3,
+                    "protein": 12,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Parsley",
+                "amount": "30",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 11,
+                    "kj": 46,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.4,
+                    "protein": 1,
+                    "salt": 0.05
+                }
+            }
+        ],
+        "preparation": "1. Cook the pasta according to package directions until al dente. Drain and set aside. \n2. In a large skillet, melt the butter over medium heat. Add the garlic and cook until fragrant, about 1-2 minutes. \n3. Add the shrimp and cook until pink and opaque, about 2-3 minutes per side. \n4. Stir in the lemon juice and parsley. Season with salt and pepper to taste. \n5. Toss the cooked pasta with the shrimp mixture until well combined. \n6. Serve immediately, garnished with additional parsley if desired.",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 30,
+        "cuisine": "italian"
+    },
+    {
+        "title": "BBQ Pulled Pork Sandwiches",
+        "ingredients": [
+            {
+                "ingredient": "Pork shoulder",
+                "amount": "1000",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 800,
+                    "kj": 3344,
+                    "fat": 55,
+                    "saturated_fat": 20,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 70,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "BBQ sauce",
+                "amount": "200",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 220,
+                    "kj": 920,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 54,
+                    "sugar": 48,
+                    "protein": 2,
+                    "salt": 2.5
+                }
+            },
+            {
+                "ingredient": "Buns",
+                "amount": "6",
+                "measurement_unit": "pieces",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 180,
+                    "kj": 753,
+                    "fat": 3,
+                    "saturated_fat": 1,
+                    "carbohydrate": 34,
+                    "sugar": 5,
+                    "protein": 6,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "Coleslaw mix",
+                "amount": "300",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 90,
+                    "kj": 377,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 18,
+                    "sugar": 12,
+                    "protein": 2,
+                    "salt": 0.5
+                }
+            },
+            {
+                "ingredient": "Apple cider vinegar",
+                "amount": "2",
+                "measurement_unit": "tbsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 1,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Sugar",
+                "amount": "1",
+                "measurement_unit": "tbsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 48,
+                    "kj": 201,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 12,
+                    "sugar": 12,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 6
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 150°C (300°F).\n2. Rub the pork shoulder with salt and pepper, then place it in a roasting pan.\n3. Cover the pan with aluminum foil and roast the pork for 4-5 hours, until tender.\n4. Remove the pork from the oven and let it rest for 15 minutes. Shred the pork using two forks.\n5. In a large bowl, mix the shredded pork with the BBQ sauce.\n6. For the coleslaw, combine the coleslaw mix, apple cider vinegar, sugar, and a pinch of salt in a bowl.\n7. To assemble the sandwiches, place a generous amount of BBQ pulled pork on each bun, then top with coleslaw.\n8. Serve the sandwiches warm and enjoy!",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 300,
+        "cuisine": "american"
+    },
+    {
+        "title": "Margherita Pizza",
+        "ingredients": [
+            {
+                "ingredient": "Pizza dough",
+                "amount": "1",
+                "measurement_unit": "piece",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 800,
+                    "kj": 3347,
+                    "fat": 12,
+                    "saturated_fat": 2,
+                    "carbohydrate": 160,
+                    "sugar": 2,
+                    "protein": 24,
+                    "salt": 4
+                }
+            },
+            {
+                "ingredient": "Tomato sauce",
+                "amount": "200",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 60,
+                    "kj": 251,
+                    "fat": 1,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 14,
+                    "sugar": 10,
+                    "protein": 2,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Fresh mozzarella cheese",
+                "amount": "200",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 560,
+                    "kj": 2343,
+                    "fat": 45,
+                    "saturated_fat": 28,
+                    "carbohydrate": 3,
+                    "sugar": 1,
+                    "protein": 34,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Fresh basil leaves",
+                "amount": "10",
+                "measurement_unit": "leaves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0.2,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "1",
+                "measurement_unit": "tbsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 120,
+                    "kj": 502,
+                    "fat": 14,
+                    "saturated_fat": 2,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 220°C (430°F).\n2. Roll out the pizza dough on a floured surface to your desired thickness.\n3. Spread the tomato sauce evenly over the dough, leaving a small border around the edges.\n4. Tear the fresh mozzarella cheese into pieces and distribute them evenly over the sauce.\n5. Add the fresh basil leaves and drizzle the olive oil over the top.\n6. Bake in the preheated oven for 10-15 minutes, or until the crust is golden and the cheese is bubbly and slightly browned.\n7. Remove from the oven, let cool slightly, slice, and serve hot.",
+        "diet": {
+            "vegetarien": true,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 30,
+        "cuisine": "italian"
+    },
+    {
+        "title": "Lemon Herb Grilled Chicken",
+        "ingredients": [
+            {
+                "ingredient": "Chicken breasts",
+                "amount": "800",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 880,
+                    "kj": 3682,
+                    "fat": 20,
+                    "saturated_fat": 5,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 160,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "Lemon juice",
+                "amount": "60",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 15,
+                    "kj": 63,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 5,
+                    "sugar": 1.5,
+                    "protein": 0.5,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "50",
+                "measurement_unit": "ml",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 450,
+                    "kj": 1882,
+                    "fat": 50,
+                    "saturated_fat": 7,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Garlic cloves",
+                "amount": "3",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 1,
+                    "protein": 0.9,
+                    "salt": 0.03
+                }
+            },
+            {
+                "ingredient": "Fresh rosemary",
+                "amount": "10",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 3,
+                    "kj": 13,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.6,
+                    "sugar": 0,
+                    "protein": 0.1,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "1",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 6
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "0.5",
+                "measurement_unit": "tsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 3,
+                    "kj": 13,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.7,
+                    "sugar": 0,
+                    "protein": 0.1,
+                    "salt": 0.1
+                }
+            }
+        ],
+        "preparation": "1. In a large bowl, whisk together lemon juice, olive oil, minced garlic, chopped rosemary, salt, and pepper. \n2. Add the chicken breasts to the marinade, ensuring they are well coated. Cover and refrigerate for at least 30 minutes, preferably 2-4 hours. \n3. Preheat the grill to medium-high heat. \n4. Remove the chicken from the marinade and grill for 6-8 minutes per side, or until the internal temperature reaches 75°C (165°F). \n5. Let the chicken rest for 5 minutes before serving. Enjoy with a side of grilled vegetables or a fresh salad.",
+        "diet": {
+            "vegetarian": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": true,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 30,
+        "cuisine": "Mediterranean"
+    },
+    {
+        "title": "Beef Wellington",
+        "ingredients": [
+            {
+                "ingredient": "Beef tenderloin",
+                "amount": "1",
+                "measurement_unit": "kg",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 2500,
+                    "kj": 10460,
+                    "fat": 200,
+                    "saturated_fat": 80,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 200,
+                    "salt": 3
+                }
+            },
+            {
+                "ingredient": "Mushrooms",
+                "amount": "250",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 55,
+                    "kj": 230,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 10,
+                    "sugar": 3,
+                    "protein": 4,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Prosciutto",
+                "amount": "200",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 400,
+                    "kj": 1670,
+                    "fat": 30,
+                    "saturated_fat": 10,
+                    "carbohydrate": 2,
+                    "sugar": 0,
+                    "protein": 30,
+                    "salt": 4
+                }
+            },
+            {
+                "ingredient": "Puff pastry",
+                "amount": "500",
+                "measurement_unit": "g",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 2000,
+                    "kj": 8360,
+                    "fat": 150,
+                    "saturated_fat": 80,
+                    "carbohydrate": 150,
+                    "sugar": 5,
+                    "protein": 25,
+                    "salt": 2.5
+                }
+            },
+            {
+                "ingredient": "Egg yolks",
+                "amount": "2",
+                "measurement_unit": "yolks",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 110,
+                    "kj": 460,
+                    "fat": 9,
+                    "saturated_fat": 3,
+                    "carbohydrate": 1,
+                    "sugar": 1,
+                    "protein": 6,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "2",
+                "measurement_unit": "tbsp",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1005,
+                    "fat": 27,
+                    "saturated_fat": 3,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 200°C (390°F).\n2. Season the beef tenderloin with salt and pepper. Heat the olive oil in a large pan over high heat and sear the beef on all sides until browned. Remove from the pan and let it cool.\n3. In the same pan, add the mushrooms and cook until all the moisture has evaporated. Let them cool.\n4. Lay out the prosciutto on a piece of plastic wrap, overlapping slightly. Spread the cooked mushrooms over the prosciutto. Place the beef on top and roll it up tightly. Chill in the refrigerator for 15 minutes.\n5. Roll out the puff pastry on a floured surface. Remove the plastic wrap from the beef and place it on the pastry. Wrap the beef in the pastry, sealing the edges. Brush with beaten egg yolks.\n6. Place the wrapped beef on a baking sheet and bake for 25-30 minutes for medium-rare, or until the pastry is golden brown. Let it rest for 10 minutes before slicing and serving.",
+        "diet": {
+            "vegetarien": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 90,
+        "cuisine": "British"
+    },
+    {
+        "title": "Velvety Butternut Squash Soup",
+        "ingredients": [
+            {
+                "ingredient": "Butternut squash",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 82,
+                    "kj": 343,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 21,
+                    "sugar": 4,
+                    "protein": 2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Vegetable broth",
+                "amount": "4",
+                "measurement_unit": "cups",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 20,
+                    "kj": 84,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 4,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Onion",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 44,
+                    "kj": 184,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 10,
+                    "sugar": 5,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Garlic cloves",
+                "amount": "2",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 8,
+                    "kj": 33,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Coconut milk",
+                "amount": "1/2",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 73,
+                    "kj": 305,
+                    "fat": 7,
+                    "saturated_fat": 6,
+                    "carbohydrate": 2,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 0.01
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 239,
+                    "kj": 1000,
+                    "fat": 27,
+                    "saturated_fat": 4,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": null,
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "to taste",
+                "measurement_unit": null,
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat your oven to 400°F (200°C). \n2. Cut the butternut squash in half lengthwise and remove the seeds. Drizzle with olive oil and season with salt and pepper. Place the squash halves, cut side down, on a baking sheet lined with parchment paper. Roast for 45-50 minutes, or until the squash is tender. \n3. In a large pot, heat the remaining olive oil over medium heat. Add chopped onion and minced garlic. Cook until softened, about 5 minutes. \n4. Scoop out the flesh of the roasted butternut squash and add it to the pot. Stir in the vegetable broth and bring to a simmer. Cook for 10-15 minutes. \n5. Using an immersion blender, blend the soup until smooth. Stir in the coconut milk and season with salt and pepper to taste. Serve hot.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": true,
+            "lowcal": false,
+            "lowcarb": true,
+            "keto": false,
+            "paleo": true,
+            "lowfat": true,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 75,
+        "cuisine": "American"
+    },
+    {
+        "title": "Teriyaki Tofu Bowl",
+        "ingredients": [
+            {
+                "ingredient": "Extra firm tofu",
+                "amount": "1",
+                "measurement_unit": "block",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 176,
+                    "kj": 737,
+                    "fat": 10,
+                    "saturated_fat": 1.5,
+                    "carbohydrate": 6,
+                    "sugar": 1,
+                    "protein": 20,
+                    "salt": 0.5
+                }
+            },
+            {
+                "ingredient": "Teriyaki sauce",
+                "amount": "1/4",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 60,
+                    "kj": 251,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 15,
+                    "sugar": 12,
+                    "protein": 1,
+                    "salt": 2
+                }
+            },
+            {
+                "ingredient": "Brown rice",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 218,
+                    "kj": 912,
+                    "fat": 1.6,
+                    "saturated_fat": 0.3,
+                    "carbohydrate": 45,
+                    "sugar": 0.7,
+                    "protein": 5,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Broccoli",
+                "amount": "1",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 55,
+                    "kj": 230,
+                    "fat": 0.6,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 11,
+                    "sugar": 2.5,
+                    "protein": 4,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Carrot",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 25,
+                    "kj": 105,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 6,
+                    "sugar": 3,
+                    "protein": 0.6,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Sesame seeds",
+                "amount": "1",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 52,
+                    "kj": 218,
+                    "fat": 4.5,
+                    "saturated_fat": 0.7,
+                    "carbohydrate": 2,
+                    "sugar": 0.1,
+                    "protein": 1.6,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Green onions",
+                "amount": "2",
+                "measurement_unit": "stalks",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 10,
+                    "kj": 42,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.8,
+                    "protein": 0.6,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "1",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 119,
+                    "kj": 498,
+                    "fat": 13.5,
+                    "saturated_fat": 1.9,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": null,
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "to taste",
+                "measurement_unit": null,
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Press tofu to remove excess water. Cut tofu into cubes and place in a bowl. Pour teriyaki sauce over tofu cubes and toss to coat. Let marinate for at least 30 minutes.\n2. Preheat oven to 400°F (200°C). Line a baking sheet with parchment paper.\n3. Place marinated tofu cubes on the baking sheet in a single layer. Bake for 25-30 minutes, flipping halfway through, until tofu is golden brown and crispy.\n4. Meanwhile, cook brown rice according to package instructions.\n5. In a separate pan, heat olive oil over medium heat. Add broccoli florets and sliced carrots. Cook until tender-crisp, about 5-7 minutes.\n6. To assemble the bowls, divide cooked rice, roasted teriyaki tofu, sautéed vegetables, and sliced green onions among serving bowls.\n7. Garnish with sesame seeds and season with salt and black pepper to taste. Serve hot.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": true,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 45,
+        "cuisine": "Asian"
+    },
+    {
+        "title": "Pumpkin Spice Pancakes",
+        "ingredients": [
+            {
+                "ingredient": "All-purpose flour",
+                "amount": "1 1/2 cups",
+                "measurement_unit": "cups",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 192,
+                    "kj": 804,
+                    "fat": 1.2,
+                    "saturated_fat": 0.2,
+                    "carbohydrate": 38,
+                    "sugar": 1,
+                    "protein": 6,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Pumpkin puree",
+                "amount": "1 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 50,
+                    "kj": 210,
+                    "fat": 0.5,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 12,
+                    "sugar": 3,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Milk (dairy or plant-based)",
+                "amount": "1 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 60,
+                    "kj": 252,
+                    "fat": 2,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 4,
+                    "sugar": 4,
+                    "protein": 3,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Egg",
+                "amount": "1",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 70,
+                    "kj": 294,
+                    "fat": 5,
+                    "saturated_fat": 1.5,
+                    "carbohydrate": 1,
+                    "sugar": 1,
+                    "protein": 6,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Brown sugar",
+                "amount": "2 tablespoons",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 30,
+                    "kj": 126,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 8,
+                    "sugar": 8,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Baking powder",
+                "amount": "1 tablespoon",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Pumpkin pie spice",
+                "amount": "1 teaspoon",
+                "measurement_unit": "teaspoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "1/4 teaspoon",
+                "measurement_unit": "teaspoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0.6
+                }
+            },
+            {
+                "ingredient": "Vegetable oil",
+                "amount": "2 tablespoons",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1008,
+                    "fat": 28,
+                    "saturated_fat": 2,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. In a large mixing bowl, whisk together the flour, baking powder, pumpkin pie spice, brown sugar, and salt.\n2. In another bowl, mix together the pumpkin puree, milk, egg, and vegetable oil until well combined.\n3. Pour the wet ingredients into the dry ingredients and stir until just combined. Do not overmix; it's okay if there are a few lumps.\n4. Heat a non-stick skillet or griddle over medium heat. Lightly grease with oil or cooking spray.\n5. Pour about 1/4 cup of batter onto the skillet for each pancake. Cook until bubbles form on the surface, then flip and cook until golden brown on the other side.\n6. Serve warm with maple syrup, whipped cream, or your favorite toppings.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 20,
+        "cuisine": "American"
+    },
+    {
+        "title": "Caprese Stuffed Portobello Mushrooms",
+        "ingredients": [
+            {
+                "ingredient": "Portobello mushrooms",
+                "amount": "4",
+                "measurement_unit": "large",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 35,
+                    "kj": 146,
+                    "fat": 0.5,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 6,
+                    "sugar": 2,
+                    "protein": 3,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Fresh mozzarella cheese",
+                "amount": "8",
+                "measurement_unit": "slices",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 60,
+                    "kj": 251,
+                    "fat": 3,
+                    "saturated_fat": 1.8,
+                    "carbohydrate": 1,
+                    "sugar": 0.5,
+                    "protein": 7,
+                    "salt": 0.4
+                }
+            },
+            {
+                "ingredient": "Tomatoes",
+                "amount": "2",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 22,
+                    "kj": 92,
+                    "fat": 0.3,
+                    "saturated_fat": 0,
+                    "carbohydrate": 5,
+                    "sugar": 3,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Fresh basil leaves",
+                "amount": "1/4",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 0.3,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Balsamic glaze",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 30,
+                    "kj": 126,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 8,
+                    "sugar": 6,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "",
+                "measurement_unit": "to taste",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "",
+                "measurement_unit": "to taste",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 375°F (190°C) and line a baking sheet with parchment paper.\n2. Clean the portobello mushrooms and remove the stems.\n3. Place the mushrooms on the prepared baking sheet, gill side up.\n4. Top each mushroom with a slice of fresh mozzarella, followed by a slice of tomato.\n5. Season with salt and black pepper to taste.\n6. Bake in the preheated oven for 15-20 minutes, or until the cheese is melted and bubbly.\n7. Remove from the oven and garnish with fresh basil leaves.\n8. Drizzle balsamic glaze over the stuffed mushrooms before serving.\n9. Enjoy your delicious Caprese Stuffed Portobello Mushrooms!",
+        "diet": {
+            "vegetarian": true,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": true,
+            "keto": false,
+            "paleo": true,
+            "lowfat": true,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 25,
+        "cuisine": "Italian"
+    },
+    {
+        "title": "Mediterranean Chickpea Salad",
+        "ingredients": [
+            {
+                "ingredient": "Chickpeas",
+                "amount": "1 can",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1004,
+                    "fat": 4,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 45,
+                    "sugar": 8,
+                    "protein": 14,
+                    "salt": 0.8
+                }
+            },
+            {
+                "ingredient": "Cucumber",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 16,
+                    "kj": 67,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 4,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 0.3
+                }
+            },
+            {
+                "ingredient": "Tomatoes",
+                "amount": "2",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 22,
+                    "kj": 92,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 5,
+                    "sugar": 3,
+                    "protein": 1,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Red onion",
+                "amount": "1/4",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 10,
+                    "kj": 42,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 1,
+                    "protein": 0.5,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Feta cheese",
+                "amount": "1/4",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 100,
+                    "kj": 420,
+                    "fat": 8,
+                    "saturated_fat": 5,
+                    "carbohydrate": 1,
+                    "sugar": 0.5,
+                    "protein": 6,
+                    "salt": 0.4
+                }
+            },
+            {
+                "ingredient": "Kalamata olives",
+                "amount": "1/4",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 35,
+                    "kj": 147,
+                    "fat": 3,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 2,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "Extra virgin olive oil",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1004,
+                    "fat": 28,
+                    "saturated_fat": 4,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Lemon juice",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 8,
+                    "kj": 34,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 3,
+                    "sugar": 1,
+                    "protein": 0.1,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Fresh parsley",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 2,
+                    "kj": 8,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.3,
+                    "sugar": 0.1,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Rinse the chickpeas under cold water and drain them well. \n2. Dice the cucumber, tomatoes, and red onion. \n3. In a large mixing bowl, combine the chickpeas, diced cucumber, tomatoes, red onion, crumbled feta cheese, and sliced Kalamata olives. \n4. In a small bowl, whisk together the extra virgin olive oil, lemon juice, and chopped fresh parsley to make the dressing. \n5. Pour the dressing over the salad and toss gently to coat everything evenly. \n6. Season with salt and black pepper to taste. \n7. Serve immediately or refrigerate for later.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 15,
+        "cuisine": "Mediterranean"
+    },
+    {
+        "title": "Cajun Blackened Catfish",
+        "ingredients": [
+            {
+                "ingredient": "Catfish fillets",
+                "amount": "4",
+                "measurement_unit": "pieces",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 150,
+                    "kj": 627,
+                    "fat": 7,
+                    "saturated_fat": 1.5,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 20,
+                    "salt": 0.5
+                }
+            },
+            {
+                "ingredient": "Cajun seasoning",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 10,
+                    "kj": 42,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0,
+                    "protein": 0.5,
+                    "salt": 1.2
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "2",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1004,
+                    "fat": 28,
+                    "saturated_fat": 4,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Lemon wedges",
+                "amount": "",
+                "measurement_unit": "for serving",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.5,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat a cast-iron skillet over medium-high heat.\n2. Rub Cajun seasoning onto both sides of the catfish fillets.\n3. Drizzle olive oil over the seasoned catfish.\n4. Place the catfish fillets in the hot skillet and cook for 3-4 minutes on each side, or until blackened and cooked through.\n5. Serve hot with lemon wedges.",
+        "diet": {
+            "vegetarian": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": true,
+            "keto": true,
+            "paleo": true,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 15,
+        "cuisine": "American"
+    },
+    {
+        "title": "Apple Cinnamon Oatmeal",
+        "ingredients": [
+            {
+                "ingredient": "Rolled oats",
+                "amount": "1 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 150,
+                    "kj": 627,
+                    "fat": 2,
+                    "saturated_fat": 0.4,
+                    "carbohydrate": 27,
+                    "sugar": 1,
+                    "protein": 5,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Apple",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 95,
+                    "kj": 398,
+                    "fat": 0.3,
+                    "saturated_fat": 0,
+                    "carbohydrate": 25,
+                    "sugar": 19,
+                    "protein": 0.5,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Cinnamon",
+                "amount": "1/2 teaspoon",
+                "measurement_unit": "teaspoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 6,
+                    "kj": 25,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0.1,
+                    "protein": 0.1,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Water",
+                "amount": "2 cups",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Maple syrup (optional)",
+                "amount": "2 tablespoons",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 104,
+                    "kj": 435,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 27,
+                    "sugar": 27,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. In a saucepan, bring water to a boil. \n2. Stir in rolled oats and reduce heat to medium-low. \n3. Peel and chop the apple into small pieces. Add the chopped apple to the saucepan with oats. \n4. Sprinkle cinnamon over the oats and apple mixture. Stir well. \n5. Cook for about 5-7 minutes, stirring occasionally, until the oats are tender and the apples are softened. \n6. If desired, drizzle maple syrup over the oatmeal for added sweetness. \n7. Serve hot and enjoy!",
+        "diet": {
+            "vegetarian": true,
+            "vegan": true,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": true,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 10,
+        "cuisine": "American"
+    },
+    {
+        "title": "Pesto Pasta Primavera",
+        "ingredients": [
+            {
+                "ingredient": "Pasta (of your choice)",
+                "amount": "8 oz",
+                "measurement_unit": "grams",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 320,
+                    "kj": 1340,
+                    "fat": 2.5,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 65,
+                    "sugar": 3,
+                    "protein": 12,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Assorted Vegetables (bell peppers, zucchini, cherry tomatoes, broccoli)",
+                "amount": "2 cups",
+                "measurement_unit": "cups",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 80,
+                    "kj": 336,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 16,
+                    "sugar": 5,
+                    "protein": 3,
+                    "salt": 0.2
+                }
+            },
+            {
+                "ingredient": "Pesto sauce",
+                "amount": "½ cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 220,
+                    "kj": 920,
+                    "fat": 22,
+                    "saturated_fat": 3,
+                    "carbohydrate": 4,
+                    "sugar": 1,
+                    "protein": 3,
+                    "salt": 0.3
+                }
+            },
+            {
+                "ingredient": "Parmesan cheese (grated)",
+                "amount": "¼ cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 110,
+                    "kj": 462,
+                    "fat": 9,
+                    "saturated_fat": 5,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 7,
+                    "salt": 0.4
+                }
+            }
+        ],
+        "preparation": "1. Cook pasta according to package instructions. Drain and set aside.\n2. In a large skillet, heat olive oil over medium heat. Add assorted vegetables and sauté until tender, about 5-7 minutes.\n3. Add cooked pasta to the skillet with the vegetables.\n4. Stir in pesto sauce until everything is evenly coated.\n5. Serve hot, garnished with grated Parmesan cheese.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 25,
+        "cuisine": "Italian"
+    },
+    {
+        "title": "Korean BBQ Beef Tacos",
+        "ingredients": [
+            {
+                "ingredient": "Flank steak",
+                "amount": "1 lb",
+                "measurement_unit": "pound",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 380,
+                    "kj": 1590,
+                    "fat": 16,
+                    "saturated_fat": 6,
+                    "carbohydrate": 10,
+                    "sugar": 6,
+                    "protein": 50,
+                    "salt": 1.5
+                }
+            },
+            {
+                "ingredient": "Corn tortillas",
+                "amount": "12",
+                "measurement_unit": "pieces",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 180,
+                    "kj": 756,
+                    "fat": 3,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 36,
+                    "sugar": 2,
+                    "protein": 6,
+                    "salt": 0.5
+                }
+            },
+            {
+                "ingredient": "Korean BBQ sauce",
+                "amount": "1/2 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 120,
+                    "kj": 504,
+                    "fat": 1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 28,
+                    "sugar": 20,
+                    "protein": 1,
+                    "salt": 2
+                }
+            },
+            {
+                "ingredient": "Kimchi",
+                "amount": "1 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 40,
+                    "kj": 168,
+                    "fat": 0.5,
+                    "saturated_fat": 0,
+                    "carbohydrate": 8,
+                    "sugar": 4,
+                    "protein": 2,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Green onions, chopped",
+                "amount": "1/4 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 5,
+                    "kj": 21,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 1,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Sesame seeds",
+                "amount": "1 tbsp",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 50,
+                    "kj": 210,
+                    "fat": 4,
+                    "saturated_fat": 0.5,
+                    "carbohydrate": 2,
+                    "sugar": 0,
+                    "protein": 2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Vegetable oil",
+                "amount": "2 tbsp",
+                "measurement_unit": "tablespoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1008,
+                    "fat": 28,
+                    "saturated_fat": 2,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Marinate the flank steak in Korean BBQ sauce for at least 1 hour.\n2. Heat vegetable oil in a skillet over medium-high heat. Add the marinated steak and cook for 3-4 minutes per side, or until desired doneness. Remove from heat and let it rest for 5 minutes before slicing.\n3. Warm the corn tortillas in a separate skillet or in the oven.\n4. Assemble the tacos by placing slices of the cooked steak on each tortilla. Top with kimchi, chopped green onions, and sesame seeds.\n5. Serve immediately and enjoy!",
+        "diet": {
+            "vegetarian": false,
+            "vegan": false,
+            "lowcal": false,
+            "lowcarb": false,
+            "keto": false,
+            "paleo": false,
+            "lowfat": false,
+            "food_combining": false,
+            "whole_food": false
+        },
+        "cookingTime": 30,
+        "cuisine": "Korean"
+    },
+    {
+        "title": "Balsamic Glazed Brussels Sprouts",
+        "ingredients": [
+            {
+                "ingredient": "Brussels sprouts",
+                "amount": "1 lb",
+                "measurement_unit": "pound",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 164,
+                    "kj": 686,
+                    "fat": 1.5,
+                    "saturated_fat": 0.2,
+                    "carbohydrate": 33,
+                    "sugar": 8,
+                    "protein": 9,
+                    "salt": 0.3
+                }
+            },
+            {
+                "ingredient": "Balsamic vinegar",
+                "amount": "3 tablespoons",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 50,
+                    "kj": 209,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 12,
+                    "sugar": 12,
+                    "protein": 0.5,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Olive oil",
+                "amount": "2 tablespoons",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 238,
+                    "kj": 996,
+                    "fat": 27,
+                    "saturated_fat": 3.8,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Garlic powder",
+                "amount": "1 teaspoon",
+                "measurement_unit": "teaspoon",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 10,
+                    "kj": 42,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 2,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": "to taste",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Black pepper",
+                "amount": "to taste",
+                "measurement_unit": "to taste",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat the oven to 400°F (200°C).\n2. Wash the Brussels sprouts and trim the ends. Cut them in half.\n3. In a large bowl, toss the Brussels sprouts with olive oil, balsamic vinegar, garlic powder, salt, and black pepper until evenly coated.\n4. Spread the Brussels sprouts in a single layer on a baking sheet lined with parchment paper.\n5. Roast in the preheated oven for 25-30 minutes, or until the Brussels sprouts are caramelized and tender, stirring halfway through.\n6. Serve hot and enjoy!",
+        "diet": {
+            "vegetarian": true,
+            "vegan": true,
+            "lowcal": false,
+            "lowcarb": true,
+            "keto": false,
+            "paleo": true,
+            "lowfat": true,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 35,
+        "cuisine": "American"
+    },
+    {
+        "title": "Creamy Tomato Basil Soup",
+        "ingredients": [
+            {
+                "ingredient": "Ripe Tomatoes",
+                "amount": "2 lbs",
+                "measurement_unit": "large",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 120,
+                    "kj": 502,
+                    "fat": 0.8,
+                    "saturated_fat": 0.1,
+                    "carbohydrate": 25,
+                    "sugar": 15,
+                    "protein": 5,
+                    "salt": 0.05
+                }
+            },
+            {
+                "ingredient": "Olive Oil",
+                "amount": "2 tbsp",
+                "measurement_unit": "tablespoons",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 240,
+                    "kj": 1005,
+                    "fat": 27,
+                    "saturated_fat": 3,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Onion",
+                "amount": "1",
+                "measurement_unit": "medium",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 44,
+                    "kj": 184,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 10,
+                    "sugar": 5,
+                    "protein": 1,
+                    "salt": 0.1
+                }
+            },
+            {
+                "ingredient": "Garlic",
+                "amount": "3 cloves",
+                "measurement_unit": "cloves",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 12,
+                    "kj": 50,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 3,
+                    "sugar": 0.5,
+                    "protein": 0.5,
+                    "salt": 0.03
+                }
+            },
+            {
+                "ingredient": "Vegetable Broth",
+                "amount": "4 cups",
+                "measurement_unit": "cups",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 20,
+                    "kj": 84,
+                    "fat": 0.2,
+                    "saturated_fat": 0,
+                    "carbohydrate": 4,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 1
+                }
+            },
+            {
+                "ingredient": "Fresh Basil Leaves",
+                "amount": "1/4 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 2,
+                    "kj": 8,
+                    "fat": 0.1,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0.3,
+                    "sugar": 0,
+                    "protein": 0.2,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Coconut Milk",
+                "amount": "1/2 cup",
+                "measurement_unit": "cup",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 80,
+                    "kj": 335,
+                    "fat": 7,
+                    "saturated_fat": 6,
+                    "carbohydrate": 2,
+                    "sugar": 1,
+                    "protein": 1,
+                    "salt": 0.02
+                }
+            },
+            {
+                "ingredient": "Salt",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            },
+            {
+                "ingredient": "Pepper",
+                "amount": "to taste",
+                "measurement_unit": "",
+                "nutritional_value": {
+                    "edited": true,
+                    "kcal": 0,
+                    "kj": 0,
+                    "fat": 0,
+                    "saturated_fat": 0,
+                    "carbohydrate": 0,
+                    "sugar": 0,
+                    "protein": 0,
+                    "salt": 0
+                }
+            }
+        ],
+        "preparation": "1. Preheat your oven to 400°F (200°C).\n2. Cut the tomatoes in half and place them on a baking sheet lined with parchment paper. Drizzle with 1 tablespoon of olive oil, then season with salt and pepper. Roast in the preheated oven for 25-30 minutes, or until the tomatoes are softened and slightly caramelized.\n3. In a large pot, heat the remaining tablespoon of olive oil over medium heat. Add chopped onion and minced garlic. Cook until softened, about 5 minutes.\n4. Add the roasted tomatoes (including any juices) to the pot along with the vegetable broth. Bring to a simmer and cook for 15-20 minutes.\n5. Remove the pot from the heat and use an immersion blender to puree the soup until smooth.\n6. Stir in the coconut milk and chopped fresh basil. Season with salt and pepper to taste.\n7. Serve hot, garnished with additional fresh basil leaves if desired.",
+        "diet": {
+            "vegetarian": true,
+            "vegan": true,
+            "lowcal": false,
+            "lowcarb": true,
+            "keto": false,
+            "paleo": true,
+            "lowfat": true,
+            "food_combining": false,
+            "whole_food": true
+        },
+        "cookingTime": 75,
+        "cuisine": "American"
+    }
+]

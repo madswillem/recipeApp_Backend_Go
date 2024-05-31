@@ -1,4 +1,4 @@
-package controllers
+package server
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
 
-func UpadateUser(c *gin.Context) {
+func (s *Server) UpadateUser(c *gin.Context) {
 	var settings models.UserSettings
 	err := c.ShouldBind(&settings)
 	if err != nil {

@@ -5,11 +5,10 @@ import (
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 )
 
 type IngredientsSchema struct {
-	ID             uint `json:"id" gorm:"primarykey"`
+	BaseModel
 	RecipeSchemaID uint `json:"-"`
 
 	Ingredient       string           `json:"ingredient"`
@@ -26,7 +25,7 @@ func (ingredient *IngredientsSchema) createIngredientDBEntry() *error_handler.AP
 		NutritionalValue: ingredient.NutritionalValue,
 	}
 
-	err := initializers.DB.Create(&newIngredientDBEntry).Error
+	err := ingredient.query.Create(&newIngredientDBEntry).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}

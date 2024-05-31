@@ -5,15 +5,13 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 )
 
 type RecipeSchema struct {
-	ID               uint                `json:"_id" gorm:"primarykey"`
+	BaseModel
 	Title            string              `json:"title"`
 	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Preparation      string              `json:"preparation"`
@@ -29,7 +27,7 @@ type RecipeSchema struct {
 	RecipeGroup	 []*RecipeGroupSchema`gorm:"many2many:recipe_recipegroups"` 
 }
 
-func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
+func (recipe *RecipeSchema) Delete() *error_handler.APIError {
 	exists, apiErr := recipe.CheckIfExistsByID()
 	if apiErr != nil {
 		return apiErr
@@ -38,7 +36,7 @@ func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
 		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
 	}
 
-	err := initializers.DB.Delete(&recipe).Error
+	err := recipe.query.Delete(&recipe).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -46,7 +44,7 @@ func (recipe *RecipeSchema) Delete(c *gin.Context) *error_handler.APIError {
 }
 
 func (recipe *RecipeSchema) Update() *error_handler.APIError {
-	err := initializers.DB.Updates(&recipe).First(&recipe).Error
+	err := recipe.query.Updates(&recipe).First(&recipe).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
@@ -61,7 +59,7 @@ func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, *error_handler.APIErro
 	var result struct {
 		Found bool
 	}
-	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
+	err := recipe.query.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
 	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
@@ -69,7 +67,7 @@ func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) 
 	var result struct {
 		Found bool
 	}
-	err := initializers.DB.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
+	err := recipe.query.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
 	if err != nil {
 		return false, error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -77,7 +75,7 @@ func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) 
 }
 
 func (recipe *RecipeSchema) GetRecipeByID(reqData map[string]bool) *error_handler.APIError {
-	req := initializers.DB
+	req := recipe.query
 	if reqData["ingredients"] || reqData["everything"] {
 		req = req.Preload("Ingredients")
 	}
@@ -112,7 +110,7 @@ func (recipe *RecipeSchema) GetRecipeByID(reqData map[string]bool) *error_handle
 func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 	for _, ingredient := range recipe.Ingredients {
 		var nutritionalValue NutritionalValue
-		err := initializers.DB.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
+		err := recipe.query.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
 			Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
 			First(&nutritionalValue).Error
 		if err != nil {
@@ -156,7 +154,7 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_h
 		return apiErr
 	}
 
-	err := initializers.DB.Save(recipe).Error
+	err := recipe.query.Save(recipe).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -205,7 +203,7 @@ func (recipe *RecipeSchema) Create() *error_handler.APIError {
 		return err
 	}
 
-	tx := initializers.DB.Begin()
+	tx := recipe.query.Begin()
 
 	if err := tx.Create(&recipe).Error; err != nil {
 		tx.Rollback()
