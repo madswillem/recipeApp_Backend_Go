@@ -31,8 +31,8 @@ type Avrg struct {
 	Percentige      float64
 }
 
-func (group *RecipeGroupSchema) GetRecipeGroupByID(reqData map[string]bool) *error_handler.APIError {
-	err := group.query.Find(&group, "ID = ?", group.ID).Error
+func (group *RecipeGroupSchema) GetRecipeGroupByID(db *gorm.DB ,reqData map[string]bool) *error_handler.APIError {
+	err := db.Find(&group, "ID = ?", group.ID).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -46,14 +46,7 @@ func GetAllRecipeGroups(db *gorm.DB) (*error_handler.APIError, []RecipeGroupSche
 	}
 	return nil, groups
 }
-func (group *RecipeGroupSchema) Update() *error_handler.APIError {
-	err := group.query.Save(&group).Error
-	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-	return nil
-}
-func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema) {
+func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema, db *gorm.DB) {
 	for _, name := range recipe.Ingredients {
 		added := false
 		for _, avrgName := range group.AvrgIngredients {
@@ -90,7 +83,7 @@ func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema) {
 		group.AvrgWholeFood += 1
 	}
 	group.Recipes = append(group.Recipes, recipe)
-	group.Update()
+	group.Update(db)
 }
 
 func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {

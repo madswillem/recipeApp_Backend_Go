@@ -27,55 +27,27 @@ type RecipeSchema struct {
 	RecipeGroup	 []*RecipeGroupSchema`gorm:"many2many:recipe_recipegroups"` 
 }
 
-func (recipe *RecipeSchema) Delete() *error_handler.APIError {
-	exists, apiErr := recipe.CheckIfExistsByID()
-	if apiErr != nil {
-		return apiErr
-	}
-	if !exists {
-		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
-	}
-
-	err := recipe.query.Delete(&recipe).Error
-	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-	return nil
-}
-
-func (recipe *RecipeSchema) Update() *error_handler.APIError {
-	err := recipe.query.Updates(&recipe).First(&recipe).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
-		} else {
-			return error_handler.New("database error", http.StatusInternalServerError, err)
-		}
-	}
-	return nil
-}
-
-func (recipe *RecipeSchema) CheckIfExistsByTitle() (bool, *error_handler.APIError) {
+func (recipe *RecipeSchema) CheckIfExistsByTitle(db *gorm.DB) (bool, *error_handler.APIError) {
 	var result struct {
 		Found bool
 	}
-	err := recipe.query.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
+	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
 	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
-func (recipe *RecipeSchema) CheckIfExistsByID() (bool, *error_handler.APIError) {
+func (recipe *RecipeSchema) CheckIfExistsByID(db *gorm.DB) (bool, *error_handler.APIError) {
 	var result struct {
 		Found bool
 	}
-	err := recipe.query.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
+	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
 	if err != nil {
 		return false, error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 	return result.Found, nil
 }
 
-func (recipe *RecipeSchema) GetRecipeByID(reqData map[string]bool) *error_handler.APIError {
-	req := recipe.query
+func (recipe *RecipeSchema) GetRecipeByID(db *gorm.DB ,reqData map[string]bool) *error_handler.APIError {
+	req := db
 	if reqData["ingredients"] || reqData["everything"] {
 		req = req.Preload("Ingredients")
 	}
@@ -107,24 +79,24 @@ func (recipe *RecipeSchema) GetRecipeByID(reqData map[string]bool) *error_handle
 	return nil
 }
 
-func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
+func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIError {
 	for _, ingredient := range recipe.Ingredients {
 		var nutritionalValue NutritionalValue
-		err := recipe.query.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
+		err := db.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
 			Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
 			First(&nutritionalValue).Error
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
 				return error_handler.New("ingredient not found please add nutritional value and set edited to true", http.StatusBadRequest, err)
 			} else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
-				err := ingredient.createIngredientDBEntry()
+				err := ingredient.createIngredientDBEntry(db)
 				if err != nil {
 					return err
 				}
 			} else {
 				return error_handler.New("database error", http.StatusInternalServerError, err)
 			}
-		} else if err == nil {
+		} else {
 			if ingredient.NutritionalValue.Edited {
 				return error_handler.New("ingredient already exists", http.StatusBadRequest, err)
 			} else if !ingredient.NutritionalValue.Edited {
@@ -135,13 +107,13 @@ func (recipe *RecipeSchema) AddNutritionalValue() *error_handler.APIError {
 	return nil
 }
 
-func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_handler.APIError {
-	apiErr := recipe.GetRecipeByID(map[string]bool{"everything": true})
+func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm.DB) *error_handler.APIError {
+	apiErr := recipe.GetRecipeByID(db ,map[string]bool{"everything": true})
 	if apiErr != nil {
 		return apiErr
 	}
 	recipe.Selected += change
-	exists, apiErr := recipe.CheckIfExistsByID()
+	exists, apiErr := recipe.CheckIfExistsByID(db)
 	if apiErr != nil {
 		return apiErr
 	}
@@ -154,7 +126,7 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_h
 		return apiErr
 	}
 
-	err := recipe.query.Save(recipe).Error
+	err := db.Save(recipe).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
@@ -162,7 +134,7 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel) *error_h
 	if user.ID == 0 {
 		return nil
 	}
-	apiErr = user.AddRecipeToGroup(recipe)
+	apiErr = user.AddRecipeToGroup(db, recipe)
 
 	return apiErr
 }
@@ -187,7 +159,7 @@ func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
 	return nil
 }
 
-func (recipe *RecipeSchema) Create() *error_handler.APIError {
+func (recipe *RecipeSchema) Create(db *gorm.DB) *error_handler.APIError {
 	err := recipe.CheckForRequiredFields()
 	if err != nil {
 		return err
@@ -198,24 +170,14 @@ func (recipe *RecipeSchema) Create() *error_handler.APIError {
 		recipe.Ingredients[i].Rating.DefaultRatingStruct(recipe.Ingredients[i].Ingredient)
 	}
 
-	err = recipe.AddNutritionalValue()
+	err = recipe.AddNutritionalValue(db)
 	if err != nil {
 		return err
 	}
 
-	tx := recipe.query.Begin()
-
-	if err := tx.Create(&recipe).Error; err != nil {
-		tx.Rollback()
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-
-	return err
+	return recipe.SubmitToDB(db)
 }
+
 func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {
 	//Ings
 	sameIngs := make([]bool, len(recipe.Ingredients))

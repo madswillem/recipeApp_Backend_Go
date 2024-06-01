@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
+	"gorm.io/gorm"
 )
 
 type IngredientsSchema struct {
@@ -18,14 +19,14 @@ type IngredientsSchema struct {
 	Rating           RatingStruct     `json:"rating" gorm:"polymorphic:Owner"`
 }
 
-func (ingredient *IngredientsSchema) createIngredientDBEntry() *error_handler.APIError {
+func (ingredient *IngredientsSchema) createIngredientDBEntry(db *gorm.DB) *error_handler.APIError {
 	newIngredientDBEntry := IngredientDBSchema{
 		Name:             ingredient.Ingredient,
 		StandardUnit:     ingredient.MeasurementUnit,
 		NutritionalValue: ingredient.NutritionalValue,
 	}
 
-	err := ingredient.query.Create(&newIngredientDBEntry).Error
+	err := db.Create(&newIngredientDBEntry).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}

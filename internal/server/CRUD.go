@@ -31,7 +31,7 @@ func (s *Server) AddRecipe(c *gin.Context) {
 		return
 	}
 
-	err := body.Create()
+	err := body.Create(s.DB)
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 		return
@@ -52,7 +52,7 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 
 	body.ID = uint(i)
 
-	updateErr := body.Update()
+	updateErr := body.Update(s.DB)
 	if updateErr != nil {
 		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
 		return
@@ -68,7 +68,7 @@ func (s *Server) DeleteRecipe(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = uint(i)
 
-	deleteErr := response.Delete()
+	deleteErr := response.Delete(s.DB)
 	if deleteErr != nil {
 		error_handler.HandleError(c, deleteErr.Code, deleteErr.Message, deleteErr.Errors)
 		return
@@ -94,7 +94,7 @@ func (s *Server) GetById(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	getErr := response.GetRecipeByID(reqData)
+	getErr := response.GetRecipeByID(s.DB ,reqData)
 
 	if getErr != nil {
 		if getErr.Errors[0] == gorm.ErrRecordNotFound {
@@ -137,7 +137,7 @@ func (s *Server) Select(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = uint(i)
 	
-	selectedErr := response.UpdateSelected(1, &middleware_user)
+	selectedErr := response.UpdateSelected(1, &middleware_user, s.DB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
@@ -157,7 +157,7 @@ func (s *Server) Deselect(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = uint(i)
 
-	selectedErr := response.UpdateSelected(-1, &middleware_user)
+	selectedErr := response.UpdateSelected(-1, &middleware_user, s.DB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return

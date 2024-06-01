@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/middleware"
 	"gorm.io/gorm"
 )
 
@@ -21,21 +20,27 @@ type Server struct {
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	NewSr := &Server{
+	NewServer := &Server{
 		port: port,
 		DB: database.ConnectToDB(),
 	}
 
-	// Declare Sr config
-	sr := &http.Server{
-		Addr:         fmt.Sprintf(":%d", NewSr.port),
-		Handler:      NewSr.RegisterRoutes(),
+	database.Migrate(NewServer.DB)
+
+	if NewServer.DB == nil {
+		panic("db is nil")
+	}
+
+	// Declare Server config
+	server := &http.Server{
+		Addr:         fmt.Sprintf(":%d", NewServer.port),
+		Handler:      NewServer.RegisterRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
 
-	return sr
+	return server
 }
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
@@ -46,7 +51,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			"pageTitle": "404 Page not found",
 		})
 	})
-	r.Use(middleware.CORSMiddleware())
+	r.Use(s.CORSMiddleware())
 
 	r.POST("/create", s.AddRecipe)
 	r.GET("/get", s.GetAll)
@@ -54,11 +59,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.PATCH("/update/:id", s.UpdateRecipe)
 	r.DELETE("/delete/:id", s.DeleteRecipe)
 	r.POST("/filter", s.Filter)
-	r.GET("/select/:id", middleware.User, s.Select)
-	r.GET("/deselect/:id", middleware.User, s.Deselect)
+	r.GET("/select/:id", s.UserMiddleware, s.Select)
+	r.GET("/deselect/:id", s.UserMiddleware, s.Deselect)
 	r.GET("/colormode/:type", s.Colormode)
 
-	r.PATCH("/account/update", middleware.User, s.UpadateUser)
+	r.PATCH("/account/update", s.UserMiddleware, s.UpadateUser)
 
 	r.GET("/", s.RenderHome)
 	r.GET("/account", s.RenderAcount)

@@ -16,13 +16,13 @@ func (s *Server) UpadateUser(c *gin.Context) {
 		return
 	}
 	middleware_user, _ := c.MustGet("user").(models.UserModel)
-	apiErr := middleware_user.GetByCookie()
+	apiErr := middleware_user.GetByCookie(s.DB)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return
 	}
 	middleware_user.Settings = settings
-	apiErr = middleware_user.Update()
+	apiErr = middleware_user.Update(s.DB)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return

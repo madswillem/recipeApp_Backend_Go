@@ -1,7 +1,6 @@
 package models
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -24,8 +23,8 @@ type UserSettings struct {
 	Diet		DietSchema `gorm:"polymorphic:Owner"`
 }
 
-func (user *UserModel) GetByCookie() *error_handler.APIError{
-	err := user.query.Preload(clause.Associations).First(&user, "Cookie = ?", user.Cookie).Error
+func (user *UserModel) GetByCookie(db *gorm.DB) *error_handler.APIError{
+	err := db.Preload(clause.Associations).First(&user, "Cookie = ?", user.Cookie).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return error_handler.New("user not found", http.StatusNotFound, err)
@@ -37,68 +36,47 @@ func (user *UserModel) GetByCookie() *error_handler.APIError{
 	return nil
 
 }
-func (user *UserModel) CheckIfExistsByCookie() bool {
+func (user *UserModel) CheckIfExistsByCookie(db *gorm.DB) bool {
 	var result struct {
 		Found bool
 		Error error_handler.APIError
 	}
-	err := user.query.Raw("SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = ?) AS found;", user.Cookie).Scan(&result).Error
+	err := db.Raw("SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = ?) AS found;", user.Cookie).Scan(&result).Error
 	if err != nil {
 		error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 	return result.Found
 }
-func (user *UserModel) Create(ip string) *error_handler.APIError{
+func (user *UserModel) Create(db *gorm.DB,ip string) *error_handler.APIError{
 	user.LastLogin = time.Now()
 	user.IP = ip
 	for {
 		user.Cookie = tools.RandomString(20)
-		if !user.CheckIfExistsByCookie() {
+		if !user.CheckIfExistsByCookie(db) {
 			break
 		}
 	}
 
-	tx := user.query.Begin()
-
-	if err := tx.Create(&user).Error; err != nil {
-		tx.Rollback()
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
+	user.SubmitToDB(db)
 	
 	return nil
 }
-func (user *UserModel) Update() *error_handler.APIError{
-	err := user.query.Updates(&user).First(&user).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
-		} else {
-			return error_handler.New("database error", http.StatusInternalServerError, err)
-		}
-	}
-	return nil
-
-}
-func (user *UserModel) GetAllRecipeGroups() ([]RecipeGroupSchema, *error_handler.APIError) {
+func (user *UserModel) GetAllRecipeGroups(db *gorm.DB) ([]RecipeGroupSchema, *error_handler.APIError) {
 	var group []RecipeGroupSchema
-	if err := user.query.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
+	if err := db.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
 	    return []RecipeGroupSchema{}, error_handler.New("Database error", http.StatusInternalServerError, err)
 	}
 
 	return group, nil
 }
-func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.APIError {	
-	groups, err := user.GetAllRecipeGroups()
+func (user *UserModel) AddRecipeToGroup(db *gorm.DB ,recipe *RecipeSchema) *error_handler.APIError {	
+	groups, err := user.GetAllRecipeGroups(db)
 	if err != nil {
 		return err
 	}
 	if len(groups) < 1 {
 		user.RecipeGroups = append(user.RecipeGroups, GroupNew(recipe))
-		return user.Update()
+		return user.Update(db)
 	}
 	sortedGroups := make([]SimiliarityGroupRecipe, len(groups))
 
@@ -113,19 +91,19 @@ func (user *UserModel) AddRecipeToGroup(recipe *RecipeSchema) *error_handler.API
 	sortedGroups = SortSimilarity(sortedGroups)
 
 	if sortedGroups[0].Similarity <= 90.0 {
-		sortedGroups[0].Group.AddRecipeToGroup(recipe)
+		sortedGroups[0].Group.AddRecipeToGroup(recipe, db)
 		user.RecipeGroups = append(user.RecipeGroups, GroupNew(recipe))
-		return user.Update()
+		return user.Update(db)
 	}
 
-	sortedGroups[0].Group.AddRecipeToGroup(recipe)
-	return user.Update()
+	sortedGroups[0].Group.AddRecipeToGroup(recipe, db)
+	return user.Update(db)
 }
-// Using query to extend an existing query like a search to show recipes similar to your intrests
-func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError, []RecipeSchema) {
+// Using db to extend an existing db like a search to show recipes similar to your intrests
+func (user *UserModel) GetRecomendation(db *gorm.DB) (*error_handler.APIError, []RecipeSchema) {
 	var recipes []RecipeSchema
 	//Get recipes 
-	query =	query.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
+	db =	db.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
 		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
 		Group("recipe_schemas.id").
 		Preload(clause.Associations).
@@ -134,30 +112,30 @@ func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError
 
 	switch {
 		case user.Settings.Diet.Vegetarien:
-			query = query.Where("diet_schemas.vegetarien = ?", true)
+			db = db.Where("diet_schemas.vegetarien = ?", true)
 		case user.Settings.Diet.Vegan:
-			query = query.Where("diet_schemas.vegan = ?", true)
+			db = db.Where("diet_schemas.vegan = ?", true)
 		case user.Settings.Diet.LowCal:
-			query = query.Where("diet_schemas.lowcal = ?", true)
+			db = db.Where("diet_schemas.lowcal = ?", true)
 		case user.Settings.Diet.LowCarb:
-			query = query.Where("diet_schemas.lowcarb = ?", true)
+			db = db.Where("diet_schemas.lowcarb = ?", true)
 		case user.Settings.Diet.Keto:
-			query = query.Where("diet_schemas.keto = ?", true)
+			db = db.Where("diet_schemas.keto = ?", true)
 		case user.Settings.Diet.Paleo:
-			query = query.Where("diet_schemas.paleo = ?", true)
+			db = db.Where("diet_schemas.paleo = ?", true)
 		case user.Settings.Diet.LowFat:
-			query = query.Where("diet_schemas.lowfat = ?", true)
+			db = db.Where("diet_schemas.lowfat = ?", true)
 		case user.Settings.Diet.FoodCombining:
-			query = query.Where("diet_schemas.food_combining = ?", true)
+			db = db.Where("diet_schemas.food_combining = ?", true)
 		case user.Settings.Diet.WholeFood:
-			query = query.Where("diet_schemas.whole_food = ?", true)
+			db = db.Where("diet_schemas.whole_food = ?", true)
 	}
-	err := query.Find(&recipes).Error
+	err := db.Find(&recipes).Error
 	if err != nil {
 		return error_handler.New("Database error", http.StatusInternalServerError, err), nil
 	}
 
-	groups, apiErr := user.GetAllRecipeGroups()
+	groups, apiErr := user.GetAllRecipeGroups(db)
 	if apiErr != nil {
 		return apiErr, nil
 	}
@@ -166,7 +144,7 @@ func (user *UserModel) GetRecomendation(query *gorm.DB) (*error_handler.APIError
 	for _, recipe := range recipes {
 		for _, group := range groups {
 			sim, apiErr := recipe.GetSimilarityWithGroup(group)
-			if err != nil {
+			if apiErr != nil {
 				return apiErr, nil
 			}
 			similarity = append(similarity, SimiliarityGroupRecipe{Recipe: recipe, Group: group, Similarity: sim})
