@@ -22,7 +22,8 @@ import (
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
 	if actual.ID == 0 || expected.ID == 0 {
-		t.Errorf("Expected non-nil values for actual and expected")
+		t.Errorf(fmt.Sprintf("%d (actual.ID) != %d (expected.ID)", actual.ID, expected.ID))
+
 		return
 	}
 
@@ -413,7 +414,7 @@ func TestDeleteRecipe(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 
 		c.Request, _ = http.NewRequest(http.MethodDelete, "/delete", nil)
-		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "2"}}
 
 		// Call the Delete function
 		s.DeleteRecipe(c)
@@ -457,7 +458,7 @@ func TestUpdateRecipe(t *testing.T) {
 		}
 
 		c.Request, _ = http.NewRequest(http.MethodPatch, "/update", bytes.NewReader(jsonBody))
-		c.Params = gin.Params{gin.Param{Key: "id", Value: "2"}}
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
 
 		// Call the Update function
 		s.UpdateRecipe(c)

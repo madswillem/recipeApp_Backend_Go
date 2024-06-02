@@ -3,12 +3,13 @@ package models
 import (
 	"net/http"
 
+	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"gorm.io/gorm"
 )
 
 type RecipeGroupSchema struct {
-	BaseModel
+	gorm.Model
 	UserID		  	  uint
 	Recipes           []*RecipeSchema  `gorm:"many2many:recipe_recipegroups"` 
 	AvrgIngredients   []Avrg `gorm:"foreignKey:GroupID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
@@ -83,7 +84,7 @@ func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema, db *gorm.
 		group.AvrgWholeFood += 1
 	}
 	group.Recipes = append(group.Recipes, recipe)
-	group.Update(db)
+	database.Update(db, group)
 }
 
 func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {

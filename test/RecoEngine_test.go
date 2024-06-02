@@ -4,26 +4,27 @@ import (
 	"testing"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
+	"gorm.io/gorm"
 )
 
 func TestGetSimialrity(t *testing.T) {
 	testGroup := models.RecipeGroupSchema{
-		BaseModel: models.BaseModel{ID: 1},
+		Model: gorm.Model{ID: 1},
 		Recipes:[]*models.RecipeSchema{
-			{BaseModel: models.BaseModel{ID: 1}},
-			{BaseModel: models.BaseModel{ID: 2}},
-			{BaseModel: models.BaseModel{ID: 3}},
-			{BaseModel: models.BaseModel{ID: 4}},
-			{BaseModel: models.BaseModel{ID: 5}},
-			{BaseModel: models.BaseModel{ID: 6}},
-			{BaseModel: models.BaseModel{ID: 7}},
-			{BaseModel: models.BaseModel{ID: 8}},
-			{BaseModel: models.BaseModel{ID: 9}},
-			{BaseModel: models.BaseModel{ID: 10}},
-			{BaseModel: models.BaseModel{ID: 11}},
-			{BaseModel: models.BaseModel{ID: 12}},
-			{BaseModel: models.BaseModel{ID: 13}},
-			{BaseModel: models.BaseModel{ID: 14}},
+			{Model: gorm.Model{ID: 1}},
+			{Model: gorm.Model{ID: 2}},
+			{Model: gorm.Model{ID: 3}},
+			{Model: gorm.Model{ID: 4}},
+			{Model: gorm.Model{ID: 5}},
+			{Model: gorm.Model{ID: 6}},
+			{Model: gorm.Model{ID: 7}},
+			{Model: gorm.Model{ID: 8}},
+			{Model: gorm.Model{ID: 9}},
+			{Model: gorm.Model{ID: 10}},
+			{Model: gorm.Model{ID: 11}},
+			{Model: gorm.Model{ID: 12}},
+			{Model: gorm.Model{ID: 13}},
+			{Model: gorm.Model{ID: 14}},
 		},
 		AvrgIngredients: []models.Avrg{
 			{Name: "flower", Percentige: 14},
@@ -48,7 +49,7 @@ func TestGetSimialrity(t *testing.T) {
 	}
 
 	testRecipe := models.RecipeSchema{
-		BaseModel: models.BaseModel{ID: 1},
+		Model: gorm.Model{ID: 1},
 		Ingredients: []models.IngredientsSchema{
 			{Ingredient: "flower"},
 			{Ingredient: "water"},

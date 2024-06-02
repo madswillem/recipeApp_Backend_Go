@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 )
@@ -22,7 +23,7 @@ func (s *Server) UpadateUser(c *gin.Context) {
 		return
 	}
 	middleware_user.Settings = settings
-	apiErr = middleware_user.Update(s.DB)
+	apiErr = database.Update(s.DB, &middleware_user)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return

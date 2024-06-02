@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
@@ -11,7 +12,7 @@ import (
 )
 
 type UserModel struct {
-	BaseModel
+	gorm.Model
 	LastLogin	time.Time
 	RecipeGroups	[]RecipeGroupSchema `gorm:"foreignKey:UserID;"`
 	Settings 	UserSettings `gorm:"embedded;embeddedPrefix:setting_"`
@@ -57,7 +58,7 @@ func (user *UserModel) Create(db *gorm.DB,ip string) *error_handler.APIError{
 		}
 	}
 
-	user.SubmitToDB(db)
+	database.SubmitToDB(db, user)
 	
 	return nil
 }
@@ -76,7 +77,7 @@ func (user *UserModel) AddRecipeToGroup(db *gorm.DB ,recipe *RecipeSchema) *erro
 	}
 	if len(groups) < 1 {
 		user.RecipeGroups = append(user.RecipeGroups, GroupNew(recipe))
-		return user.Update(db)
+		return database.Update(db, user)
 	}
 	sortedGroups := make([]SimiliarityGroupRecipe, len(groups))
 
@@ -93,11 +94,11 @@ func (user *UserModel) AddRecipeToGroup(db *gorm.DB ,recipe *RecipeSchema) *erro
 	if sortedGroups[0].Similarity <= 90.0 {
 		sortedGroups[0].Group.AddRecipeToGroup(recipe, db)
 		user.RecipeGroups = append(user.RecipeGroups, GroupNew(recipe))
-		return user.Update(db)
+		return database.Update(db, user)
 	}
 
 	sortedGroups[0].Group.AddRecipeToGroup(recipe, db)
-	return user.Update(db)
+	return database.Update(db, user)
 }
 // Using db to extend an existing db like a search to show recipes similar to your intrests
 func (user *UserModel) GetRecomendation(db *gorm.DB) (*error_handler.APIError, []RecipeSchema) {

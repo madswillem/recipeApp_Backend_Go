@@ -58,7 +58,7 @@ func (rating *RatingStruct) DefaultRatingStruct(title string) {
 	rating.Subzerodegree = 1000.0
 }
 
-func (rating RatingStruct) Update(change int) *error_handler.APIError {
+func (rating *RatingStruct) Update(change int) *error_handler.APIError {
 
 	result := rating
 	data, err := tools.GetCurrentData()

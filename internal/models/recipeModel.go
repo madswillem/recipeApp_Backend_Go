@@ -2,16 +2,18 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"net/http"
 
+	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 )
 
 type RecipeSchema struct {
-	BaseModel
+	gorm.Model
 	Title            string              `json:"title"`
 	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Preparation      string              `json:"preparation"`
@@ -66,7 +68,7 @@ func (recipe *RecipeSchema) GetRecipeByID(db *gorm.DB ,reqData map[string]bool) 
 	if reqData["diet"] || reqData["everything"] {
 		req = req.Preload("Diet")
 	}
-	err := req.First(&recipe, "ID = ?", recipe.ID).Error
+	err := req.First(&recipe, "id = ?", recipe.ID).Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -113,30 +115,28 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm
 		return apiErr
 	}
 	recipe.Selected += change
-	exists, apiErr := recipe.CheckIfExistsByID(db)
-	if apiErr != nil {
-		return apiErr
-	}
-	if !exists {
-		return error_handler.New("recipe not found", http.StatusNotFound, gorm.ErrRecordNotFound)
-	}
 
 	apiErr = recipe.Rating.Update(change)
 	if apiErr != nil {
 		return apiErr
 	}
+	fmt.Println(recipe.Rating.Overall)
 
-	err := db.Save(recipe).Error
+	err := db.Model(&recipe).Update("selected", recipe.Selected).Error
+	if err != nil {
+		return error_handler.New("database error", http.StatusInternalServerError, err)
+	}
+	err = db.Model(&recipe.Rating).Updates(recipe.Rating).Error
 	if err != nil {
 		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
 	
-	if user.ID == 0 {
-		return nil
-	}
-	apiErr = user.AddRecipeToGroup(db, recipe)
+	//if user == nil {
+	//	return nil
+	//}
+	//apiErr = user.AddRecipeToGroup(db, recipe)
 
-	return apiErr
+	return nil
 }
 
 func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
@@ -175,7 +175,7 @@ func (recipe *RecipeSchema) Create(db *gorm.DB) *error_handler.APIError {
 		return err
 	}
 
-	return recipe.SubmitToDB(db)
+	return database.SubmitToDB(db, recipe)
 }
 
 func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {

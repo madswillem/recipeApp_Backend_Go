@@ -2,20 +2,32 @@ package server
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"strconv"
-	"html/template"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
 )
 
 type Server struct {
 	port int
 	DB *gorm.DB
+}
+
+func Migrate(db *gorm.DB) {
+	db.AutoMigrate(&models.RecipeSchema{})
+	db.AutoMigrate(&models.RecipeGroupSchema{})
+	db.AutoMigrate(&models.Avrg{})
+	db.AutoMigrate(&models.IngredientsSchema{})
+	db.AutoMigrate(&models.RatingStruct{})
+	db.AutoMigrate(&models.NutritionalValue{})
+	db.AutoMigrate(&models.DietSchema{})
+	db.AutoMigrate(&models.IngredientDBSchema{})
 }
 
 func NewServer() *http.Server {
@@ -25,7 +37,7 @@ func NewServer() *http.Server {
 		DB: database.ConnectToDB(),
 	}
 
-	database.Migrate(NewServer.DB)
+	Migrate(NewServer.DB)
 
 	if NewServer.DB == nil {
 		panic("db is nil")
@@ -59,7 +71,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.PATCH("/update/:id", s.UpdateRecipe)
 	r.DELETE("/delete/:id", s.DeleteRecipe)
 	r.POST("/filter", s.Filter)
-	r.GET("/select/:id", s.UserMiddleware, s.Select)
+	r.GET("/select/:id", s.Select)
 	r.GET("/deselect/:id", s.UserMiddleware, s.Deselect)
 	r.GET("/colormode/:type", s.Colormode)
 

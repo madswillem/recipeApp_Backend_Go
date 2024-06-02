@@ -1,11 +1,13 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
@@ -52,7 +54,7 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 
 	body.ID = uint(i)
 
-	updateErr := body.Update(s.DB)
+	updateErr := database.Update(s.DB, &body)
 	if updateErr != nil {
 		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
 		return
@@ -68,7 +70,7 @@ func (s *Server) DeleteRecipe(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = uint(i)
 
-	deleteErr := response.Delete(s.DB)
+	deleteErr := database.Delete(s.DB, &response)
 	if deleteErr != nil {
 		error_handler.HandleError(c, deleteErr.Code, deleteErr.Message, deleteErr.Errors)
 		return
@@ -87,14 +89,10 @@ func (s *Server) GetById(c *gin.Context) {
 	response.ID = uint(i)
 
 	reqData := map[string]bool{
-		"ingredients":      true,
-		"ingredient_nutri": true,
-		"ingredient_rate":  true,
-		"rating":           true,
-		"nutritionalvalue": true,
-		"diet":             true,
+		"everything": true,
 	}
 	getErr := response.GetRecipeByID(s.DB ,reqData)
+	fmt.Println(response.Version)
 
 	if getErr != nil {
 		if getErr.Errors[0] == gorm.ErrRecordNotFound {
@@ -117,7 +115,7 @@ func (s *Server) Filter(c *gin.Context) {
 		return
 	}
 
-	recipes, apiErr := body.Filter()
+	recipes, apiErr := body.Filter(s.DB)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return
@@ -132,12 +130,16 @@ func (s *Server) Select(c *gin.Context) {
 		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
 		return
 	}
-	middleware_user, _ := c.MustGet("user").(models.UserModel)
+	middleware_user, _ := c.Get("user")
+	user, ok := middleware_user.(models.UserModel)
+	if !ok {
+		fmt.Println("type assertion failed")
+	}
 	
 	response := models.RecipeSchema{}
 	response.ID = uint(i)
 	
-	selectedErr := response.UpdateSelected(1, &middleware_user, s.DB)
+	selectedErr := response.UpdateSelected(1, &user, s.DB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return

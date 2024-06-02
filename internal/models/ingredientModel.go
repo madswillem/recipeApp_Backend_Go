@@ -9,7 +9,7 @@ import (
 )
 
 type IngredientsSchema struct {
-	BaseModel
+	gorm.Model
 	RecipeSchemaID uint `json:"-"`
 
 	Ingredient       string           `json:"ingredient"`
