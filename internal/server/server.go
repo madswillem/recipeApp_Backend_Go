@@ -14,12 +14,29 @@ import (
 	"gorm.io/gorm"
 )
 
+const MethodGET = "GET"
+const MethodPost = "POST"
+
+type InnitFuncs func(*Server) error
+type ExtraControllers struct {
+	function func(* gin.Context)
+	route string
+	method string
+}
+
+type Config struct {
+	Innit	[]InnitFuncs
+	Controllers	[]ExtraControllers
+	DBConf	gorm.Config
+}
+
 type Server struct {
 	port int
 	DB *gorm.DB
+	config *Config
 }
 
-func Migrate(db *gorm.DB) {
+func migrate(db *gorm.DB) {
 	db.AutoMigrate(&models.RecipeSchema{})
 	db.AutoMigrate(&models.RecipeGroupSchema{})
 	db.AutoMigrate(&models.Avrg{})
@@ -30,14 +47,19 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&models.IngredientDBSchema{})
 }
 
-func NewServer() *http.Server {
+func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port: port,
-		DB: database.ConnectToDB(),
+		DB: database.ConnectToDB(&config.DBConf),
+		config: config,
 	}
-
-	Migrate(NewServer.DB)
+	
+	for _, fnc := range NewServer.config.Innit {
+		err := fnc(NewServer)
+		fmt.Println(err)
+	}
+	migrate(NewServer.DB)
 
 	if NewServer.DB == nil {
 		panic("db is nil")
@@ -64,6 +86,15 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 	})
 	r.Use(s.CORSMiddleware())
+
+	for _, controller := range s.config.Controllers {
+		if controller.method == MethodGET {
+			r.GET(controller.route, controller.function)
+		}
+		if controller.method == MethodPost {
+			r.GET(controller.route, controller.function)
+		}
+	}
 
 	r.POST("/create", s.AddRecipe)
 	r.GET("/get", s.GetAll)

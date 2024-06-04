@@ -89,7 +89,7 @@ func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIE
 			First(&nutritionalValue).Error
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				return error_handler.New("ingredient not found please add nutritional value and set edited to true", http.StatusBadRequest, err)
+				return error_handler.New(fmt.Sprintf("ingredient %s not found please add nutritional value and set edited to true", ingredient.Ingredient), http.StatusBadRequest, err)
 			} else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
 				err := ingredient.createIngredientDBEntry(db)
 				if err != nil {
@@ -100,7 +100,7 @@ func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIE
 			}
 		} else {
 			if ingredient.NutritionalValue.Edited {
-				return error_handler.New("ingredient already exists", http.StatusBadRequest, err)
+				return error_handler.New(fmt.Sprintf("Ingredient: %s already exists", ingredient.Ingredient), http.StatusBadRequest, err)
 			} else if !ingredient.NutritionalValue.Edited {
 				ingredient.NutritionalValue = nutritionalValue
 			}
@@ -141,18 +141,18 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm
 
 func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
 	if recipe.Title == "" {
-		return error_handler.New("missing required field", http.StatusBadRequest, errors.New("missing recipe title"))
+		return error_handler.New("missing recipe title", http.StatusBadRequest, errors.New("missing recipe title"))
 	}
 	if recipe.Ingredients == nil {
 		return error_handler.New("missing recipe ingredients", http.StatusBadRequest, errors.New("missing recipe ingredients"))
 	}
 	if recipe.Preparation == "" {
-		return error_handler.New("missing recipe ingredients", http.StatusBadRequest, errors.New("missing recipe preparation"))
+		return error_handler.New("missing recipe preperation", http.StatusBadRequest, errors.New("missing recipe preparation"))
 	}
 	for _, ingredient := range recipe.Ingredients {
 		err := ingredient.CheckForRequiredFields()
 		if err != nil {
-			return error_handler.New("missing required field", http.StatusBadRequest, err)
+			return error_handler.New(fmt.Sprintf("missing required field %s", err.Error()), http.StatusBadRequest, err)
 		}
 	}
 

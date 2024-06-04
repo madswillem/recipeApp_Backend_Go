@@ -5,10 +5,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/server"
+	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -80,22 +79,6 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 	if len(errors) > 0 {
 		t.Error(strings.Join(errors, "\n"))
 	}
-}
-func readFileAsString(filePath string, t *testing.T) string {
-	println(filePath)
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Fatalf("Error opening file %s: %s", filePath, err)
-	}
-	defer file.Close()
-
-	var buf bytes.Buffer
-	_, err = io.Copy(&buf, file)
-	if err != nil {
-		t.Fatalf("Error copying file content: %s", err)
-	}
-
-	return buf.String()
 }
 
 func innitTestDB() *gorm.DB {
@@ -170,7 +153,12 @@ func TestAddRecipe(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			c.Request = httptest.NewRequest(http.MethodPost, "/create", strings.NewReader(readFileAsString(completeRequestFilePath, t)))
+			reqBody, err := tools.ReadFileAsString(completeRequestFilePath)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			c.Request = httptest.NewRequest(http.MethodPost, "/create", strings.NewReader(reqBody))
 			c.Request.Header.Set("Content-Type", "application/json")
 
 			s.AddRecipe(c)
@@ -192,7 +180,10 @@ func TestAddRecipe(t *testing.T) {
 				}
 
 				var expectedReturn models.RecipeSchema
-				expectedBody := readFileAsString(completeExpectedFilePath, t)
+				expectedBody, err := tools.ReadFileAsString(completeExpectedFilePath)
+				if err != nil {
+					t.Fatal(err)
+				}
 				err = json.Unmarshal([]byte(expectedBody), &expectedReturn)
 				if err != nil {
 					t.Fatal(err)
@@ -234,7 +225,12 @@ func TestGetAll(t *testing.T) {
 		}
 
 		var expected_return []models.RecipeSchema
-		err = json.Unmarshal([]byte(readFileAsString(file_path, t)), &expected_return)
+		expected_return_string, err := tools.ReadFileAsString(file_path)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		err = json.Unmarshal([]byte(expected_return_string), &expected_return)
 		if err != nil {
 			t.Errorf("Failed to unmarshal expected body: %s", err.Error())
 		}
@@ -281,7 +277,12 @@ func TestGetByID(t *testing.T) {
 		}
 
 		var expected_return models.RecipeSchema
-		err = json.Unmarshal([]byte(readFileAsString(file_path, t)), &expected_return)
+		expected_return_string, err := tools.ReadFileAsString(file_path)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		err = json.Unmarshal([]byte(expected_return_string), &expected_return)
 		if err != nil {
 			t.Errorf("Failed to unmarshal expected body: %s", err.Error())
 		}

@@ -2,31 +2,18 @@ package database
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func ConnectToDB() *gorm.DB {
-	newLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		logger.Config{
-		    SlowThreshold:             200 * time.Millisecond, // Slow SQL threshold
-		    LogLevel:                  logger.Info,            // Log level
-		    IgnoreRecordNotFoundError: true,                   // Ignore ErrRecordNotFound error for logger
-		    Colorful:                  true,                   // Disable color
-		},
-	)
+func ConnectToDB(conf *gorm.Config) *gorm.DB {
+	
 	dsn := os.Getenv("DB")
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: newLogger,
-	})
+	db, err := gorm.Open(postgres.Open(dsn), conf)
 
 	if err != nil || db == nil {
 		panic("Error ")
