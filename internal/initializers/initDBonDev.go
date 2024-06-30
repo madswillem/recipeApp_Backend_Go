@@ -21,9 +21,9 @@ func InitDBonDev(s *server.Server) error {
 	}
 
 	for _, recipe := range recipes {
-		err := recipe.Create(s.DB)
+		err := recipe.Create(s.NewDB)
 		if err != nil {
-			fmt.Printf("Recipe %s, Ingredient %s, err: %s", recipe.Title, "", err.Message)
+			fmt.Printf("Recipe %s, Ingredient %s, err: %s", recipe.Name, "", err.Message)
 		}
 	}
 

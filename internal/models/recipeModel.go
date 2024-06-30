@@ -5,35 +5,38 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"time"
 
-	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
+	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 )
 
 type RecipeSchema struct {
-	gorm.Model
-	Title            string              `json:"title"`
-	Ingredients      []IngredientsSchema `json:"ingredients" gorm:"foreignKey:RecipeSchemaID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Preparation      string              `json:"preparation"`
-	Cuisine          string              `json:"cuisine"`
-	CookingTime      int                 `json:"cookingtime"`
-	Image            string              `json:"image"`
-	NutriScore       string              `json:"nutriscore"`
-	NutritionalValue NutritionalValue    `json:"nutritional_value" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Diet             DietSchema          `json:"diet" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Selected         int                 `json:"selected"`
-	Rating           RatingStruct        `json:"rating" gorm:"polymorphic:Owner; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Version          int                 `json:"__v"`
-	RecipeGroup	 []*RecipeGroupSchema`gorm:"many2many:recipe_recipegroups"` 
+	ID          string        `db:"id"`
+	CreatedAt   time.Time     `db:"created_at"`
+	Author      string        `db:"author"`
+	Name        string        `db:"name"`
+	Cuisine     string        `db:"cuisine"`
+	Yield       int           `db:"yield"`
+	YieldUnit   string        `db:"yield_unit"`
+	PrepTime    string        `db:"prep_time"`
+	CookingTime string        `db:"cooking_time"`
+	Selected	int			  `db:"selected"`
+	Version     int64         `db:"version"`
+	Ingredients []IngredientsSchema 
+	Diet 		DietSchema
+	NutritionalValue	NutritionalValue
+	Rating 				RatingStruct
+	Steps 				[]StepsStruct
 }
 
 func (recipe *RecipeSchema) CheckIfExistsByTitle(db *gorm.DB) (bool, *error_handler.APIError) {
 	var result struct {
 		Found bool
 	}
-	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Title).Scan(&result).Error
+	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Name).Scan(&result).Error
 	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
 }
 
@@ -85,11 +88,11 @@ func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIE
 	for _, ingredient := range recipe.Ingredients {
 		var nutritionalValue NutritionalValue
 		err := db.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
-			Where("ingredients_schemas.ingredient = ?", ingredient.Ingredient).
+			Where("ingredients_schemas.ingredient = ?", ingredient.Name).
 			First(&nutritionalValue).Error
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				return error_handler.New(fmt.Sprintf("ingredient %s not found please add nutritional value and set edited to true", ingredient.Ingredient), http.StatusBadRequest, err)
+				return error_handler.New(fmt.Sprintf("ingredient %s not found please add nutritional value and set edited to true", ingredient.Name), http.StatusBadRequest, err)
 			} else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
 				err := ingredient.createIngredientDBEntry(db)
 				if err != nil {
@@ -100,7 +103,7 @@ func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIE
 			}
 		} else {
 			if ingredient.NutritionalValue.Edited {
-				return error_handler.New(fmt.Sprintf("Ingredient: %s already exists", ingredient.Ingredient), http.StatusBadRequest, err)
+				return error_handler.New(fmt.Sprintf("Ingredient: %s already exists", ingredient.Name), http.StatusBadRequest, err)
 			} else if !ingredient.NutritionalValue.Edited {
 				ingredient.NutritionalValue = nutritionalValue
 			}
@@ -140,42 +143,87 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm
 }
 
 func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
-	if recipe.Title == "" {
-		return error_handler.New("missing recipe title", http.StatusBadRequest, errors.New("missing recipe title"))
+	if recipe.Name == "" {
+		return error_handler.New("missing recipe name", http.StatusBadRequest, errors.New("missing recipe name"))
 	}
 	if recipe.Ingredients == nil {
 		return error_handler.New("missing recipe ingredients", http.StatusBadRequest, errors.New("missing recipe ingredients"))
 	}
-	if recipe.Preparation == "" {
-		return error_handler.New("missing recipe preperation", http.StatusBadRequest, errors.New("missing recipe preparation"))
+	if recipe.Steps == nil {
+		return error_handler.New("missing recipe steps", http.StatusBadRequest, errors.New("missing recipe steps"))
 	}
 	for _, ingredient := range recipe.Ingredients {
 		err := ingredient.CheckForRequiredFields()
 		if err != nil {
-			return error_handler.New(fmt.Sprintf("missing required field %s", err.Error()), http.StatusBadRequest, err)
+			return error_handler.New(fmt.Sprintf("missing required field in ingredient %s %s", ingredient.Name,err.Error()), http.StatusBadRequest, err)
 		}
 	}
 
 	return nil
 }
 
-func (recipe *RecipeSchema) Create(db *gorm.DB) *error_handler.APIError {
-	err := recipe.CheckForRequiredFields()
-	if err != nil {
-		return err
+func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
+	apiErr := recipe.CheckForRequiredFields()
+	if apiErr != nil {
+		return apiErr
 	}
 
-	recipe.Rating.DefaultRatingStruct(recipe.Title)
 	for i := 0; i < len(recipe.Ingredients); i++ {
-		recipe.Ingredients[i].Rating.DefaultRatingStruct(recipe.Ingredients[i].Ingredient)
+		recipe.Ingredients[i].Rating.DefaultRatingStruct(nil, &recipe.Ingredients[i].ID)
 	}
 
-	err = recipe.AddNutritionalValue(db)
+	//err = recipe.AddNutritionalValue(db)
+	//if err != nil {
+	//	return err
+	//}
+
+	tx := db.MustBegin()
+	// Insert recipe
+    query := `INSERT INTO recipes (author, name, cuisine, yield, yield_unit, prep_time, cooking_time, selected, version)
+              VALUES (:author, :name, :cuisine, :yield, :yield_unit, :prep_time, :cooking_time, :selected, :version) RETURNING id`
+    stmt, err := tx.PrepareNamed(query)
+    if err != nil {
+        return error_handler.New("Query error: " + err.Error(), http.StatusInternalServerError, err)
+    }
+    err = stmt.Get(&recipe.ID, recipe)
+	stmt.Close()
+    if err != nil {
+		tx.Rollback()
+        return error_handler.New("Dtabase error: " + err.Error(), http.StatusInternalServerError, err)
+    }
+
+	// Insert Rating
+	recipe.Rating.DefaultRatingStruct(&recipe.ID, nil)
+	query = `INSERT INTO rating (
+				recipe_id, overall, mon, tue, wed, thu, fri, sat, sun, win, spr, sum, aut,
+				thirtydegree, twentiedegree, tendegree, zerodegree, subzerodegree)
+			VALUES (
+				:recipe_id, :overall, :mon, :tue, :wed, :thu, :fri, :sat, :sun, :win, :spr, :sum, :aut,
+				:thirtydegree, :twentiedegree, :tendegree, :zerodegree, :subzerodegree)`
+
+	_, err = tx.NamedExec(query, recipe.Rating)
 	if err != nil {
-		return err
+		tx.Rollback()
+		return error_handler.New("Error inserting recipe: " + err.Error(), http.StatusInternalServerError, err)
 	}
 
-	return database.SubmitToDB(db, recipe)
+	// Insert Ingredient
+	for _, ing := range recipe.Ingredients   {
+		err := ing.Create(tx)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		return error_handler.New("Error creating recipe", http.StatusInternalServerError, err)
+	}
+
+
+	fmt.Println(recipe.ID)
+
+	return nil
 }
 
 func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {
@@ -185,7 +233,7 @@ func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (flo
 
 	for i, ingredient := range recipe.Ingredients {
 		for y, avrgIngredient := range group.AvrgIngredients {
-			if ingredient.Ingredient == avrgIngredient.Name {
+			if ingredient.Name == avrgIngredient.Name {
 				sameIngs[i] = true
 				sameAvrgIngs[y] = true
 				break
@@ -253,4 +301,3 @@ func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (flo
 
 	return sim, nil
 }
-

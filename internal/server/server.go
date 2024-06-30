@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
@@ -33,6 +34,7 @@ type Config struct {
 type Server struct {
 	port int
 	DB *gorm.DB
+	NewDB *sqlx.DB
 	config *Config
 }
 
@@ -44,14 +46,15 @@ func migrate(db *gorm.DB) {
 	db.AutoMigrate(&models.RatingStruct{})
 	db.AutoMigrate(&models.NutritionalValue{})
 	db.AutoMigrate(&models.DietSchema{})
-	db.AutoMigrate(&models.IngredientDBSchema{})
+	db.AutoMigrate(&models.IngredientDB{})
 }
 
 func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port: port,
-		DB: database.ConnectToDB(&config.DBConf),
+		DB: database.ConnectToGORMDB(&config.DBConf),
+		NewDB: database.ConnectToDB(&sqlx.Conn{}),
 		config: config,
 	}
 	
@@ -102,11 +105,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.PATCH("/update/:id", s.UpdateRecipe)
 	r.DELETE("/delete/:id", s.DeleteRecipe)
 	r.POST("/filter", s.Filter)
-	r.GET("/select/:id", s.Select)
-	r.GET("/deselect/:id", s.UserMiddleware, s.Deselect)
+	r.GET("/select/:id", s.UserMiddleware, s.Select)
+	r.GET("/deselect/:id", s.UserMiddleware, s.UserMiddleware, s.Deselect)
 	r.GET("/colormode/:type", s.Colormode)
 
 	r.PATCH("/account/update", s.UserMiddleware, s.UpadateUser)
+	r.GET("/recommendation", s.UserMiddleware, s.GetRecommendation)
 
 	r.GET("/", s.RenderHome)
 	r.GET("/account", s.RenderAcount)

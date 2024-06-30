@@ -39,25 +39,17 @@ func (group *RecipeGroupSchema) GetRecipeGroupByID(db *gorm.DB ,reqData map[stri
 	}
 	return nil
 }
-func GetAllRecipeGroups(db *gorm.DB) (*error_handler.APIError, []RecipeGroupSchema) {
-	var groups []RecipeGroupSchema
-	err := db.Find(&groups).Error
-	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err), nil
-	}
-	return nil, groups
-}
 func (group *RecipeGroupSchema) AddRecipeToGroup(recipe *RecipeSchema, db *gorm.DB) {
 	for _, name := range recipe.Ingredients {
 		added := false
 		for _, avrgName := range group.AvrgIngredients {
-			if name.Ingredient == avrgName.Name {
+			if name.Name == avrgName.Name {
 				avrgName.Percentige += 1
 				added = true
 			}
 		}
 		if !added {
-			group.AvrgIngredients = append(group.AvrgIngredients, Avrg{Name: name.Ingredient, Percentige: 1})
+			group.AvrgIngredients = append(group.AvrgIngredients, Avrg{Name: name.Name, Percentige: 1})
 		}
 	}
 	for _, cuisine := range group.AvrgCuisine {
@@ -91,7 +83,7 @@ func GroupNew(recipe *RecipeSchema) RecipeGroupSchema {
 	new := RecipeGroupSchema{}
 	new.Recipes = append(new.Recipes, recipe)
 	for _, ing := range recipe.Ingredients {
-		new.AvrgIngredients = append(new.AvrgIngredients, Avrg{Name: ing.Ingredient, Percentige: 1})
+		new.AvrgIngredients = append(new.AvrgIngredients, Avrg{Name: ing.Name, Percentige: 1})
 	}
 	new.AvrgCuisine = append(new.AvrgCuisine, Avrg{Name: recipe.Cuisine, Percentige: 1})
 	switch {

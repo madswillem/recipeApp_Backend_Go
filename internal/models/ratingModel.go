@@ -3,41 +3,39 @@ package models
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 )
 
 type RatingStruct struct {
-	ID         uint   `gorm:"primarykey"`
-	OwnerTitle string `json:"owner_title"`
-	OwnerID    string
-	OwnerType  string
-
-	Overall float64 `json:"overall"`
-
-	Mon float64 `json:"mon"`
-	Tue float64 `json:"tue"`
-	Wed float64 `json:"wed"`
-	Thu float64 `json:"thu"`
-	Fri float64 `json:"fri"`
-	Sat float64 `json:"sat"`
-	Sun float64 `json:"sun"`
-
-	Win float64 `json:"win"`
-	Spr float64 `json:"spr"`
-	Sum float64 `json:"sum"`
-	Aut float64 `json:"aut"`
-
-	Thirtydegree  float64 `json:"thirtydegree"`
-	Twentiedegree float64 `json:"twentiedegree"`
-	Tendegree     float64 `json:"tendegree"`
-	Zerodegree    float64 `json:"zerodegree"`
-	Subzerodegree float64 `json:"subzerodegree"`
+	ID             string    `db:"id" json:"id"`
+    CreatedAt      time.Time `db:"created_at" json:"created_at"`
+    IngredientID   *string   `db:"ingredient_id" json:"ingredient_id,omitempty"`
+    RecipeID       *string   `db:"recipe_id" json:"recipe_id,omitempty"`
+    Overall        float64   `db:"overall" json:"overall"`
+    Mon            float64   `db:"mon" json:"mon"`
+    Tue            float64   `db:"tue" json:"tue"`
+    Wed            float64   `db:"wed" json:"wed"`
+    Thu            float64   `db:"thu" json:"thu"`
+    Fri            float64   `db:"fri" json:"fri"`
+    Sat            float64   `db:"sat" json:"sat"`
+    Sun            float64   `db:"sun" json:"sun"`
+    Win            float64   `db:"win" json:"win"`
+    Spr            float64   `db:"spr" json:"spr"`
+    Sum            float64   `db:"sum" json:"sum"`
+    Aut            float64   `db:"aut" json:"aut"`
+    ThirtyDegree   float64   `db:"thirtydegree" json:"thirtydegree"`
+    TwentyDegree   float64   `db:"twentiedegree" json:"twentiedegree"`
+    TenDegree      float64   `db:"tendegree" json:"tendegree"`
+    ZeroDegree     float64   `db:"zerodegree" json:"zerodegree"`
+    SubZeroDegree  float64   `db:"subzerodegree" json:"subzerodegree"`
 }
 
-func (rating *RatingStruct) DefaultRatingStruct(title string) {
-	rating.OwnerTitle = title
+func (rating *RatingStruct) DefaultRatingStruct(recipe_id *string, ingredient_id *string) {
+	rating.RecipeID = recipe_id
+	rating.IngredientID = ingredient_id
 
 	rating.Overall = 1000.0
 	rating.Mon = 1000.0
@@ -51,11 +49,11 @@ func (rating *RatingStruct) DefaultRatingStruct(title string) {
 	rating.Spr = 1000.0
 	rating.Sum = 1000.0
 	rating.Aut = 1000.0
-	rating.Thirtydegree = 1000.0
-	rating.Twentiedegree = 1000.0
-	rating.Tendegree = 1000.0
-	rating.Zerodegree = 1000.0
-	rating.Subzerodegree = 1000.0
+	rating.ThirtyDegree = 1000.0
+	rating.TwentyDegree = 1000.0
+	rating.TenDegree = 1000.0
+	rating.ZeroDegree = 1000.0
+	rating.SubZeroDegree = 1000.0
 }
 
 func (rating *RatingStruct) Update(change int) *error_handler.APIError {
@@ -103,15 +101,15 @@ func (rating *RatingStruct) Update(change int) *error_handler.APIError {
 
 	switch data.Temp {
 	case "subzerodegree":
-		result.Subzerodegree += tools.PercentageCalculator(result.Subzerodegree*float64(change), percentage)
+		result.SubZeroDegree += tools.PercentageCalculator(result.SubZeroDegree*float64(change), percentage)
 	case "zerodegree":
-		result.Zerodegree += tools.PercentageCalculator(result.Zerodegree*float64(change), percentage)
+		result.ZeroDegree += tools.PercentageCalculator(result.ZeroDegree*float64(change), percentage)
 	case "tendegree":
-		result.Tendegree += tools.PercentageCalculator(result.Tendegree*float64(change), percentage)
+		result.TenDegree += tools.PercentageCalculator(result.TenDegree*float64(change), percentage)
 	case "twentiedegree":
-		result.Twentiedegree += tools.PercentageCalculator(result.Twentiedegree*float64(change), percentage)
+		result.TwentyDegree += tools.PercentageCalculator(result.TwentyDegree*float64(change), percentage)
 	case "thirtydegree":
-		result.Thirtydegree += tools.PercentageCalculator(result.Thirtydegree*float64(change), percentage)
+		result.ThirtyDegree += tools.PercentageCalculator(result.ThirtyDegree*float64(change), percentage)
 	}
 
 	arr := []float64{
@@ -128,11 +126,11 @@ func (rating *RatingStruct) Update(change int) *error_handler.APIError {
 		result.Sum,
 		result.Aut,
 
-		result.Thirtydegree,
-		result.Twentiedegree,
-		result.Tendegree,
-		result.Zerodegree,
-		result.Subzerodegree,
+		result.ThirtyDegree,
+		result.TwentyDegree,
+		result.TenDegree,
+		result.ZeroDegree,
+		result.SubZeroDegree,
 	}
 
 	result.Overall = tools.CalculateAverage(arr)

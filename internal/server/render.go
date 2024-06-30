@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -41,7 +42,7 @@ func (s *Server) RenderProductpage(c *gin.Context) {
 	}
 
 	res := models.RecipeSchema{}
-	res.ID = uint(i)
+	res.ID = fmt.Sprint(i)
 
 	reqData := map[string]bool{
 		"ingredients":      true,

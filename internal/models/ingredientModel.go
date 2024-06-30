@@ -3,46 +3,59 @@ package models
 import (
 	"errors"
 	"net/http"
+	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"gorm.io/gorm"
 )
 
 type IngredientsSchema struct {
-	gorm.Model
-	RecipeSchemaID uint `json:"-"`
-
-	Ingredient       string           `json:"ingredient"`
-	Amount           string           `json:"amount"`
-	MeasurementUnit  string           `json:"measurement_unit"`
-	NutritionalValue NutritionalValue `json:"nutritional_value" gorm:"polymorphic:Owner"`
-	Rating           RatingStruct     `json:"rating" gorm:"polymorphic:Owner"`
+	ID           string    `db:"id" json:"id"`
+    CreatedAt    time.Time `db:"created_at" json:"created_at"`
+    RecipeID     string    `db:"recipe_id" json:"recipe_id"`
+    IngredientID string    `db:"ingredient_id" json:"ingredient_id"`
+    Amount       int64     `db:"amount" json:"amount"`
+    Unit         string    `db:"unit" json:"unit"`
+    Name         string    `db:"name" json:"name"`
+	NutritionalValue NutritionalValue `db:"nv" json:"nv"`
+	Rating	 RatingStruct `db:"rating" json:"rating"`
 }
 
 func (ingredient *IngredientsSchema) createIngredientDBEntry(db *gorm.DB) *error_handler.APIError {
-	newIngredientDBEntry := IngredientDBSchema{
-		Name:             ingredient.Ingredient,
-		StandardUnit:     ingredient.MeasurementUnit,
+	newIngredientDBEntry := IngredientDB{
+		Name:             ingredient.Name,
+		StandardUnit:     ingredient.Unit,
 		NutritionalValue: ingredient.NutritionalValue,
 	}
 
 	err := db.Create(&newIngredientDBEntry).Error
 	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
+		return error_handler.New("Error while getting Ingredient: " + err.Error(), http.StatusInternalServerError, err)
 	}
 
 	return nil
 }
 
 func (ingredient *IngredientsSchema) CheckForRequiredFields() error {
-	if ingredient.Ingredient == "" {
-		return errors.New("missing ingredient")
+	if ingredient.Name == "" {
+		return errors.New("missing name")
 	}
-	if ingredient.Amount == "" {
+	if ingredient.Amount == 0 {
 		return errors.New("missing amount")
 	}
-	if ingredient.MeasurementUnit == "" {
+	if ingredient.Unit == "" {
 		return errors.New("missing measurement unit")
 	}
+	return nil
+}
+
+func (ingredient *IngredientsSchema) Create(tx *sqlx.Tx) *error_handler.APIError {
+	var err *error_handler.APIError
+	ingredient.IngredientID, err = GetIngIDByName(tx, ingredient.Name)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

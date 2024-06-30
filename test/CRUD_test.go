@@ -20,7 +20,7 @@ import (
 )
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
-	if actual.ID == 0 || expected.ID == 0 {
+	if actual.ID == "" || expected.ID == "" {
 		t.Errorf(fmt.Sprintf("%d (actual.ID) != %d (expected.ID)", actual.ID, expected.ID))
 
 		return
@@ -57,20 +57,17 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 	}
 
 	// Compare other recipe properties
-	if actual.Title != expected.Title {
-		errors = append(errors, fmt.Sprintf("Expected title %s but got %s", expected.Title, actual.Title))
+	if actual.Name != expected.Name {
+		errors = append(errors, fmt.Sprintf("Expected Name %s but got %s", expected.Name, actual.Name))
 	}
-	if actual.Preparation != expected.Preparation {
-		errors = append(errors, fmt.Sprintf("Expected preparation %s but got %s", expected.Preparation, actual.Preparation))
+	if actual.Steps != expected.Steps {
+		errors = append(errors, fmt.Sprintf("Expected Steps %s but got %s", expected.Steps, actual.Steps))
 	}
 	if actual.CookingTime != expected.CookingTime {
 		errors = append(errors, fmt.Sprintf("Expected cooking_time %d but got %d", expected.CookingTime, actual.CookingTime))
 	}
-	if actual.Image != expected.Image {
-		errors = append(errors, fmt.Sprintf("Expected image %s but got %s", expected.Image, actual.Image))
-	}
-	if actual.NutriScore != expected.NutriScore {
-		errors = append(errors, fmt.Sprintf("Expected nutriscore %s but got %s", expected.NutriScore, actual.NutriScore))
+	if actual.NutritionalValue != expected.NutritionalValue {
+		errors = append(errors, fmt.Sprintf("Expected NutritionalValue %s but got %s", expected.NutritionalValue, actual.NutritionalValue))
 	}
 	if actual.Rating != expected.Rating {
 		errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expected.Rating, actual.Rating))
@@ -452,7 +449,7 @@ func TestUpdateRecipe(t *testing.T) {
 
 		// Create a new request with the updated recipe
 		updatedRecipe := make(map[string]interface{})
-		updatedRecipe["title"] = "Updated Recipe"
+		updatedRecipe["Name"] = "Updated Recipe"
 		jsonBody, err := json.Marshal(updatedRecipe)
 		if err != nil {
 			t.Fatal(err)
@@ -477,7 +474,7 @@ func TestUpdateRecipe(t *testing.T) {
 
 		// Create a new request with the updated recipe
 		updatedRecipe := make(map[string]interface{})
-		updatedRecipe["title"] = "Updated Wrong Recipe"
+		updatedRecipe["Name"] = "Updated Wrong Recipe"
 		jsonBody, err := json.Marshal(updatedRecipe)
 		if err != nil {
 			t.Fatal(err)

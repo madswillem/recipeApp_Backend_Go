@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -32,7 +33,7 @@ func (s *Server) GetRecipe(c *gin.Context) {
 		return
 	}
 	res := models.RecipeSchema{}
-	res.ID = uint(i)
+	res.ID = fmt.Sprint(i)
 	reqData := map[string]bool{
 		"ingredients":      true,
 		"ingredient_nutri": true,
@@ -43,7 +44,7 @@ func (s *Server) GetRecipe(c *gin.Context) {
 	}
 	res.GetRecipeByID(s.DB ,reqData)
 
-	if res.ID == 0 {
+	if res.ID == "" {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{
 			"pageTitle": "404 Page not found",
 		})

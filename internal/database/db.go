@@ -2,15 +2,20 @@ package database
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"os"
 
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func ConnectToDB(conf *gorm.Config) *gorm.DB {
+
+
+func ConnectToGORMDB(conf *gorm.Config) *gorm.DB {
 	
 	dsn := os.Getenv("DB")
 	db, err := gorm.Open(postgres.Open(dsn), conf)
@@ -18,6 +23,15 @@ func ConnectToDB(conf *gorm.Config) *gorm.DB {
 	if err != nil || db == nil {
 		panic("Error ")
 	}
+	return db
+}
+
+func ConnectToDB(conf *sqlx.Conn) *sqlx.DB {
+	db, err := sqlx.Connect("postgres", "user=mads password=1234 dbname=test_unexpected_behavior sslmode=disable")
+    if err != nil {
+        log.Fatalln(err)
+    }
+	db.MustExec(schema)
 	return db
 }
 

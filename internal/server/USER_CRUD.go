@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -30,4 +31,25 @@ func (s *Server) UpadateUser(c *gin.Context) {
 	}
 	
 	c.JSON(http.StatusAccepted, middleware_user)
+}
+func (s *Server) GetRecommendation(c *gin.Context) {
+	middleware_user, _ := c.Get("user")
+	user, ok := middleware_user.(models.UserModel)
+	if !ok {
+		fmt.Println("type assertion failed")
+	}
+
+	err := user.GetByCookie(s.DB)
+	if err != nil {
+		error_handler.HandleError(c ,err.Code, err.Message, err.Errors)
+		return
+	}
+
+	err, recipes := user.GetRecomendation(s.DB)
+	if err != nil {
+		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
+		return
+	}
+	
+	c.JSON(http.StatusOK, recipes)
 }

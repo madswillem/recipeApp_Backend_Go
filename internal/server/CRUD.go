@@ -11,15 +11,56 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func (s *Server) GetAll(c *gin.Context) {
-	var recipes []models.RecipeSchema
-	result := s.DB.Preload(clause.Associations).Preload("Ingredients.Rating").Preload("Ingredients.NutritionalValue").Find(&recipes)
+	recipes := []models.RecipeSchema{}
+	ingredients := []models.IngredientsSchema{}
+	steps := []models.StepsStruct{}
+	nutritional_values := []models.NutritionalValue{}
 
-	if result.Error != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "Database error", []error{result.Error})
+	err := s.NewDB.Select(&recipes, "SELECT * FROM recipes")
+	if err != nil {
+		print(err.Error())
+		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting recipes", []error{err})
+		return
+	}
+
+	err = s.NewDB.Select(&ingredients, "SELECT ri.*, i.name AS name FROM recipe_ingredient ri JOIN ingredient i ON ri.ingredient_id = i.id")
+	if err != nil {
+		print(err.Error())
+		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting ingredients", []error{err})
+		return
+	}
+
+	err = s.NewDB.Select(&steps, "SELECT * FROM step")
+	if err != nil {
+		print(err.Error())
+		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting steps", []error{err})
+		return
+	}
+
+	err = s.NewDB.Select(&nutritional_values, "SELECT * FROM nutritional_value WHERE (recipe_id IS NOT NULL)::integer = 1")
+	if err != nil {
+		print(err.Error())
+		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting nutritional values", []error{err})
+		return
+	}
+
+	recipeMap := make(map[string]*models.RecipeSchema)
+	for i := range recipes {
+		recipeMap[recipes[i].ID] = &recipes[i]
+	}
+
+	for _, ingredient := range ingredients {
+		if recipe, found := recipeMap[ingredient.RecipeID]; found {
+			recipe.Ingredients = append(recipe.Ingredients, ingredient)
+		}
+	}
+	for _, step := range steps {
+		if recipe, found := recipeMap[*step.RecipeID]; found {
+			recipe.Steps = append(recipe.Steps, step)
+		}
 	}
 	c.JSON(http.StatusOK, recipes)
 }
@@ -33,7 +74,7 @@ func (s *Server) AddRecipe(c *gin.Context) {
 		return
 	}
 
-	err := body.Create(s.DB)
+	err := body.Create(s.NewDB)
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 		return
@@ -52,7 +93,7 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 	var body models.RecipeSchema
 	c.ShouldBindJSON(&body)
 
-	body.ID = uint(i)
+	body.ID = fmt.Sprint(i)
 
 	updateErr := database.Update(s.DB, &body)
 	if updateErr != nil {
@@ -68,7 +109,7 @@ func (s *Server) DeleteRecipe(c *gin.Context) {
 		return
 	}
 	response := models.RecipeSchema{}
-	response.ID = uint(i)
+	response.ID = fmt.Sprint(i)
 
 	deleteErr := database.Delete(s.DB, &response)
 	if deleteErr != nil {
@@ -86,7 +127,7 @@ func (s *Server) GetById(c *gin.Context) {
 		return
 	}
 	response := models.RecipeSchema{}
-	response.ID = uint(i)
+	response.ID = fmt.Sprint(i)
 
 	reqData := map[string]bool{
 		"everything": true,
@@ -137,7 +178,7 @@ func (s *Server) Select(c *gin.Context) {
 	}
 	
 	response := models.RecipeSchema{}
-	response.ID = uint(i)
+	response.ID = fmt.Sprint(i)
 	
 	selectedErr := response.UpdateSelected(1, &user, s.DB)
 	if selectedErr != nil {
@@ -157,7 +198,7 @@ func (s *Server) Deselect(c *gin.Context) {
 	middleware_user, _ := c.MustGet("user").(models.UserModel)
 
 	response := models.RecipeSchema{}
-	response.ID = uint(i)
+	response.ID = fmt.Sprint(i)
 
 	selectedErr := response.UpdateSelected(-1, &middleware_user, s.DB)
 	if selectedErr != nil {

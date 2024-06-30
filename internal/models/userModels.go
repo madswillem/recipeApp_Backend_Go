@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -20,7 +21,7 @@ type UserModel struct {
 	IP		string
 }
 type UserSettings struct {
-	Allergies	[]*IngredientDBSchema `gorm:"many2many:user_allergies"`
+	Allergies	[]*IngredientDB `gorm:"many2many:user_allergies"`
 	Diet		DietSchema `gorm:"polymorphic:Owner"`
 }
 
@@ -63,12 +64,14 @@ func (user *UserModel) Create(db *gorm.DB,ip string) *error_handler.APIError{
 	return nil
 }
 func (user *UserModel) GetAllRecipeGroups(db *gorm.DB) ([]RecipeGroupSchema, *error_handler.APIError) {
-	var group []RecipeGroupSchema
-	if err := db.Preload(clause.Associations).Find(&group, "user_id = ?", user.ID).Error; err != nil {
-	    return []RecipeGroupSchema{}, error_handler.New("Database error", http.StatusInternalServerError, err)
+	var groups []RecipeGroupSchema
+	fmt.Println(user.ID)
+	err := db.Select(&groups).Where("user_id = ?", user.ID).Scan(&groups).Error;
+	if  err != nil {
+	    return []RecipeGroupSchema{}, error_handler.New("Database error when fetching RecipeGroups i", http.StatusInternalServerError, err)
 	}
 
-	return group, nil
+	return groups, nil
 }
 func (user *UserModel) AddRecipeToGroup(db *gorm.DB ,recipe *RecipeSchema) *error_handler.APIError {	
 	groups, err := user.GetAllRecipeGroups(db)
@@ -133,7 +136,7 @@ func (user *UserModel) GetRecomendation(db *gorm.DB) (*error_handler.APIError, [
 	}
 	err := db.Find(&recipes).Error
 	if err != nil {
-		return error_handler.New("Database error", http.StatusInternalServerError, err), nil
+		return error_handler.New("Database error when fetching recipes", http.StatusInternalServerError, err), nil
 	}
 
 	groups, apiErr := user.GetAllRecipeGroups(db)
