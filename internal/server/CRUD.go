@@ -83,6 +83,24 @@ func (s *Server) AddRecipe(c *gin.Context) {
 	c.JSON(http.StatusCreated, body)
 }
 
+func (s *Server) AddIngredient(c *gin.Context) {
+	var body models.IngredientDB
+
+	binderr := c.ShouldBindJSON(&body)
+	if binderr != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", []error{binderr})
+		return
+	}
+
+	err := body.Create(s.NewDB)
+	if err != nil {
+		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
+		return
+	}
+
+	c.JSON(http.StatusAccepted, body)
+}
+
 func (s *Server) UpdateRecipe(c *gin.Context) {
 	i, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -103,19 +121,13 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 }
 
 func (s *Server) DeleteRecipe(c *gin.Context) {
-	i, err := strconv.Atoi(c.Param("id"))
+	i:= c.Param("id")
+	err := s.NewDB.QueryRowx(`DELETE FROM public.recipes WHERE id LIKE $1`, i).Err()
 	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
-		return
+		error_handler.HandleError(c, http.StatusInternalServerError, err.Error(), []error{err})
+		return 
 	}
-	response := models.RecipeSchema{}
-	response.ID = fmt.Sprint(i)
 
-	deleteErr := database.Delete(s.DB, &response)
-	if deleteErr != nil {
-		error_handler.HandleError(c, deleteErr.Code, deleteErr.Message, deleteErr.Errors)
-		return
-	}
 	c.Status(http.StatusOK)
 }
 

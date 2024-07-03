@@ -57,5 +57,16 @@ func (ingredient *IngredientsSchema) Create(tx *sqlx.Tx) *error_handler.APIError
 		return err
 	}
 
+	query := `INSERT INTO recipe_ingredient 
+    (recipe_id, ingredient_id, amount, unit) 
+    VALUES 
+    (:recipe_id, :ingredient_id, :amount, :unit)`
+
+    _, db_err := tx.NamedExec(query, &ingredient)
+    if db_err != nil {
+		tx.Rollback()
+        return error_handler.New("Error creating "+ingredient.Name+": "+db_err.Error(), http.StatusInternalServerError, db_err)
+    }
+
 	return nil
 }

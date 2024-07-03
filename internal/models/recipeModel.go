@@ -209,6 +209,7 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 
 	// Insert Ingredient
 	for _, ing := range recipe.Ingredients   {
+		ing.RecipeID = recipe.ID
 		err := ing.Create(tx)
 		if err != nil {
 			tx.Rollback()

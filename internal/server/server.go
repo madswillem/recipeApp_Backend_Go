@@ -100,6 +100,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}
 
 	r.POST("/create", s.AddRecipe)
+	r.POST("/create_ingredient", s.AddIngredient)
 	r.GET("/get", s.GetAll)
 	r.GET("/getbyid/:id", s.GetById)
 	r.PATCH("/update/:id", s.UpdateRecipe)
