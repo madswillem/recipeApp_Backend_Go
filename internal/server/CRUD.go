@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
@@ -102,27 +101,79 @@ func (s *Server) AddIngredient(c *gin.Context) {
 }
 
 func (s *Server) UpdateRecipe(c *gin.Context) {
-	i, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
-		return
+
+	var body struct {
+		Name        *string        `db:"name" json:"name"`
+		Cuisine     *string        `db:"cuisine" json:"cuisine"`
+		Yield       *int           `db:"yield" json:"yield"`
+		YieldUnit   *string        `db:"yield_unit" json:"yield_unit"`
+		PrepTime    *string        `db:"prep_time" json:"prep_time"`
+		CookingTime *string        `db:"cooking_time" json:"cooking_time"`
+		Ingredients *[]models.IngredientsSchema 
+		Diet 		*models.DietSchema
+		Steps 		*[]models.StepsStruct
 	}
 
-	var body models.RecipeSchema
+	i:= c.Param("id")
+
 	c.ShouldBindJSON(&body)
 
-	body.ID = fmt.Sprint(i)
-
-	updateErr := database.Update(s.DB, &body)
-	if updateErr != nil {
-		error_handler.HandleError(c, updateErr.Code, updateErr.Message, updateErr.Errors)
-		return
+	tx, err := s.NewDB.Beginx()
+	if err != nil {
+		error_handler.HandleError(c, http.StatusInternalServerError, "Error initiating transaction", []error{err})
 	}
+
+	var setParts []string
+	var args []interface{}
+
+	if body.Name != nil {
+		setParts = append(setParts, "name = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.Name)
+	}
+	if body.Cuisine != nil {
+		setParts = append(setParts, "cuisine = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.Cuisine)
+	}
+	if body.Yield != nil {
+		setParts = append(setParts, "yield = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.Yield)
+	}
+	if body.YieldUnit != nil {
+		setParts = append(setParts, "yield_unit = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.YieldUnit)
+	}
+	if body.PrepTime != nil {
+		setParts = append(setParts, "prep_time = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.PrepTime)
+	}
+	if body.CookingTime != nil {
+		setParts = append(setParts, "cooking_time = $" + strconv.Itoa(len(args) +1))
+		args = append(args, *body.CookingTime)
+	}
+
+	if len(setParts) == 0 {
+		// No fields to body
+		error_handler.HandleError(c, http.StatusExpectationFailed, "Nothing to update", []error{})
+		return 
+	}
+
+	query := "UPDATE recipes SET " + strings.Join(setParts, ", ") + " WHERE id = $" + strconv.Itoa(len(args) +1)
+	fmt.Println(query)
+	args = append(args, i)
+
+	_, err = tx.Exec(query, args...)
+	if err != nil {
+		tx.Rollback()
+		error_handler.HandleError(c, http.StatusInternalServerError, "Error Updating recipe", []error{err})
+		return 
+	}
+
+	tx.Commit()
 }
 
 func (s *Server) DeleteRecipe(c *gin.Context) {
 	i:= c.Param("id")
-	err := s.NewDB.QueryRowx(`DELETE FROM public.recipes WHERE id LIKE $1`, i).Err()
+	err := s.NewDB.QueryRowx(`DELETE FROM public.recipes WHERE id = $1`, i).Err()
 	if err != nil {
 		error_handler.HandleError(c, http.StatusInternalServerError, err.Error(), []error{err})
 		return 
