@@ -219,7 +219,7 @@ func (s *Server) Filter(c *gin.Context) {
 		return
 	}
 
-	recipes, apiErr := body.Filter(s.DB)
+	recipes, apiErr := body.Filter(s.NewDB)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return

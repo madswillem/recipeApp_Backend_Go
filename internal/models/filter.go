@@ -1,79 +1,81 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type Filter struct {
-	SearchText  string     `json:"search"`
-	NutriScore  string     `json:"nutriscore"`
-	CookingTime int        `json:"cookingtime"`
-	Ingredients []string   `json:"ingredients"`
-	Diet        DietSchema `json:"diet"`
+	SearchText  *string `db:"searchtext" json:"search"`
+	NutriScore  *string `db:"nutriscore" json:"nutriscore"`
+	Name        *string `db:"name" json:"name"`
+	Cuisine     *string `db:"cuisine" json:"cuisine"`
+	PrepTime    *string `db:"prep_time" json:"prep_time"`
+	CookingTime *string `db:"cooking_time" json:"cooking_time"`
+	Ingredients *[]string `json:"ingredients"`
+	Diet        *DietSchema
 }
 
-func (f *Filter) AddFullTextSearchToQuery(query *gorm.DB) (*gorm.DB, *error_handler.APIError) {
-	println(f.SearchText)
-	query = query.Where("to_tsvector('english', recipe_schemas.title) @@ websearch_to_tsquery('english', ?)", f.SearchText).
-		Or("to_tsvector('english', ingredients_schemas.ingredient) @@ websearch_to_tsquery('english', ?)", f.SearchText).
-		Or("to_tsvector('english', recipe_schemas.preparation) @@ websearch_to_tsquery('english', ?)", f.SearchText).
-		Order("COUNT(rating_structs.overall) desc")
-	return query, nil
-}
+func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) {
+	recipes := []RecipeSchema{}
+	var where []string
+	var args []interface{}
 
-func (f *Filter) Filter(db *gorm.DB) (*[]RecipeSchema, *error_handler.APIError) {
-	var recipes []RecipeSchema
-	query := db.Joins("JOIN ingredients_schemas ON recipe_schemas.id = ingredients_schemas.recipe_schema_id").
-		Joins("JOIN diet_schemas ON diet_schemas.owner_id = recipe_schemas.id").
-		Group("recipe_schemas.id").
-		Preload(clause.Associations).
-		Preload("Ingredients.Rating").
-		Preload("Ingredients.NutritionalValue")
-
-	if f.Ingredients != nil {
-		query = db.Where("ingredients_schemas.ingredient IN ?", f.Ingredients).
-			Having("COUNT(DISTINCT ingredients_schemas.id) = ?", len(f.Ingredients))
+	if f.SearchText != nil {
+		where = append(where, `to_tsvector('english', recipes.name) @@ websearch_to_tsquery('english', $1) 
+					OR to_tsvector('english', ingredient.name) @@ websearch_to_tsquery('english', :$1)
+					OR to_tsvector('english', step.step) @@ websearch_to_tsquery('english', :$1)`)
+		args = append(args, f.SearchText)
+	}
+	if f.NutriScore != nil {
+		args = append(args, f.NutriScore)
+		where = append(where, fmt.Sprintf(`nutritional_value.nutriscore = :$%d`, len(args)))
+	}
+	if f.Cuisine != nil {
+		args = append(args, f.Cuisine)
+		where = append(where, fmt.Sprintf(`recipes.cuisine = $%d`, len(args)))
+	}
+	if f.PrepTime != nil {
+		args = append(args, f.PrepTime)
+		where = append(where, fmt.Sprintf(`recipes.prep_time <= $%d`, len(args)))
+	}
+	if f.CookingTime != nil {
+		args = append(args, f.CookingTime)
+		where = append(where, fmt.Sprintf(`recipes.cooking_time <= $%d`, len(args)))
+	}
+	if f.Ingredients != nil && len(*f.Ingredients) > 0 {
+		for _, ing := range *f.Ingredients {
+			args = append(args, ing)
+			where = append(where, fmt.Sprintf(`ingredient.name = $%d`, len(args)))
+		}
+	}
+	if f.Diet != nil {
+		where = append(where, `AND diet.vegetarien = :vegetarien
+								AND diet.vegan = :vegan
+								AND diet.lowcal = :lowcal
+								AND diet.lowcarb = :lowcarb
+								AND diet.keto = :keto
+								AND diet.paleo = :paleo
+								AND diet.lowfat = :lowfat
+								AND diet.food_combining = :food_combining
+								AND diet.whole_food = :whole_food;`)
 	}
 
-	switch {
-	case f.Diet.Vegetarien:
-		query = db.Where("diet_schemas.vegetarien = ?", true)
-	case f.Diet.Vegan:
-		query = db.Where("diet_schemas.vegan = ?", true)
-	case f.Diet.LowCal:
-		query = db.Where("diet_schemas.lowcal = ?", true)
-	case f.Diet.LowCarb:
-		query = db.Where("diet_schemas.lowcarb = ?", true)
-	case f.Diet.Keto:
-		query = db.Where("diet_schemas.keto = ?", true)
-	case f.Diet.Paleo:
-		query = db.Where("diet_schemas.paleo = ?", true)
-	case f.Diet.LowFat:
-		query = db.Where("diet_schemas.lowfat = ?", true)
-	case f.Diet.FoodCombining:
-		query = db.Where("diet_schemas.food_combining = ?", true)
-	case f.Diet.WholeFood:
-		query = db.Where("diet_schemas.whole_food = ?", true)
-	case f.CookingTime > 0:
-		query = db.Where("recipe_schemas.cooking_time <= ?", f.CookingTime)
-	case f.NutriScore != "":
-		query = db.Where("recipe_schemas.nutri_score = ?", f.NutriScore)
-	}
+	query := `SELECT recipes.*
+				FROM recipes 
+				LEFT JOIN recipe_ingredient ON recipes.id = recipe_ingredient.recipe_id
+				LEFT JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id 
+				LEFT JOIN nutritional_value ON recipes.id = nutritional_value.recipe_id
+				LEFT JOIN step ON recipes.id = step.recipe_id
+				WHERE ` + strings.Join(where, " AND ")
 
-	if f.SearchText != "" {
-		query.Joins("JOIN rating_structs ON recipe_schemas.id = rating_structs.owner_id")
-		query, _ = f.AddFullTextSearchToQuery(query)
-	}
-
-	err := query.Find(&recipes).Error
-
+	err := db.Select(&recipes, query,args...)
 	if err != nil {
-		return nil, error_handler.New("database error", http.StatusInternalServerError, err)
+		return nil, error_handler.New("Dtabase error: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
 	return &recipes, nil
