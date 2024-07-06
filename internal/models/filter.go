@@ -27,8 +27,8 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 
 	if f.SearchText != nil {
 		where = append(where, `to_tsvector('english', recipes.name) @@ websearch_to_tsquery('english', $1) 
-					OR to_tsvector('english', ingredient.name) @@ websearch_to_tsquery('english', :$1)
-					OR to_tsvector('english', step.step) @@ websearch_to_tsquery('english', :$1)`)
+					OR to_tsvector('english', ingredient.name) @@ websearch_to_tsquery('english', $1)
+					OR to_tsvector('english', step.step) @@ websearch_to_tsquery('english', $1)`)
 		args = append(args, f.SearchText)
 	}
 	if f.NutriScore != nil {
@@ -65,13 +65,15 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 								AND diet.whole_food = :whole_food;`)
 	}
 
-	query := `SELECT recipes.*
+	query := `SELECT DISTINCT recipes.*
 				FROM recipes 
 				LEFT JOIN recipe_ingredient ON recipes.id = recipe_ingredient.recipe_id
 				LEFT JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id 
 				LEFT JOIN nutritional_value ON recipes.id = nutritional_value.recipe_id
 				LEFT JOIN step ON recipes.id = step.recipe_id
 				WHERE ` + strings.Join(where, " AND ")
+
+	fmt.Println(query)
 
 	err := db.Select(&recipes, query,args...)
 	if err != nil {
