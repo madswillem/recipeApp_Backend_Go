@@ -28,7 +28,7 @@ type RecipeSchema struct {
 	Ingredients []IngredientsSchema 
 	Diet 		DietSchema
 	NutritionalValue	NutritionalValue
-	Rating 				RatingStruct
+	Rating 				RatingStruct `db:"rating"`
 	Steps 				[]StepsStruct
 }
 
@@ -51,34 +51,38 @@ func (recipe *RecipeSchema) CheckIfExistsByID(db *gorm.DB) (bool, *error_handler
 	return result.Found, nil
 }
 
-func (recipe *RecipeSchema) GetRecipeByID(db *gorm.DB ,reqData map[string]bool) *error_handler.APIError {
-	req := db
-	if reqData["ingredients"] || reqData["everything"] {
-		req = req.Preload("Ingredients")
-	}
-	if reqData["ingredient_nutri"] || reqData["everything"] {
-		req = req.Preload("Ingredients.NutritionalValue")
-	}
-	if reqData["ingredient_rate"] || reqData["everything"] {
-		req = req.Preload("Ingredients.Rating")
-	}
-	if reqData["rating"] || reqData["everything"] {
-		req = req.Preload("Rating")
-	}
-	if reqData["nutritionalvalue"] || reqData["everything"] {
-		req = req.Preload("NutritionalValue")
-	}
-	if reqData["diet"] || reqData["everything"] {
-		req = req.Preload("Diet")
-	}
-	err := req.First(&recipe, "id = ?", recipe.ID).Error
+func (recipe *RecipeSchema) GetRecipeByIDGORM(db *gorm.DB ,reqData map[string]bool) *error_handler.APIError {
+	return nil
+}
 
+func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB ,reqData map[string]bool) *error_handler.APIError {
+	err := db.Get(recipe, `SELECT recipes.*,
+								rt.id AS "rating.id", rt.created_at AS "rating.created_at", 
+								rt.recipe_id AS "rating.recipe_id", rt.overall AS "rating.overall", rt.mon AS "rating.mon", 
+								rt.tue AS "rating.tue", rt.wed AS "rating.wed", rt.thu AS "rating.thu", rt.fri AS "rating.fri", 
+								rt.sat AS "rating.sat", rt.sun AS "rating.sun", rt.win AS "rating.win", 
+								rt.spr AS "rating.spr", rt.sum AS "rating.sum", rt.aut AS "rating.aut", 
+								rt.thirtydegree AS "rating.thirtydegree", rt.twentiedegree AS "rating.twentiedegree", 
+								rt.tendegree AS "rating.tendegree", rt.zerodegree AS "rating.zerodegree", 
+								rt.subzerodegree AS "rating.subzerodegree"
+							FROM recipes 
+							LEFT JOIN rating rt ON rt.recipe_id = recipes.id
+							WHERE recipes.id = $1`, recipe.ID)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return error_handler.New("recipe not found", http.StatusNotFound, err)
-		} else {
-			return error_handler.New("database error", http.StatusInternalServerError, err)
-		}
+		return error_handler.New("An error ocurred fetching the recipe: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	err = db.Select(&recipe.Steps, `SELECT * FROM step WHERE recipe_id = $1`, recipe.ID)
+	if err != nil {
+		return error_handler.New("An error ocurred fetching the steps: "+err.Error(),  http.StatusInternalServerError, err)
+	}
+
+	err = db.Select(&recipe.Ingredients, `SELECT recipe_ingredient.*, ingredient.name AS name 
+										FROM recipe_ingredient 
+										INNER JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id
+										WHERE recipe_id = $1`, recipe.ID)
+	if err != nil {
+		return error_handler.New("An error ocurred fetching the ingredients: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
 	return nil
@@ -113,7 +117,7 @@ func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIE
 }
 
 func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm.DB) *error_handler.APIError {
-	apiErr := recipe.GetRecipeByID(db ,map[string]bool{"everything": true})
+	apiErr := recipe.GetRecipeByIDGORM(db ,map[string]bool{"everything": true})
 	if apiErr != nil {
 		return apiErr
 	}

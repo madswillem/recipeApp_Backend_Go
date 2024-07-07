@@ -42,7 +42,7 @@ func (s *Server) GetRecipe(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	res.GetRecipeByID(s.DB ,reqData)
+	res.GetRecipeByIDGORM(s.DB ,reqData)
 
 	if res.ID == "" {
 		c.HTML(http.StatusNotFound, "404.html", gin.H{

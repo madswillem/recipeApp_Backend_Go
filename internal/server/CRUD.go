@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
-	"gorm.io/gorm"
 )
 
 func (s *Server) GetAll(c *gin.Context) {
@@ -183,30 +182,15 @@ func (s *Server) DeleteRecipe(c *gin.Context) {
 }
 
 func (s *Server) GetById(c *gin.Context) {
-	i, err := strconv.Atoi(c.Param("id"))
+	i := c.Param("id")
+	
+	result := models.RecipeSchema{ID: i}
+	err := result.GetRecipeByID(s.NewDB, nil)
+
 	if err != nil {
-		errMessage := strings.Join([]string{"id", c.Param("id"), "is not a number"}, " ")
-		error_handler.HandleError(c, http.StatusBadRequest, errMessage, []error{err})
-		return
+		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 	}
-	response := models.RecipeSchema{}
-	response.ID = fmt.Sprint(i)
-
-	reqData := map[string]bool{
-		"everything": true,
-	}
-	getErr := response.GetRecipeByID(s.DB ,reqData)
-	fmt.Println(response.Version)
-
-	if getErr != nil {
-		if getErr.Errors[0] == gorm.ErrRecordNotFound {
-			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
-		} else {
-			error_handler.HandleError(c, getErr.Code, getErr.Message, getErr.Errors)
-		}
-		return
-	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, result)
 }
 
 func (s *Server) Filter(c *gin.Context) {

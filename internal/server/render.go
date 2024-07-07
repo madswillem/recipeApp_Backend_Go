@@ -52,7 +52,7 @@ func (s *Server) RenderProductpage(c *gin.Context) {
 		"nutritionalvalue": true,
 		"diet":             true,
 	}
-	getErr := res.GetRecipeByID(s.DB ,reqData)
+	getErr := res.GetRecipeByIDGORM(s.DB ,reqData)
 
 	if getErr != nil {
 		if getErr.Errors[0] == gorm.ErrRecordNotFound {
