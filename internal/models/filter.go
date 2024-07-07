@@ -73,11 +73,61 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 				LEFT JOIN step ON recipes.id = step.recipe_id
 				WHERE ` + strings.Join(where, " AND ")
 
-	fmt.Println(query)
-
 	err := db.Select(&recipes, query,args...)
 	if err != nil {
 		return nil, error_handler.New("Dtabase error: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	if len(recipes) <= 0 {
+		return nil, nil
+	}	
+
+	recipeMap := make(map[string]*RecipeSchema)
+	for i := range recipes {
+		recipeMap[recipes[i].ID] = &recipes[i]
+	}
+	id_array := make([]string, len(recipes))
+	for i, r := range recipes {
+		id_array[i] = r.ID
+	}
+
+	ingredients := []IngredientsSchema{}
+	query, args, err = sqlx.In(`SELECT recipe_ingredient.*, ingredient.name FROM recipe_ingredient INNER JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id WHERE recipe_ingredient.recipe_id IN (?)`, id_array)
+	if err != nil {
+		return nil, error_handler.New("error building ingredients query: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	query = db.Rebind(query)
+
+	err = db.Select(&ingredients, query, args...)
+	if err != nil {
+		return nil, error_handler.New("error fetching ingredients: "+query, http.StatusInternalServerError, err)
+	}
+
+	for _, ingredient := range ingredients {
+		if recipe, found := recipeMap[ingredient.RecipeID]; found {
+			recipe.Ingredients = append(recipe.Ingredients, ingredient)
+		}
+	}
+
+	steps := []StepsStruct{}
+	query, args, err = sqlx.In(`SELECT * FROM step WHERE step.recipe_id IN (?)`, id_array)
+	if err != nil {
+		return nil, error_handler.New("error fetching steps: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	query = db.Rebind(query)
+
+	err = db.Select(&steps, query, args...)
+	if err != nil {
+		return nil, error_handler.New("error fetching steps: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	
+	for _, step := range steps {
+		if recipe, found := recipeMap[*step.RecipeID]; found {
+			recipe.Steps = append(recipe.Steps, step)
+		}
 	}
 
 	return &recipes, nil
