@@ -11,7 +11,7 @@ func (s *Server) UserMiddleware(c *gin.Context) {
 	var user models.UserModel
 	cookie, err := c.Cookie("user")
 	if err != nil || cookie == "" {
-		user.Create(s.DB ,"unkwon")
+		user.Create(s.NewDB ,"unkwon")
 		c.SetCookie("user", user.Cookie, 31536000, "/", "localhost", false, true)
 	} else {
 		user.Cookie = cookie

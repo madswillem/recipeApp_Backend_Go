@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
@@ -13,12 +14,12 @@ import (
 )
 
 type UserModel struct {
-	gorm.Model
-	LastLogin	time.Time
+	ID 				string 				`database:"id"`
+	LastLogin		time.Time 			`database:"last_login"`
+	Cookie			string 				`database:"cookie"`
+	IP				string 				`database:"ip"`
 	RecipeGroups	[]RecipeGroupSchema `gorm:"foreignKey:UserID;"`
-	Settings 	UserSettings `gorm:"embedded;embeddedPrefix:setting_"`
-	Cookie		string
-	IP		string
+	Settings 		UserSettings 		`gorm:"embedded;embeddedPrefix:setting_"`
 }
 type UserSettings struct {
 	Allergies	[]*IngredientDB `gorm:"many2many:user_allergies"`
@@ -38,18 +39,15 @@ func (user *UserModel) GetByCookie(db *gorm.DB) *error_handler.APIError{
 	return nil
 
 }
-func (user *UserModel) CheckIfExistsByCookie(db *gorm.DB) bool {
-	var result struct {
-		Found bool
-		Error error_handler.APIError
-	}
-	err := db.Raw("SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = ?) AS found;", user.Cookie).Scan(&result).Error
+func (user *UserModel) CheckIfExistsByCookie(db *sqlx.DB) bool {
+	found := false
+	err := db.Get(found ,"SELECT EXISTS(SELECT * FROM user_models WHERE Cookie = $1) AS found;", user.Cookie)
 	if err != nil {
 		error_handler.New("database error", http.StatusInternalServerError, err)
 	}
-	return result.Found
+	return found
 }
-func (user *UserModel) Create(db *gorm.DB,ip string) *error_handler.APIError{
+func (user *UserModel) Create(db *sqlx.DB ,ip string) *error_handler.APIError{
 	user.LastLogin = time.Now()
 	user.IP = ip
 	for {
@@ -59,7 +57,10 @@ func (user *UserModel) Create(db *gorm.DB,ip string) *error_handler.APIError{
 		}
 	}
 
-	database.SubmitToDB(db, user)
+	_, err := db.NamedExec(`INSERT INTO user (cookie, ip) VALUES (:cookie, :ip)`, user)
+	if err != nil {
+		return error_handler.New("Error inserting user: "+err.Error(), http.StatusInternalServerError, err)
+	}
 	
 	return nil
 }

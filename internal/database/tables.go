@@ -163,5 +163,13 @@ const schema = `
 			ON UPDATE CASCADE
 			ON DELETE CASCADE,
 		CONSTRAINT rating_check CHECK (((ingredient_id IS NOT NULL)::integer + (recipe_id IS NOT NULL)::integer) = 1)
+	);
+	CREATE TABLE IF NOT EXISTS public."user"
+	(
+		id uuid NOT NULL DEFAULT gen_random_uuid(),
+		created_at timestamp without time zone DEFAULT (now())::timestamp without time zone,
+		cookie text COLLATE pg_catalog."default",
+		ip text COLLATE pg_catalog."default",
+		CONSTRAINT user_pkey PRIMARY KEY (id)
 	)
 `
