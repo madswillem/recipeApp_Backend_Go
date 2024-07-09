@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"gorm.io/gorm"
 )
 
@@ -38,17 +37,6 @@ type Server struct {
 	config *Config
 }
 
-func migrate(db *gorm.DB) {
-	db.AutoMigrate(&models.RecipeSchema{})
-	db.AutoMigrate(&models.RecipeGroupSchema{})
-	db.AutoMigrate(&models.Avrg{})
-	db.AutoMigrate(&models.IngredientsSchema{})
-	db.AutoMigrate(&models.RatingStruct{})
-	db.AutoMigrate(&models.NutritionalValue{})
-	db.AutoMigrate(&models.DietSchema{})
-	db.AutoMigrate(&models.IngredientDB{})
-}
-
 func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
@@ -62,7 +50,6 @@ func NewServer(config *Config) *http.Server {
 		err := fnc(NewServer)
 		fmt.Println(err)
 	}
-	migrate(NewServer.DB)
 
 	if NewServer.DB == nil {
 		panic("db is nil")

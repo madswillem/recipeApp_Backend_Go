@@ -171,5 +171,24 @@ const schema = `
 		cookie text COLLATE pg_catalog."default",
 		ip text COLLATE pg_catalog."default",
 		CONSTRAINT user_pkey PRIMARY KEY (id)
+	);
+	CREATE TABLE IF NOT EXISTS public.recipegroup_avrg
+	(
+		id uuid NOT NULL DEFAULT gen_random_uuid(),
+		created_at timestamp without time zone DEFAULT (now())::timestamp without time zone,
+		group_id uuid,
+		ingredient_id uuid,
+		cuisine_id uuid,
+		percentage numeric,
+		CONSTRAINT recipegroup_avrg_pkey PRIMARY KEY (id),
+		CONSTRAINT fk_average_group FOREIGN KEY (group_id)
+			REFERENCES public.recipe_group (id) MATCH SIMPLE
+			ON UPDATE CASCADE
+			ON DELETE CASCADE,
+		CONSTRAINT fk_average_ingredient FOREIGN KEY (ingredient_id)
+			REFERENCES public.ingredient (id) MATCH SIMPLE
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+		CONSTRAINT recipegroup_avrg_check CHECK (((ingredient_id IS NOT NULL)::integer + (cuisine_id IS NOT NULL)::integer) = 1)
 	)
 `

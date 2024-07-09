@@ -3,13 +3,11 @@ package models
 import (
 	"errors"
 	"fmt"
-	"math"
 	"net/http"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
 )
 
@@ -231,78 +229,3 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 	return nil
 }
 
-func (recipe *RecipeSchema) GetSimilarityWithGroup(group RecipeGroupSchema) (float64, *error_handler.APIError) {
-	//Ings
-	sameIngs := make([]bool, len(recipe.Ingredients))
-	sameAvrgIngs := make([]bool, len(group.AvrgIngredients))
-
-	for i, ingredient := range recipe.Ingredients {
-		for y, avrgIngredient := range group.AvrgIngredients {
-			if ingredient.Name == avrgIngredient.Name {
-				sameIngs[i] = true
-				sameAvrgIngs[y] = true
-				break
-			}
-		}
-	}
-
-	var allIngs []float64
-	for _, ing := range sameIngs {
-		if !ing {
-			allIngs = append(allIngs, 0)
-		}
-	}
-	for i, avrging := range sameAvrgIngs {
-		if avrging {
-			allIngs = append(allIngs, group.AvrgIngredients[i].Percentige/float64(len(group.Recipes)))
-		}
-		if !avrging {
-			allIngs = append(allIngs, 1-group.AvrgIngredients[i].Percentige/float64(len(group.Recipes)))
-		}
-	}
-	simIngs := tools.CalculateAverage(allIngs)
-
-	// Cuisine
-	arrCuisine := make([]float64, len(group.AvrgCuisine))
-	for i, cuisine := range group.AvrgCuisine {
-		if cuisine.Name == recipe.Cuisine {
-			arrCuisine[i] = cuisine.Percentige / float64(len(group.Recipes))
-		}
-		if cuisine.Name != recipe.Cuisine {
-			arrCuisine[i] = 1 - cuisine.Percentige/float64(len(group.Recipes))
-		}
-	}
-	simCuisine := tools.CalculateAverage(arrCuisine)
-	// Diet
-	sumDiet := 0.0
-	switch {
-	case !recipe.Diet.Vegetarien:
-		sumDiet += group.AvrgVegetarien / float64(len(group.Recipes))
-	case !recipe.Diet.Vegan:
-		sumDiet += group.AvrgVegan / float64(len(group.Recipes))
-	case !recipe.Diet.LowCal:
-		sumDiet += group.AvrgLowCal / float64(len(group.Recipes))
-	case !recipe.Diet.LowCarb:
-		sumDiet += group.AvrgLowCarb / float64(len(group.Recipes))
-	case !recipe.Diet.Keto:
-		sumDiet += group.AvrgKeto / float64(len(group.Recipes))
-	case !recipe.Diet.Paleo:
-		sumDiet += group.AvrgPaleo / float64(len(group.Recipes))
-	case !recipe.Diet.LowFat:
-		sumDiet += group.AvrgLowFat / float64(len(group.Recipes))
-	case !recipe.Diet.FoodCombining:
-		sumDiet += group.AvrgFoodCombining / float64(len(group.Recipes))
-	case !recipe.Diet.WholeFood:
-		sumDiet += group.AvrgWholeFood / float64(len(group.Recipes))
-	}
-	sim := sumDiet
-	sim += simIngs * 5.0
-	sim += simCuisine * 4
-	sim /= 10.0
-
-	if math.IsNaN(sim) {
-		return 0.0, error_handler.New("Similarity is not a number", http.StatusInternalServerError, nil)
-	}
-
-	return sim, nil
-}
