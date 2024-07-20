@@ -1,6 +1,6 @@
 module github.com/madswillem/recipeApp_Backend_Go
 
-go 1.21.5
+go 1.21.11
 
 require (
 	github.com/gin-gonic/gin v1.9.1
@@ -33,6 +33,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/madswillem/gompare v0.0.0-20240718165440-81c7e9bc138c // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
