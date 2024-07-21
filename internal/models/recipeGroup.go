@@ -1,7 +1,11 @@
 package models
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/madswillem/gompare"
@@ -9,7 +13,7 @@ import (
 )
 
 type RecipeGroupSchema struct {
-	ID              string `db:"id"`
+	ID              string
 	IngredientDict  map[string]int
 	IngredientVec   []float64
 	PreperationDict map[string]int
@@ -24,6 +28,23 @@ type RecipeGroupSchema struct {
 	Recipes         []RecipeSchema
 }
 
+func (rp *RecipeGroupSchema) Scan(val interface{}) error {
+	switch v := val.(type) {
+	case []byte:
+		json.Unmarshal(v, &rp)
+		return nil
+	case string:
+		json.Unmarshal([]byte(v), &rp)
+		return nil
+	default:
+		return errors.New(fmt.Sprintf("Unsuported type: %T", v))
+	}
+}
+
+func (rp *RecipeGroupSchema) Value() (driver.Value, error) {
+	return json.Marshal(rp)
+}
+
 func (rp *RecipeGroupSchema) Create(r *RecipeSchema) {
 	// Vectorize the Recipes
 	// Vectorize Ingredients
@@ -33,7 +54,8 @@ func (rp *RecipeGroupSchema) Create(r *RecipeSchema) {
 	}
 
 	h := gompare.New(gompare.Config{})
-	h.Add(ingredient_list...)
+	h.InputStrings = make([][]string, 1)
+	h.InputStrings[0] = ingredient_list
 	h.NormalMatrix()
 	rp.IngredientDict = h.OuputMatrix.Dict
 	rp.IngredientVec = tools.AverageVectors(h.OuputMatrix.Vec...)
@@ -61,4 +83,19 @@ func (rp *RecipeGroupSchema) Create(r *RecipeSchema) {
 	rp.PrepTime = time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
 	fmt.Sscanf(r.CookingTime, "%d:%d:%d", hour, min, sec)
 	rp.CookingTime = time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
+
+	steps := make([]string, len(r.Steps))
+	for i, s := range r.Steps {
+		steps[i] = s.Step
+	}
+	prep := strings.Join(steps, " ")
+	h = gompare.New(gompare.Config{})
+	h.Add(prep)
+	h.NormalMatrix()
+	rp.PreperationDict = h.OuputMatrix.Dict
+	rp.PreperationVec = h.OuputMatrix.Vec[0]
+}
+
+func (rp *RecipeGroupSchema) Compare(r *RecipeSchema) float64 {
+	return 0.0
 }

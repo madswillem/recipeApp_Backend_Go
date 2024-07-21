@@ -21,7 +21,7 @@ import (
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
 	if actual.ID == "" || expected.ID == "" {
-		t.Errorf(fmt.Sprintf("%d (actual.ID) != %d (expected.ID)", actual.ID, expected.ID))
+		t.Errorf(fmt.Sprintf("%s (actual.ID) != %s (expected.ID)", actual.ID, expected.ID))
 
 		return
 	}
@@ -32,6 +32,12 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 		return
 	}
 
+	// Check if the lengths of actual.Steps and expected.Steps are equal
+	if len(actual.Steps) != len(expected.Steps) {
+		t.Errorf("Expected %d ingredients but got %d", len(expected.Steps), len(actual.Steps))
+		return
+	}
+
 	var errors []string
 
 	// Compare each ingredient in the actual recipe
@@ -39,14 +45,14 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 		expectedIngredient := expected.Ingredients[num]
 
 		// Compare ingredient properties
-		if ingredient.Ingredient != expectedIngredient.Ingredient {
-			errors = append(errors, fmt.Sprintf("Expected ingredient %s but got %s", expectedIngredient.Ingredient, ingredient.Ingredient))
+		if ingredient.Name != expectedIngredient.Name {
+			errors = append(errors, fmt.Sprintf("Expected ingredient %s but got %s", expectedIngredient.Name, ingredient.Name))
 		}
 		if ingredient.Amount != expectedIngredient.Amount {
-			errors = append(errors, fmt.Sprintf("Expected amount %s but got %s", expectedIngredient.Amount, ingredient.Amount))
+			errors = append(errors, fmt.Sprintf("Expected amount %d but got %d", expectedIngredient.Amount, ingredient.Amount))
 		}
-		if ingredient.MeasurementUnit != expectedIngredient.MeasurementUnit {
-			errors = append(errors, fmt.Sprintf("Expected measurement_unit %s but got %s", expectedIngredient.MeasurementUnit, ingredient.MeasurementUnit))
+		if ingredient.Unit != expectedIngredient.Unit {
+			errors = append(errors, fmt.Sprintf("Expected measurement_unit %s but got %s", expectedIngredient.Unit, ingredient.Unit))
 		}
 		if ingredient.NutritionalValue != expectedIngredient.NutritionalValue {
 			errors = append(errors, fmt.Sprintf("Expected nutritional_value %v but got %v", expectedIngredient.NutritionalValue, ingredient.NutritionalValue))
@@ -56,18 +62,30 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 		}
 	}
 
+	// Compare Steps
+	for num, step := range actual.Steps {
+		expectedStep := expected.Steps[num]
+
+		if step.Step != expectedStep.Step {
+			errors = append(errors, fmt.Sprintf("Expected step %s but got %s", expectedStep.Step, step.Step))
+		}
+		if step.TechniqueID != expectedStep.TechniqueID {
+			errors = append(errors, fmt.Sprintf("Expected technique %s but got %s", *expectedStep.TechniqueID, *step.TechniqueID))
+		}
+	}
+
 	// Compare other recipe properties
 	if actual.Name != expected.Name {
 		errors = append(errors, fmt.Sprintf("Expected Name %s but got %s", expected.Name, actual.Name))
 	}
-	if actual.Steps != expected.Steps {
-		errors = append(errors, fmt.Sprintf("Expected Steps %s but got %s", expected.Steps, actual.Steps))
+	if actual.PrepTime != expected.PrepTime {
+		errors = append(errors, fmt.Sprintf("Expected prep_time %s but got %s", expected.PrepTime, actual.PrepTime))
 	}
 	if actual.CookingTime != expected.CookingTime {
-		errors = append(errors, fmt.Sprintf("Expected cooking_time %d but got %d", expected.CookingTime, actual.CookingTime))
+		errors = append(errors, fmt.Sprintf("Expected cooking_time %s but got %s", expected.CookingTime, actual.CookingTime))
 	}
 	if actual.NutritionalValue != expected.NutritionalValue {
-		errors = append(errors, fmt.Sprintf("Expected NutritionalValue %s but got %s", expected.NutritionalValue, actual.NutritionalValue))
+		errors = append(errors, fmt.Sprintf("Expected NutritionalValue %v but got %v", expected.NutritionalValue, actual.NutritionalValue))
 	}
 	if actual.Rating != expected.Rating {
 		errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expected.Rating, actual.Rating))
@@ -82,7 +100,6 @@ func innitTestDB() *gorm.DB {
 	db, err := gorm.Open(postgres.Open("host=127.0.0.1 user=mads password=1234 dbname=test  port=5432 sslmode=disable"), &gorm.Config{})
 	migrate(db)
 
-
 	if err != nil || db == nil {
 		panic("Error ")
 	}
@@ -92,12 +109,10 @@ func innitTestDB() *gorm.DB {
 func migrate(db *gorm.DB) {
 	db.AutoMigrate(&models.RecipeSchema{})
 	db.AutoMigrate(&models.RecipeGroupSchema{})
-	db.AutoMigrate(&models.Avrg{})
 	db.AutoMigrate(&models.IngredientsSchema{})
 	db.AutoMigrate(&models.RatingStruct{})
 	db.AutoMigrate(&models.NutritionalValue{})
 	db.AutoMigrate(&models.DietSchema{})
-	db.AutoMigrate(&models.IngredientDBSchema{})
 }
 
 func TestAddRecipe(t *testing.T) {
@@ -239,7 +254,7 @@ func TestGetAll(t *testing.T) {
 }
 func TestGetByID(t *testing.T) {
 	s := server.Server{DB: innitTestDB()}
-	
+
 	t.Run("get recipe by id", func(t *testing.T) {
 		// Initialize the gin context
 		w := httptest.NewRecorder()

@@ -7,16 +7,15 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/server"
 	"gorm.io/gorm"
 )
-	
+
 func init() {
 	initializers.LoadEnvVariables()
 }
 
-
-func main() { 
+func main() {
 
 	config := server.Config{
-		Innit: []server.InnitFuncs{initializers.InitDBonDev},
+		Innit:  []server.InnitFuncs{initializers.InitDBonDev},
 		DBConf: gorm.Config{},
 	}
 	server := server.NewServer(&config)

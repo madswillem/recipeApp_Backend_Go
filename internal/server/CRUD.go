@@ -102,18 +102,18 @@ func (s *Server) AddIngredient(c *gin.Context) {
 func (s *Server) UpdateRecipe(c *gin.Context) {
 
 	var body struct {
-		Name        *string        `db:"name" json:"name"`
-		Cuisine     *string        `db:"cuisine" json:"cuisine"`
-		Yield       *int           `db:"yield" json:"yield"`
-		YieldUnit   *string        `db:"yield_unit" json:"yield_unit"`
-		PrepTime    *string        `db:"prep_time" json:"prep_time"`
-		CookingTime *string        `db:"cooking_time" json:"cooking_time"`
-		Ingredients *[]models.IngredientsSchema 
-		Diet 		*models.DietSchema
-		Steps 		*[]models.StepsStruct
+		Name        *string `db:"name" json:"name"`
+		Cuisine     *string `db:"cuisine" json:"cuisine"`
+		Yield       *int    `db:"yield" json:"yield"`
+		YieldUnit   *string `db:"yield_unit" json:"yield_unit"`
+		PrepTime    *string `db:"prep_time" json:"prep_time"`
+		CookingTime *string `db:"cooking_time" json:"cooking_time"`
+		Ingredients *[]models.IngredientsSchema
+		Diet        *models.DietSchema
+		Steps       *[]models.StepsStruct
 	}
 
-	i:= c.Param("id")
+	i := c.Param("id")
 
 	c.ShouldBindJSON(&body)
 
@@ -126,37 +126,37 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 	var args []interface{}
 
 	if body.Name != nil {
-		setParts = append(setParts, "name = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "name = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.Name)
 	}
 	if body.Cuisine != nil {
-		setParts = append(setParts, "cuisine = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "cuisine = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.Cuisine)
 	}
 	if body.Yield != nil {
-		setParts = append(setParts, "yield = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "yield = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.Yield)
 	}
 	if body.YieldUnit != nil {
-		setParts = append(setParts, "yield_unit = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "yield_unit = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.YieldUnit)
 	}
 	if body.PrepTime != nil {
-		setParts = append(setParts, "prep_time = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "prep_time = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.PrepTime)
 	}
 	if body.CookingTime != nil {
-		setParts = append(setParts, "cooking_time = $" + strconv.Itoa(len(args) +1))
+		setParts = append(setParts, "cooking_time = $"+strconv.Itoa(len(args)+1))
 		args = append(args, *body.CookingTime)
 	}
 
 	if len(setParts) == 0 {
 		// No fields to body
 		error_handler.HandleError(c, http.StatusExpectationFailed, "Nothing to update", []error{})
-		return 
+		return
 	}
 
-	query := "UPDATE recipes SET " + strings.Join(setParts, ", ") + " WHERE id = $" + strconv.Itoa(len(args) +1)
+	query := "UPDATE recipes SET " + strings.Join(setParts, ", ") + " WHERE id = $" + strconv.Itoa(len(args)+1)
 	fmt.Println(query)
 	args = append(args, i)
 
@@ -164,18 +164,18 @@ func (s *Server) UpdateRecipe(c *gin.Context) {
 	if err != nil {
 		tx.Rollback()
 		error_handler.HandleError(c, http.StatusInternalServerError, "Error Updating recipe", []error{err})
-		return 
+		return
 	}
 
 	tx.Commit()
 }
 
 func (s *Server) DeleteRecipe(c *gin.Context) {
-	i:= c.Param("id")
+	i := c.Param("id")
 	err := s.NewDB.QueryRowx(`DELETE FROM public.recipes WHERE id = $1`, i).Err()
 	if err != nil {
 		error_handler.HandleError(c, http.StatusInternalServerError, err.Error(), []error{err})
-		return 
+		return
 	}
 
 	c.Status(http.StatusOK)
@@ -183,9 +183,9 @@ func (s *Server) DeleteRecipe(c *gin.Context) {
 
 func (s *Server) GetById(c *gin.Context) {
 	i := c.Param("id")
-	
+
 	result := models.RecipeSchema{ID: i}
-	err := result.GetRecipeByID(s.NewDB, nil)
+	err := result.GetRecipeByID(s.NewDB)
 
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
@@ -223,10 +223,10 @@ func (s *Server) Select(c *gin.Context) {
 	if !ok {
 		fmt.Println("type assertion failed")
 	}
-	
+
 	response := models.RecipeSchema{}
 	response.ID = fmt.Sprint(i)
-	
+
 	selectedErr := response.UpdateSelected(1, &user, s.DB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)

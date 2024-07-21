@@ -53,7 +53,7 @@ func (recipe *RecipeSchema) GetRecipeByIDGORM(db *gorm.DB, reqData map[string]bo
 	return nil
 }
 
-func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB, reqData map[string]bool) *error_handler.APIError {
+func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB) *error_handler.APIError {
 	err := db.Get(recipe, `SELECT recipes.*,
 								rt.id AS "rating.id", rt.created_at AS "rating.created_at",
 								rt.recipe_id AS "rating.recipe_id", rt.overall AS "rating.overall", rt.mon AS "rating.mon",
@@ -82,6 +82,8 @@ func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB, reqData map[string]bool) 
 	if err != nil {
 		return error_handler.New("An error ocurred fetching the ingredients: "+err.Error(), http.StatusInternalServerError, err)
 	}
+
+	fmt.Printf("Recipe: %v", recipe)
 
 	return nil
 }

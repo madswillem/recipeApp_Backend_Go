@@ -19,33 +19,34 @@ const MethodPost = "POST"
 
 type InnitFuncs func(*Server) error
 type ExtraControllers struct {
-	function func(* gin.Context)
-	route string
-	method string
+	Function   func(*gin.Context)
+	Middleware func(*gin.Context)
+	Route      string
+	Method     string
 }
 
 type Config struct {
-	Innit	[]InnitFuncs
-	Controllers	[]ExtraControllers
-	DBConf	gorm.Config
+	Innit       []InnitFuncs
+	Controllers []ExtraControllers
+	DBConf      gorm.Config
 }
 
 type Server struct {
-	port int
-	DB *gorm.DB
-	NewDB *sqlx.DB
+	port   int
+	DB     *gorm.DB
+	NewDB  *sqlx.DB
 	config *Config
 }
 
 func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
-		port: port,
-		DB: database.ConnectToGORMDB(&config.DBConf),
-		NewDB: database.ConnectToDB(&sqlx.Conn{}),
+		port:   port,
+		DB:     database.ConnectToGORMDB(&config.DBConf),
+		NewDB:  database.ConnectToDB(&sqlx.Conn{}),
 		config: config,
 	}
-	
+
 	for _, fnc := range NewServer.config.Innit {
 		err := fnc(NewServer)
 		fmt.Println(err)
@@ -78,11 +79,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(s.CORSMiddleware())
 
 	for _, controller := range s.config.Controllers {
-		if controller.method == MethodGET {
-			r.GET(controller.route, controller.function)
+		if controller.Route == MethodGET {
+			r.GET(controller.Route, controller.Function)
 		}
-		if controller.method == MethodPost {
-			r.GET(controller.route, controller.function)
+		if controller.Method == MethodPost {
+			r.GET(controller.Route, controller.Function)
 		}
 	}
 
@@ -98,6 +99,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/colormode/:type", s.Colormode)
 
 	r.PATCH("/account/update", s.UserMiddleware, s.UpadateUser)
+	r.GET("/creategroup", s.UserMiddleware, s.CreateGroup)
 	r.GET("/recommendation", s.UserMiddleware, s.GetRecommendation)
 
 	r.GET("/", s.RenderHome)
@@ -115,4 +117,3 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	return r
 }
-

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -29,7 +30,7 @@ func (s *Server) UpadateUser(c *gin.Context) {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return
 	}
-	
+
 	c.JSON(http.StatusAccepted, middleware_user)
 }
 func (s *Server) GetRecommendation(c *gin.Context) {
@@ -41,7 +42,7 @@ func (s *Server) GetRecommendation(c *gin.Context) {
 
 	err := user.GetByCookie(s.DB)
 	if err != nil {
-		error_handler.HandleError(c ,err.Code, err.Message, err.Errors)
+		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 		return
 	}
 
@@ -50,6 +51,30 @@ func (s *Server) GetRecommendation(c *gin.Context) {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, recipes)
+}
+func (s *Server) CreateGroup(c *gin.Context) {
+	middleware_user, _ := c.Get("user")
+	user, ok := middleware_user.(models.UserModel)
+	if !ok {
+		fmt.Println("type assertion failed")
+	}
+
+	r := models.RecipeSchema{ID: "a8fc6df4-018e-45fa-ae9a-dfdf7dad171f"}
+	r.GetRecipeByID(s.NewDB)
+
+	rp := models.RecipeGroupSchema{}
+	rp.Create(&r)
+	user.RecipeGroups = append(user.RecipeGroups, rp)
+
+	v, err := json.Marshal(user.RecipeGroups)
+	if err != nil {
+		error_handler.HandleError(c, http.StatusInternalServerError, "Couldnt Marshal recipe group", []error{err})
+	}
+
+	fmt.Printf("Recipe groups: %v \n", user.RecipeGroups)
+
+	s.NewDB.MustExec(`UPDATE "user" SET groups = $1 WHERE id = $2`, v, user.ID)
+	c.JSON(http.StatusAccepted, user)
 }

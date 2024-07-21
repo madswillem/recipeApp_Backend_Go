@@ -1,6 +1,7 @@
 package test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
@@ -43,5 +44,19 @@ func TestGetCurrentData(t *testing.T) {
 	_, err := tools.GetCurrentData()
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
+	}
+}
+
+func TestAverageVectors(t *testing.T) {
+	v1 := []float64{1.0, 2.0, 3.0}
+	v2 := []float64{4.0, 5.0}
+	v3 := []float64{7.0, 8.0, 9.0, 10.0}
+
+	expected := []float64{4, 5, 6, 3.3333333333333335}
+
+	avg := tools.AverageVectors(v1, v2, v3)
+
+	if reflect.DeepEqual(avg, expected) {
+		t.Errorf("Expected %v but got %v", expected, avg)
 	}
 }
