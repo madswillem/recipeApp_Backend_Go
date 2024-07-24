@@ -56,7 +56,7 @@ func (s *Server) GetAll(c *gin.Context) {
 		}
 	}
 	for _, step := range steps {
-		if recipe, found := recipeMap[*step.RecipeID]; found {
+		if recipe, found := recipeMap[step.RecipeID]; found {
 			recipe.Steps = append(recipe.Steps, step)
 		}
 	}

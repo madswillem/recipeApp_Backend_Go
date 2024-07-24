@@ -61,8 +61,12 @@ func (s *Server) CreateGroup(c *gin.Context) {
 		fmt.Println("type assertion failed")
 	}
 
-	r := models.RecipeSchema{ID: "a8fc6df4-018e-45fa-ae9a-dfdf7dad171f"}
-	r.GetRecipeByID(s.NewDB)
+	r := models.RecipeSchema{ID: "aa85daf1-dbc5-462d-a6fe-3fbb358b08dd"}
+	apiErr := r.GetRecipeByID(s.NewDB)
+	if apiErr != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, apiErr)
+		return
+	}
 
 	rp := models.RecipeGroupSchema{}
 	rp.Create(&r)
@@ -72,8 +76,6 @@ func (s *Server) CreateGroup(c *gin.Context) {
 	if err != nil {
 		error_handler.HandleError(c, http.StatusInternalServerError, "Couldnt Marshal recipe group", []error{err})
 	}
-
-	fmt.Printf("Recipe groups: %v \n", user.RecipeGroups)
 
 	s.NewDB.MustExec(`UPDATE "user" SET groups = $1 WHERE id = $2`, v, user.ID)
 	c.JSON(http.StatusAccepted, user)

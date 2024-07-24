@@ -10,12 +10,12 @@ import (
 )
 
 type Filter struct {
-	SearchText  *string `db:"searchtext" json:"search"`
-	NutriScore  *string `db:"nutriscore" json:"nutriscore"`
-	Name        *string `db:"name" json:"name"`
-	Cuisine     *string `db:"cuisine" json:"cuisine"`
-	PrepTime    *string `db:"prep_time" json:"prep_time"`
-	CookingTime *string `db:"cooking_time" json:"cooking_time"`
+	SearchText  *string   `db:"searchtext" json:"search"`
+	NutriScore  *string   `db:"nutriscore" json:"nutriscore"`
+	Name        *string   `db:"name" json:"name"`
+	Cuisine     *string   `db:"cuisine" json:"cuisine"`
+	PrepTime    *string   `db:"prep_time" json:"prep_time"`
+	CookingTime *string   `db:"cooking_time" json:"cooking_time"`
 	Ingredients *[]string `json:"ingredients"`
 	Diet        *DietSchema
 }
@@ -26,7 +26,7 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 	var args []interface{}
 
 	if f.SearchText != nil {
-		where = append(where, `to_tsvector('english', recipes.name) @@ websearch_to_tsquery('english', $1) 
+		where = append(where, `to_tsvector('english', recipes.name) @@ websearch_to_tsquery('english', $1)
 					OR to_tsvector('english', ingredient.name) @@ websearch_to_tsquery('english', $1)
 					OR to_tsvector('english', step.step) @@ websearch_to_tsquery('english', $1)`)
 		args = append(args, f.SearchText)
@@ -66,21 +66,21 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 	}
 
 	query := `SELECT DISTINCT recipes.*
-				FROM recipes 
+				FROM recipes
 				LEFT JOIN recipe_ingredient ON recipes.id = recipe_ingredient.recipe_id
-				LEFT JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id 
+				LEFT JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id
 				LEFT JOIN nutritional_value ON recipes.id = nutritional_value.recipe_id
 				LEFT JOIN step ON recipes.id = step.recipe_id
 				WHERE ` + strings.Join(where, " AND ")
 
-	err := db.Select(&recipes, query,args...)
+	err := db.Select(&recipes, query, args...)
 	if err != nil {
 		return nil, error_handler.New("Dtabase error: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
 	if len(recipes) <= 0 {
 		return nil, nil
-	}	
+	}
 
 	recipeMap := make(map[string]*RecipeSchema)
 	for i := range recipes {
@@ -123,9 +123,8 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 		return nil, error_handler.New("error fetching steps: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
-	
 	for _, step := range steps {
-		if recipe, found := recipeMap[*step.RecipeID]; found {
+		if recipe, found := recipeMap[step.RecipeID]; found {
 			recipe.Steps = append(recipe.Steps, step)
 		}
 	}

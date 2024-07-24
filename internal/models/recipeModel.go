@@ -83,8 +83,6 @@ func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB) *error_handler.APIError {
 		return error_handler.New("An error ocurred fetching the ingredients: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
-	fmt.Printf("Recipe: %v", recipe)
-
 	return nil
 }
 
@@ -220,11 +218,21 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 			return err
 		}
 	}
+
+	//Insert Steps
+	for _, s := range recipe.Steps {
+		s.RecipeID = recipe.ID
+		err := s.Create(tx)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return error_handler.New("Error creating recipe", http.StatusInternalServerError, err)
 	}
-
 	fmt.Println(recipe.ID)
 
 	return nil
