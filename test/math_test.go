@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -52,11 +53,34 @@ func TestAverageVectors(t *testing.T) {
 	v2 := []float64{4.0, 5.0}
 	v3 := []float64{7.0, 8.0, 9.0, 10.0}
 
-	expected := []float64{4, 5, 6, 3.3333333333333335}
+	expected := []float64{4, 5, 4, 3.333333333333333}
 
 	avg := tools.AverageVectors(v1, v2, v3)
 
-	if reflect.DeepEqual(avg, expected) {
+	fmt.Println(avg)
+	if !reflect.DeepEqual(avg, expected) {
 		t.Errorf("Expected %v but got %v", expected, avg)
 	}
+}
+
+func TestAddVectors(t *testing.T) {
+	t.Run("Test with 3 Vecs of diffrent length", func(t *testing.T) {
+		vec1 := []float64{1.0, 2.0, 3.0}
+		vec2 := []float64{4.0, 5.0}
+		vec3 := []float64{7.0, 8.0, 9.0, 10.0}
+
+		sum := tools.AddVectors(vec1, vec2, vec3)
+
+		fmt.Println("Sum of vectors:", sum)
+	})
+}
+
+func TestMultiplyVectorByNum(t *testing.T) {
+	t.Run("test", func(t *testing.T) {
+		vec := []float64{1.0, 3.0, 2.0}
+
+		product := tools.MultiplyVectorByNum(10, vec)
+
+		fmt.Println("Product: ", product)
+	})
 }

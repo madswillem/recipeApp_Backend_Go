@@ -82,7 +82,7 @@ func (rp *RecipeGroupSchema) Create(r *RecipeSchema) {
 	rp.TechniquesVec = tools.AverageVectors(h.OutputMatrix.Vec...)
 
 	var hour, min, sec int
-	fmt.Sscanf(r.PrepTime, "%d:%d:%d", hour, min, sec)
+	fmt.Sscanf(r.PrepTime, "%d:%d:%d", &hour, &min, &sec)
 	rp.PrepTime = time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
 	fmt.Sscanf(r.CookingTime, "%d:%d:%d", hour, min, sec)
 	rp.CookingTime = time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
@@ -163,4 +163,62 @@ func (rp *RecipeGroupSchema) Compare(r *RecipeSchema) float64 {
 
 	sim := simIngs*2 + simCuisine*3 + simPrep + simTech*2
 	return sim / 8
+}
+
+func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
+	ingredient_list := make([]string, len(r.Ingredients))
+	for n, i := range r.Ingredients {
+		ingredient_list[n] = i.Name
+	}
+
+	h := gompare.New(gompare.Config{
+		Matrix: gompare.Matrix{
+			Dict: rp.IngredientDict,
+		},
+	})
+	h.InputStrings = make([][]string, 1)
+	h.InputStrings[0] = ingredient_list
+	h.NormalMatrix()
+	vec := tools.AddVectors(tools.MultiplyVectorByNum(float64(len(rp.Recipes)), rp.IngredientVec), h.OutputMatrix.Vec[0])
+	rp.IngredientDict = h.OutputMatrix.Dict
+	rp.IngredientVec = tools.MultiplyVectorByNum(1.0/float64(len(rp.Recipes)+1), vec)
+
+	steps := make([]string, len(r.Steps))
+	for i, s := range r.Steps {
+		steps[i] = s.Step
+	}
+	prep := strings.Join(steps, " ")
+	h = gompare.New(gompare.Config{
+		Matrix: gompare.Matrix{
+			Dict: rp.PreperationDict,
+		},
+	})
+	h.Add(prep)
+	h.NormalMatrix()
+	vec = tools.AddVectors(tools.MultiplyVectorByNum(float64(len(rp.Recipes)), rp.PreperationVec), h.OutputMatrix.Vec[0])
+	rp.PreperationDict = h.OutputMatrix.Dict
+	rp.PreperationVec = tools.MultiplyVectorByNum(1.0/float64(len(rp.Recipes)+1), vec)
+
+	h = gompare.New(gompare.Config{
+		Matrix: gompare.Matrix{
+			Dict: rp.CuisineDict,
+		},
+	})
+	h.Add(r.Cuisine)
+	h.NormalMatrix()
+	vec = tools.AddVectors(tools.MultiplyVectorByNum(float64(len(rp.Recipes)), rp.CuisineVec), h.OutputMatrix.Vec[0])
+	rp.CuisineDict = h.OutputMatrix.Dict
+	rp.CuisineVec = tools.MultiplyVectorByNum(1.0/float64(len(rp.Recipes)+1), vec)
+
+	var hour, min, sec int
+	fmt.Sscanf(r.PrepTime, "%d:%d:%d", &hour, &min, &sec)
+	rp.PrepTime += time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
+	fmt.Println(time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second)
+	fmt.Println(len(rp.Recipes) + 1)
+	rp.PrepTime /= time.Duration(len(rp.Recipes) + 1)
+	fmt.Sscanf(r.CookingTime, "%d:%d:%d", &hour, &min, &sec)
+	rp.CookingTime += time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
+	rp.CookingTime /= time.Duration(len(rp.Recipes) + 1)
+
+	return
 }

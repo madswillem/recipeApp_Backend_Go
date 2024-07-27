@@ -30,29 +30,29 @@ func CalculateAverage(numbers []float64) float64 {
 }
 
 func AverageVectors(vectors ...[]float64) []float64 {
-	if len(vectors) == 0 {
-		return nil
+	result := AddVectors(vectors...)
+	return MultiplyVectorByNum(1.0/float64(len(vectors)), result)
+}
+func MultiplyVectorByNum(f float64, v []float64) []float64 {
+	for i := range v {
+		v[i] *= f
 	}
-
-	// Find the length of the longest vector
-	maxLength := 0
-	for _, v := range vectors {
-		if len(v) > maxLength {
-			maxLength = len(v)
+	return v
+}
+func AddVectors(vec ...[]float64) []float64 {
+	max_len := 0
+	for _, v := range vec {
+		if len(v) > max_len {
+			max_len = len(v)
 		}
 	}
 
-	avg := make([]float64, maxLength)
-	for _, v := range vectors {
-		for i := 0; i < len(v); i++ {
-			avg[i] += v[i]
+	result_vec := make([]float64, max_len)
+	for _, v := range vec {
+		for i, f := range v {
+			result_vec[i] += f
 		}
 	}
 
-	numVectors := float64(len(vectors))
-	for i := 0; i < maxLength; i++ {
-		avg[i] /= numVectors
-	}
-
-	return avg
+	return result_vec
 }
