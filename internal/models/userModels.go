@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -88,6 +89,20 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 		group_ranking[i].Group = &user.RecipeGroups[i]
 		group_ranking[i].Sim = user.RecipeGroups[i].Compare(r)
 	}
+
+	group_addble := make([]struct {
+		Group *RecipeGroupSchema
+		Sim   float64
+	}, 0)
+	fmt.Printf("%+v\n", group_ranking)
+	for i := range group_ranking {
+		if group_ranking[i].Sim >= .9 {
+			group_addble = append(group_addble, group_ranking[i])
+		}
+	}
+	fmt.Printf("%+v\n", group_ranking)
+
+	group_addble[0].Group.Add(r)
 
 	return nil
 }

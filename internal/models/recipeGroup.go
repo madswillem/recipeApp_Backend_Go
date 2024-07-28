@@ -27,19 +27,6 @@ type RecipeGroupSchema struct {
 	Recipes         []RecipeSchema
 }
 
-func (rp *RecipeGroupSchema) Scan(val interface{}) error {
-	switch v := val.(type) {
-	case []byte:
-		json.Unmarshal(v, &rp)
-		return nil
-	case string:
-		json.Unmarshal([]byte(v), &rp)
-		return nil
-	default:
-		return fmt.Errorf("unsuported type: %T", v)
-	}
-}
-
 func (rp *RecipeGroupSchema) Value() (driver.Value, error) {
 	return json.Marshal(rp)
 }

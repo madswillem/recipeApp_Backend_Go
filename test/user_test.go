@@ -350,8 +350,10 @@ func TestAdd(t *testing.T) {
 func TestUser_Add(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		db := database.ConnectToDB(&sqlx.Conn{})
+		r := models.RecipeSchema{ID: "aa85daf1-dbc5-462d-a6fe-3fbb358b08dd"}
+		r.GetRecipeByID(db)
 		user := models.UserModel{ID: "a5e4a4fb-1b70-4cfc-8350-55decee258ab"}
-		err := user.AddToGroup(db, &models.RecipeSchema{})
+		err := user.AddToGroup(db, &r)
 		if err != nil {
 			t.Errorf("Error: %+v\n", err)
 		}
