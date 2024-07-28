@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -65,6 +66,27 @@ func (user *UserModel) Create(db *sqlx.DB, ip string) *error_handler.APIError {
 	stmt.Close()
 	if err != nil {
 		return error_handler.New("Error inserting user: "+err.Error(), http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
+func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.APIError {
+	var groups []byte
+	err := db.Get(&groups, `SELECT "groups" FROM "user" WHERE id=$1`, user.ID)
+	if err != nil {
+		return error_handler.New("Error fetching recipe_groups", http.StatusInternalServerError, err)
+	}
+	json.Unmarshal(groups, &user.RecipeGroups)
+
+	group_ranking := make([]struct {
+		Group *RecipeGroupSchema
+		Sim   float64
+	}, len(user.RecipeGroups))
+
+	for i := range user.RecipeGroups {
+		group_ranking[i].Group = &user.RecipeGroups[i]
+		group_ranking[i].Sim = user.RecipeGroups[i].Compare(r)
 	}
 
 	return nil

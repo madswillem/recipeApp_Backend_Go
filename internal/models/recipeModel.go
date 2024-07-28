@@ -86,54 +86,49 @@ func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB) *error_handler.APIError {
 	return nil
 }
 
-func (recipe *RecipeSchema) AddNutritionalValue(db *gorm.DB) *error_handler.APIError {
-	for _, ingredient := range recipe.Ingredients {
-		var nutritionalValue NutritionalValue
-		err := db.Joins("JOIN ingredients_schemas ON nutritional_values.owner_id = ingredients_schemas.id").
-			Where("ingredients_schemas.ingredient = ?", ingredient.Name).
-			First(&nutritionalValue).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) && !ingredient.NutritionalValue.Edited {
-				return error_handler.New(fmt.Sprintf("ingredient %s not found please add nutritional value and set edited to true", ingredient.Name), http.StatusBadRequest, err)
-			} else if errors.Is(err, gorm.ErrRecordNotFound) && ingredient.NutritionalValue.Edited {
-				err := ingredient.createIngredientDBEntry(db)
-				if err != nil {
-					return err
-				}
-			} else {
-				return error_handler.New("database error", http.StatusInternalServerError, err)
-			}
-		} else {
-			if ingredient.NutritionalValue.Edited {
-				return error_handler.New(fmt.Sprintf("Ingredient: %s already exists", ingredient.Name), http.StatusBadRequest, err)
-			} else if !ingredient.NutritionalValue.Edited {
-				ingredient.NutritionalValue = nutritionalValue
-			}
-		}
-	}
-	return nil
-}
-
-func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *gorm.DB) *error_handler.APIError {
-	apiErr := recipe.GetRecipeByIDGORM(db, map[string]bool{"everything": true})
+func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx.DB) *error_handler.APIError {
+	apiErr := recipe.GetRecipeByID(db)
 	if apiErr != nil {
 		return apiErr
 	}
-	recipe.Selected += change
 
 	apiErr = recipe.Rating.Update(change)
 	if apiErr != nil {
 		return apiErr
 	}
+
 	fmt.Println(recipe.Rating.Overall)
 
-	err := db.Model(&recipe).Update("selected", recipe.Selected).Error
+	recipe.Selected += change
+	recipe.Version += 1
+
+	tx := db.MustBegin()
+	tx.MustExec(`UPDATE "user" SET selected=$1, version=$2 WHERE id=$3`, recipe.Selected, recipe.Version, recipe.ID)
+	query := `
+    UPDATE weather_data
+    SET
+        overall = :overall,
+        mon = :mon,
+        tue = :tue,
+        wed = :wed,
+        thu = :thu,
+        fri = :fri,
+        sat = :sat,
+        sun = :sun,
+        win = :win,
+        spr = :spr,
+        sum = :sum,
+        aut = :aut,
+        thirtydegree = :thirtydegree,
+        twentiedegree = :twentiedegree,
+        tendegree = :tendegree,
+        zerodegree = :zerodegree,
+        subzerodegree = :subzerodegree
+    WHERE some_condition = :some_condition`
+	tx.NamedExec(query, recipe.Rating)
+	err := tx.Commit()
 	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-	err = db.Model(&recipe.Rating).Updates(recipe.Rating).Error
-	if err != nil {
-		return error_handler.New("database error", http.StatusInternalServerError, err)
+		return error_handler.New("Error creating recipe", http.StatusInternalServerError, err)
 	}
 
 	//if user == nil {

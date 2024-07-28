@@ -227,7 +227,7 @@ func (s *Server) Select(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = fmt.Sprint(i)
 
-	selectedErr := response.UpdateSelected(1, &user, s.DB)
+	selectedErr := response.UpdateSelected(1, &user, s.NewDB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
@@ -247,7 +247,7 @@ func (s *Server) Deselect(c *gin.Context) {
 	response := models.RecipeSchema{}
 	response.ID = fmt.Sprint(i)
 
-	selectedErr := response.UpdateSelected(-1, &middleware_user, s.DB)
+	selectedErr := response.UpdateSelected(-1, &middleware_user, s.NewDB)
 	if selectedErr != nil {
 		error_handler.HandleError(c, selectedErr.Code, selectedErr.Message, selectedErr.Errors)
 		return
