@@ -209,3 +209,21 @@ func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
 
 	return
 }
+
+func (rp *RecipeGroupSchema) Merge(rp2 *RecipeGroupSchema) {
+	//Create Merged Dict for Ingredient
+	for k := range rp2.IngredientDict {
+		if rp.IngredientDict[k] == 0 {
+			rp.IngredientDict[k] = len(rp.IngredientDict) + 1
+		}
+	}
+	rp.IngredientVec = append(rp.IngredientVec, make([]float64, len(rp.IngredientDict)-len(rp.IngredientVec))...)
+	rp2_ingvec := make([]float64, len(rp.IngredientDict))
+	for k, v := range rp2.IngredientDict {
+		i := rp.IngredientDict[k]
+		rp2_ingvec[i-1] = rp2.IngredientVec[v-1]
+	}
+
+	vec := tools.AddVectors(tools.MultiplyVectorByNum(float64(len(rp.Recipes)), rp.IngredientVec), tools.MultiplyVectorByNum(float64(len(rp2.Recipes)), rp2_ingvec))
+	rp.IngredientVec = tools.MultiplyVectorByNum(1.0/float64(len(rp.Recipes)+1), vec)
+}

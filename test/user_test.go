@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -344,6 +345,62 @@ func TestAdd(t *testing.T) {
 		})
 		//fmt.Println(rp.PreperationDict)
 		fmt.Println(rp.PrepTime)
+	})
+}
+func TestMerge(t *testing.T) {
+	t.Run("test", func(t *testing.T) {
+		rp := models.RecipeGroupSchema{
+			Recipes: []models.RecipeSchema{
+				{ID: "string"},
+			},
+			IngredientDict: map[string]int{
+				"hi":  1,
+				"i":   2,
+				"am":  3,
+				"ben": 4,
+			},
+			IngredientVec: []float64{
+				1, 1, 1, 1,
+			},
+		}
+		rp2 := models.RecipeGroupSchema{
+			Recipes: []models.RecipeSchema{
+				{ID: "string"},
+			},
+			IngredientDict: map[string]int{
+				"hi":      1,
+				"you":     2,
+				"are":     3,
+				"timothe": 4,
+			},
+			IngredientVec: []float64{
+				1, 1, 1, 1,
+			},
+		}
+
+		expected := models.RecipeGroupSchema{
+			IngredientDict: map[string]int{
+				"hi":      1,
+				"i":       2,
+				"am":      3,
+				"ben":     4,
+				"you":     5,
+				"are":     6,
+				"timothe": 7,
+			},
+			IngredientVec: []float64{
+				1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+			},
+		}
+
+		rp.Merge(&rp2)
+
+		if !reflect.DeepEqual(rp.IngredientDict, expected.IngredientDict) {
+			t.Errorf("Expected %+v but got %+v", expected.IngredientDict, rp.IngredientDict)
+		}
+		if !reflect.DeepEqual(rp.IngredientVec, expected.IngredientVec) {
+			t.Errorf("Expected %+v but got %+v", expected.IngredientVec, rp.IngredientVec)
+		}
 	})
 }
 
