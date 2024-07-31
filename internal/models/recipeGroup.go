@@ -211,19 +211,31 @@ func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
 }
 
 func (rp *RecipeGroupSchema) Merge(rp2 *RecipeGroupSchema) {
-	//Create Merged Dict for Ingredient
-	for k := range rp2.IngredientDict {
-		if rp.IngredientDict[k] == 0 {
-			rp.IngredientDict[k] = len(rp.IngredientDict) + 1
-		}
-	}
-	rp.IngredientVec = append(rp.IngredientVec, make([]float64, len(rp.IngredientDict)-len(rp.IngredientVec))...)
-	rp2_ingvec := make([]float64, len(rp.IngredientDict))
-	for k, v := range rp2.IngredientDict {
-		i := rp.IngredientDict[k]
-		rp2_ingvec[i-1] = rp2.IngredientVec[v-1]
-	}
+	//Merge Ingredients
+	m := tools.MergeMatrix(tools.Matrix{
+		Dict: rp.IngredientDict,
+		Vec:  rp.IngredientVec,
+		Len:  len(rp.Recipes),
+	}, tools.Matrix{
+		Dict: rp2.IngredientDict,
+		Vec:  rp2.IngredientVec,
+		Len:  len(rp2.Recipes),
+	})
 
-	vec := tools.AddVectors(tools.MultiplyVectorByNum(float64(len(rp.Recipes)), rp.IngredientVec), tools.MultiplyVectorByNum(float64(len(rp2.Recipes)), rp2_ingvec))
-	rp.IngredientVec = tools.MultiplyVectorByNum(1.0/float64(len(rp.Recipes)+1), vec)
+	rp.IngredientDict = m.Dict
+	rp.IngredientVec = m.Vec
+
+	//Merge Cuisine
+	m = tools.MergeMatrix(tools.Matrix{
+		Dict: rp.CuisineDict,
+		Vec:  rp.CuisineVec,
+		Len:  len(rp.Recipes),
+	}, tools.Matrix{
+		Dict: rp2.CuisineDict,
+		Vec:  rp2.CuisineVec,
+		Len:  len(rp2.Recipes),
+	})
+
+	rp.CuisineDict = m.Dict
+	rp.CuisineVec = m.Vec
 }

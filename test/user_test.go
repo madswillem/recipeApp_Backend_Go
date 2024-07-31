@@ -362,6 +362,12 @@ func TestMerge(t *testing.T) {
 			IngredientVec: []float64{
 				1, 1, 1, 1,
 			},
+			CuisineDict: map[string]int{
+				"italien": 1,
+			},
+			CuisineVec: []float64{
+				1,
+			},
 		}
 		rp2 := models.RecipeGroupSchema{
 			Recipes: []models.RecipeSchema{
@@ -375,6 +381,12 @@ func TestMerge(t *testing.T) {
 			},
 			IngredientVec: []float64{
 				1, 1, 1, 1,
+			},
+			CuisineDict: map[string]int{
+				"french": 1,
+			},
+			CuisineVec: []float64{
+				1,
 			},
 		}
 
@@ -391,6 +403,13 @@ func TestMerge(t *testing.T) {
 			IngredientVec: []float64{
 				1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
 			},
+			CuisineDict: map[string]int{
+				"italien": 1,
+				"french":  2,
+			},
+			CuisineVec: []float64{
+				0.5, 0.5,
+			},
 		}
 
 		rp.Merge(&rp2)
@@ -400,6 +419,12 @@ func TestMerge(t *testing.T) {
 		}
 		if !reflect.DeepEqual(rp.IngredientVec, expected.IngredientVec) {
 			t.Errorf("Expected %+v but got %+v", expected.IngredientVec, rp.IngredientVec)
+		}
+		if !reflect.DeepEqual(rp.CuisineDict, expected.CuisineDict) {
+			t.Errorf("Expected %+v but got %+v", expected.CuisineDict, rp.CuisineDict)
+		}
+		if !reflect.DeepEqual(rp.CuisineVec, expected.CuisineVec) {
+			t.Errorf("Expected %+v but got %+v", expected.CuisineVec, rp.CuisineVec)
 		}
 	})
 }

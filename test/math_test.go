@@ -84,3 +84,56 @@ func TestMultiplyVectorByNum(t *testing.T) {
 		fmt.Println("Product: ", product)
 	})
 }
+
+func TestMergeMatrix(t *testing.T) {
+	t.Run("test", func(t *testing.T) {
+		a := tools.Matrix{
+			Len: 1,
+			Dict: map[string]int{
+				"hi":  1,
+				"i":   2,
+				"am":  3,
+				"ben": 4,
+			},
+			Vec: []float64{
+				1, 1, 1, 1,
+			},
+		}
+		b := tools.Matrix{
+			Len: 1,
+			Dict: map[string]int{
+				"hi":      1,
+				"you":     2,
+				"are":     3,
+				"timothe": 4,
+			},
+			Vec: []float64{
+				1, 1, 1, 1,
+			},
+		}
+
+		expected := tools.Matrix{
+			Dict: map[string]int{
+				"hi":      1,
+				"i":       2,
+				"am":      3,
+				"ben":     4,
+				"you":     5,
+				"are":     6,
+				"timothe": 7,
+			},
+			Vec: []float64{
+				1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+			},
+		}
+
+		r := tools.MergeMatrix(a, b)
+
+		if !reflect.DeepEqual(r.Dict, expected.Dict) {
+			t.Errorf("Expected %+v but got %+v", expected.Dict, r.Dict)
+		}
+		if !reflect.DeepEqual(r.Vec, expected.Vec) {
+			t.Errorf("Expected %+v but got %+v", expected.Vec, r.Vec)
+		}
+	})
+}
