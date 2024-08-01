@@ -351,7 +351,7 @@ func TestMerge(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		rp := models.RecipeGroupSchema{
 			Recipes: []models.RecipeSchema{
-				{ID: "string"},
+				{ID: "string1"},
 			},
 			IngredientDict: map[string]int{
 				"hi":  1,
@@ -385,7 +385,7 @@ func TestMerge(t *testing.T) {
 		}
 		rp2 := models.RecipeGroupSchema{
 			Recipes: []models.RecipeSchema{
-				{ID: "string"},
+				{ID: "string2"},
 			},
 			IngredientDict: map[string]int{
 				"hi":      1,
@@ -419,6 +419,10 @@ func TestMerge(t *testing.T) {
 		}
 
 		expected := models.RecipeGroupSchema{
+			Recipes: []models.RecipeSchema{
+				{ID: "string1"},
+				{ID: "string2"},
+			},
 			IngredientDict: map[string]int{
 				"hi":      1,
 				"i":       2,
@@ -458,6 +462,9 @@ func TestMerge(t *testing.T) {
 
 		rp.Merge(&rp2)
 
+		if !reflect.DeepEqual(rp.Recipes, expected.Recipes) {
+			t.Errorf("Expected %+v but got %+v", expected.Recipes, rp.Recipes)
+		}
 		if !reflect.DeepEqual(rp.IngredientDict, expected.IngredientDict) {
 			t.Errorf("Expected %+v but got %+v", expected.IngredientDict, rp.IngredientDict)
 		}
