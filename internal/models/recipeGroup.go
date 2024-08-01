@@ -21,6 +21,7 @@ type RecipeGroupSchema struct {
 	CuisineVec      []float64
 	PrepTime        time.Duration
 	CookingTime     time.Duration
+	DietDict        map[string]int
 	DietVec         []float64
 	TechniquesDict  map[string]int
 	TechniquesVec   []float64
@@ -206,8 +207,6 @@ func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
 	fmt.Sscanf(r.CookingTime, "%d:%d:%d", &hour, &min, &sec)
 	rp.CookingTime += time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
 	rp.CookingTime /= time.Duration(len(rp.Recipes) + 1)
-
-	return
 }
 
 func (rp *RecipeGroupSchema) Merge(rp2 *RecipeGroupSchema) {
@@ -238,4 +237,45 @@ func (rp *RecipeGroupSchema) Merge(rp2 *RecipeGroupSchema) {
 
 	rp.CuisineDict = m.Dict
 	rp.CuisineVec = m.Vec
+
+	//Merge Preperation
+	m = tools.MergeMatrix(tools.Matrix{
+		Dict: rp.PreperationDict,
+		Vec:  rp.PreperationVec,
+		Len:  len(rp.Recipes),
+	}, tools.Matrix{
+		Dict: rp2.PreperationDict,
+		Vec:  rp2.PreperationVec,
+		Len:  len(rp2.Recipes),
+	})
+
+	rp.PreperationDict = m.Dict
+	rp.PreperationVec = m.Vec
+
+	//Merge Techniques
+	m = tools.MergeMatrix(tools.Matrix{
+		Dict: rp.TechniquesDict,
+		Vec:  rp.TechniquesVec,
+		Len:  len(rp.Recipes),
+	}, tools.Matrix{
+		Dict: rp2.TechniquesDict,
+		Vec:  rp2.TechniquesVec,
+		Len:  len(rp2.Recipes),
+	})
+
+	rp.TechniquesDict = m.Dict
+	rp.TechniquesVec = m.Vec
+
+	//Merge PrepTime
+	rp.PrepTime *= time.Duration(len(rp.Recipes))
+	rp.PrepTime += rp2.PrepTime * time.Duration(len(rp2.Recipes))
+	rp.PrepTime /= time.Duration(len(rp.Recipes) + len(rp2.Recipes))
+
+	//Merge CookingTime
+	rp.CookingTime *= time.Duration(len(rp.Recipes))
+	rp.CookingTime += rp2.CookingTime * time.Duration(len(rp2.Recipes))
+	rp.CookingTime /= time.Duration(len(rp.Recipes) + len(rp2.Recipes))
+
+	//Merge Recipes
+	rp.Recipes = append(rp.Recipes, rp2.Recipes...)
 }

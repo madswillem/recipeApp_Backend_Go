@@ -368,6 +368,20 @@ func TestMerge(t *testing.T) {
 			CuisineVec: []float64{
 				1,
 			},
+			PreperationDict: map[string]int{
+				"hello": 1,
+			},
+			PreperationVec: []float64{
+				1,
+			},
+			TechniquesDict: map[string]int{
+				"0000hedfgiuha": 1,
+			},
+			TechniquesVec: []float64{
+				1,
+			},
+			PrepTime:    time.Hour * 2,
+			CookingTime: time.Hour * 3,
 		}
 		rp2 := models.RecipeGroupSchema{
 			Recipes: []models.RecipeSchema{
@@ -388,6 +402,20 @@ func TestMerge(t *testing.T) {
 			CuisineVec: []float64{
 				1,
 			},
+			PreperationDict: map[string]int{
+				"bye": 1,
+			},
+			PreperationVec: []float64{
+				1,
+			},
+			TechniquesDict: map[string]int{
+				"0000dhfapohedfgiuha": 1,
+			},
+			TechniquesVec: []float64{
+				1,
+			},
+			PrepTime:    time.Minute * 4,
+			CookingTime: time.Minute * 4,
 		}
 
 		expected := models.RecipeGroupSchema{
@@ -410,6 +438,22 @@ func TestMerge(t *testing.T) {
 			CuisineVec: []float64{
 				0.5, 0.5,
 			},
+			PreperationDict: map[string]int{
+				"hello": 1,
+				"bye":   2,
+			},
+			PreperationVec: []float64{
+				0.5, 0.5,
+			},
+			TechniquesDict: map[string]int{
+				"0000hedfgiuha":       1,
+				"0000dhfapohedfgiuha": 2,
+			},
+			TechniquesVec: []float64{
+				0.5, 0.5,
+			},
+			PrepTime:    time.Minute * 62,
+			CookingTime: time.Minute * 92,
 		}
 
 		rp.Merge(&rp2)
@@ -425,6 +469,24 @@ func TestMerge(t *testing.T) {
 		}
 		if !reflect.DeepEqual(rp.CuisineVec, expected.CuisineVec) {
 			t.Errorf("Expected %+v but got %+v", expected.CuisineVec, rp.CuisineVec)
+		}
+		if !reflect.DeepEqual(rp.PreperationDict, expected.PreperationDict) {
+			t.Errorf("Expected %+v but got %+v", expected.PreperationDict, rp.PreperationDict)
+		}
+		if !reflect.DeepEqual(rp.PreperationVec, expected.PreperationVec) {
+			t.Errorf("Expected %+v but got %+v", expected.PreperationVec, rp.PreperationVec)
+		}
+		if !reflect.DeepEqual(rp.TechniquesDict, expected.TechniquesDict) {
+			t.Errorf("Expected %+v but got %+v", expected.TechniquesDict, rp.TechniquesDict)
+		}
+		if !reflect.DeepEqual(rp.TechniquesVec, expected.TechniquesVec) {
+			t.Errorf("Expected %+v but got %+v", expected.TechniquesVec, rp.TechniquesVec)
+		}
+		if !reflect.DeepEqual(rp.PrepTime, expected.PrepTime) {
+			t.Errorf("Expected %+v but got %+v", expected.PrepTime, rp.PrepTime)
+		}
+		if !reflect.DeepEqual(rp.CookingTime, expected.CookingTime) {
+			t.Errorf("Expected %+v but got %+v", expected.CookingTime, rp.CookingTime)
 		}
 	})
 }

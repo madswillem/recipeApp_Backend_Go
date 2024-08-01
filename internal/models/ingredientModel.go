@@ -7,7 +7,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"gorm.io/gorm"
 )
 
 type IngredientsSchema struct {
@@ -20,21 +19,6 @@ type IngredientsSchema struct {
     Name         string    `db:"name" json:"name"`
 	NutritionalValue NutritionalValue `db:"nv" json:"nv"`
 	Rating	 RatingStruct `db:"rating" json:"rating"`
-}
-
-func (ingredient *IngredientsSchema) createIngredientDBEntry(db *gorm.DB) *error_handler.APIError {
-	newIngredientDBEntry := IngredientDB{
-		Name:             ingredient.Name,
-		StandardUnit:     ingredient.Unit,
-		NutritionalValue: ingredient.NutritionalValue,
-	}
-
-	err := db.Create(&newIngredientDBEntry).Error
-	if err != nil {
-		return error_handler.New("Error while getting Ingredient: " + err.Error(), http.StatusInternalServerError, err)
-	}
-
-	return nil
 }
 
 func (ingredient *IngredientsSchema) CheckForRequiredFields() error {
