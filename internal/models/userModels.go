@@ -102,6 +102,12 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 	}
 	fmt.Printf("%+v\n", group_ranking)
 
+	if len(group_addble) > 1 {
+		for i := 1; i < len(group_addble); i++ {
+			group_addble[0].Group.Merge(group_addble[i].Group)
+		}
+	}
+
 	group_addble[0].Group.Add(r)
 
 	return nil

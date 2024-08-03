@@ -131,12 +131,12 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx
 		return error_handler.New("Error creating recipe", http.StatusInternalServerError, err)
 	}
 
-	//if user == nil {
-	//	return nil
-	//}
-	//apiErr = user.AddRecipeToGroup(db, recipe)
+	if user == nil {
+		return nil
+	}
+	apiErr = user.AddToGroup(db, recipe)
 
-	return nil
+	return apiErr
 }
 
 func (recipe *RecipeSchema) CheckForRequiredFields() *error_handler.APIError {
