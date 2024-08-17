@@ -72,6 +72,24 @@ func (user *UserModel) Create(db *sqlx.DB, ip string) *error_handler.APIError {
 	return nil
 }
 
+func (user *UserModel) AddGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.APIError {
+	apiErr := r.GetRecipeByID(db)
+	if apiErr != nil {
+		return apiErr
+	}
+
+	rp := RecipeGroupSchema{}
+	rp.Create(r)
+	user.RecipeGroups = append(user.RecipeGroups, rp)
+
+	v, err := json.Marshal(user.RecipeGroups)
+	if err != nil {
+		return error_handler.New("Failed to marshal recipe groups", http.StatusInternalServerError, err)
+	}
+
+	db.MustExec(`UPDATE "user" SET groups = $1 WHERE id = $2`, v, user.ID)
+	return nil
+}
 func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.APIError {
 	var groups []byte
 	err := db.Get(&groups, `SELECT "groups" FROM "user" WHERE id=$1`, user.ID)
@@ -79,6 +97,10 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 		return error_handler.New("Error fetching recipe_groups", http.StatusInternalServerError, err)
 	}
 	json.Unmarshal(groups, &user.RecipeGroups)
+
+	if len(user.RecipeGroups) < 1 {
+		return user.AddGroup(db, r)
+	}
 
 	group_ranking := make([]struct {
 		Group *RecipeGroupSchema

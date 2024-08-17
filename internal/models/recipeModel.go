@@ -103,9 +103,9 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx
 	recipe.Version += 1
 
 	tx := db.MustBegin()
-	tx.MustExec(`UPDATE "user" SET selected=$1, version=$2 WHERE id=$3`, recipe.Selected, recipe.Version, recipe.ID)
+	tx.MustExec(`UPDATE "recipes" SET selected=$1, version=$2 WHERE id=$3`, recipe.Selected, recipe.Version, recipe.ID)
 	query := `
-    UPDATE weather_data
+    UPDATE rating
     SET
         overall = :overall,
         mon = :mon,
@@ -124,7 +124,7 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx
         tendegree = :tendegree,
         zerodegree = :zerodegree,
         subzerodegree = :subzerodegree
-    WHERE some_condition = :some_condition`
+    WHERE id = :id`
 	tx.NamedExec(query, recipe.Rating)
 	err := tx.Commit()
 	if err != nil {

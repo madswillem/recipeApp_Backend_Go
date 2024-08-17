@@ -95,7 +95,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.DELETE("/delete/:id", s.DeleteRecipe)
 	r.POST("/filter", s.Filter)
 	r.GET("/select/:id", s.UserMiddleware, s.Select)
-	r.GET("/deselect/:id", s.UserMiddleware, s.UserMiddleware, s.Deselect)
+	r.GET("/deselect/:id", s.UserMiddleware, s.Deselect)
 	r.GET("/colormode/:type", s.Colormode)
 
 	r.PATCH("/account/update", s.UserMiddleware, s.UpadateUser)

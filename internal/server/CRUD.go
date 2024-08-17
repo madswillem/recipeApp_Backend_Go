@@ -213,11 +213,6 @@ func (s *Server) Filter(c *gin.Context) {
 }
 
 func (s *Server) Select(c *gin.Context) {
-	i, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		error_handler.HandleError(c, http.StatusBadRequest, "id is not a number", []error{err})
-		return
-	}
 	middleware_user, _ := c.Get("user")
 	user, ok := middleware_user.(models.UserModel)
 	if !ok {
@@ -225,7 +220,7 @@ func (s *Server) Select(c *gin.Context) {
 	}
 
 	response := models.RecipeSchema{}
-	response.ID = fmt.Sprint(i)
+	response.ID = c.Param("id")
 
 	selectedErr := response.UpdateSelected(1, &user, s.NewDB)
 	if selectedErr != nil {
