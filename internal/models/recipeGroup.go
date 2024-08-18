@@ -154,6 +154,7 @@ func (rp *RecipeGroupSchema) Compare(r *RecipeSchema) float64 {
 }
 
 func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
+	rp.Recipes = append(rp.Recipes, *r)
 	ingredient_list := make([]string, len(r.Ingredients))
 	for n, i := range r.Ingredients {
 		ingredient_list[n] = i.Name
@@ -202,7 +203,6 @@ func (rp *RecipeGroupSchema) Add(r *RecipeSchema) {
 	fmt.Sscanf(r.PrepTime, "%d:%d:%d", &hour, &min, &sec)
 	rp.PrepTime += time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
 	fmt.Println(time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second)
-	fmt.Println(len(rp.Recipes) + 1)
 	rp.PrepTime /= time.Duration(len(rp.Recipes) + 1)
 	fmt.Sscanf(r.CookingTime, "%d:%d:%d", &hour, &min, &sec)
 	rp.CookingTime += time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second

@@ -19,7 +19,7 @@ func (s *Server) UserMiddleware(c *gin.Context) {
 		c.SetCookie("user", user.Cookie, 31536000, "/", "localhost", false, true)
 	} else {
 		user.Cookie = cookie
-		err := user.GetByCookie(s.DB)
+		err := user.GetByCookie(s.NewDB)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 		}

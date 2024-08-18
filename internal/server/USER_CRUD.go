@@ -19,7 +19,7 @@ func (s *Server) UpadateUser(c *gin.Context) {
 		return
 	}
 	middleware_user, _ := c.MustGet("user").(models.UserModel)
-	apiErr := middleware_user.GetByCookie(s.DB)
+	apiErr := middleware_user.GetByCookie(s.NewDB)
 	if apiErr != nil {
 		error_handler.HandleError(c, apiErr.Code, apiErr.Message, apiErr.Errors)
 		return
@@ -40,7 +40,7 @@ func (s *Server) GetRecommendation(c *gin.Context) {
 		fmt.Println("type assertion failed")
 	}
 
-	err := user.GetByCookie(s.DB)
+	err := user.GetByCookie(s.NewDB)
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 		return

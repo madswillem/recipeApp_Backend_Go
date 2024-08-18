@@ -497,7 +497,6 @@ func TestMerge(t *testing.T) {
 		}
 	})
 }
-
 func TestUser_Add(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		db := database.ConnectToDB(&sqlx.Conn{})
@@ -507,6 +506,18 @@ func TestUser_Add(t *testing.T) {
 		err := user.AddToGroup(db, &r)
 		if err != nil {
 			t.Errorf("Error: %+v\n", err)
+		}
+	})
+}
+
+func TestGetUser(t *testing.T) {
+	t.Run("by cookie", func(t *testing.T) {
+		db := database.ConnectToDB(&sqlx.Conn{})
+		u := models.UserModel{Cookie: "A2H0PFDRIuj5G8YC6qdq"}
+		err := u.GetByCookie(db)
+		if err != nil {
+			t.Errorf("%+v", err)
+			return
 		}
 	})
 }

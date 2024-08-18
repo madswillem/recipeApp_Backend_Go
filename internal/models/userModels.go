@@ -10,32 +10,32 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type UserModel struct {
-	ID           string              `database:"id"`
-	LastLogin    time.Time           `database:"last_login"`
-	Cookie       string              `database:"cookie"`
-	IP           string              `database:"ip"`
-	RecipeGroups []RecipeGroupSchema `database:"groups"`
-	Settings     UserSettings        `database:"settings"`
+	ID           string    `database:"id"`
+	CreatedAt    time.Time `db:"created_at"`
+	LastLogin    time.Time `database:"last_login"`
+	Cookie       string    `database:"cookie"`
+	IP           string    `database:"ip"`
+	RecipeGroups []RecipeGroupSchema
+	Groups       []byte       `database:"groups"`
+	Settings     UserSettings `database:"settings"`
 }
 type UserSettings struct {
 	Allergies []*IngredientDB `database:"allergies"`
 	Diet      DietSchema      `gorm:"polymorphic:Owner"`
 }
 
-func (user *UserModel) GetByCookie(db *gorm.DB) *error_handler.APIError {
-	err := db.Preload(clause.Associations).First(&user, "Cookie = ?", user.Cookie).Error
+func (user *UserModel) GetByCookie(db *sqlx.DB) *error_handler.APIError {
+	err := db.Get(user, `SELECT id, created_at, ip, groups FROM "user" WHERE cookie = $1`, user.Cookie)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return error_handler.New("user not found", http.StatusNotFound, err)
-		} else {
-			return error_handler.New("database error", http.StatusInternalServerError, err)
-		}
+		return error_handler.New("database error", http.StatusInternalServerError, err)
 	}
-
+	err = json.Unmarshal(user.Groups, &user.RecipeGroups)
+	if err != nil {
+		return error_handler.New("Error unmarshaling groups", http.StatusInternalServerError, err)
+	}
 	return nil
 }
 
@@ -96,8 +96,10 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 	if err != nil {
 		return error_handler.New("Error fetching recipe_groups", http.StatusInternalServerError, err)
 	}
-	json.Unmarshal(groups, &user.RecipeGroups)
-
+	err = json.Unmarshal(groups, &user.RecipeGroups)
+	if err != nil {
+		return error_handler.New("Error unmarshaling groups", http.StatusInternalServerError, err)
+	}
 	if len(user.RecipeGroups) < 1 {
 		return user.AddGroup(db, r)
 	}
@@ -131,6 +133,14 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 	}
 
 	group_addble[0].Group.Add(r)
+	user.Groups, err = json.Marshal(user.RecipeGroups)
+	if err != nil {
+		return error_handler.New("failed to marshal", http.StatusInternalServerError, err)
+	}
+	_, err = db.Exec(`UPDATE "user" SET groups = $1 WHERE id = $2`, user.Groups, user.ID)
+	if err != nil {
+		return error_handler.New("database error", http.StatusInternalServerError, err)
+	}
 
 	return nil
 }
