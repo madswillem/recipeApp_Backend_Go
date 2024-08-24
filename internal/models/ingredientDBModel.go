@@ -19,6 +19,10 @@ type IngredientDB struct {
 	NutritionalValue NutritionalValue `json:"nv"`
 	Rating           RatingStruct     `json:"rating"`
 }
+type Category struct {
+	ID   string `db:"id"`
+	Name string `db:"name" json:"name"`
+}
 
 func (ingredient *IngredientDB) Create(db *sqlx.DB) *error_handler.APIError {
 	tx := db.MustBegin()
@@ -35,7 +39,7 @@ func (ingredient *IngredientDB) Create(db *sqlx.DB) *error_handler.APIError {
 		tx.Rollback()
 		return error_handler.New("Dtabase error: "+err.Error(), http.StatusInternalServerError, err)
 	}
-	
+
 	// Create Rating
 	ingredient.Rating.DefaultRatingStruct(nil, &ingredient.ID)
 	query = `INSERT INTO rating (
@@ -48,9 +52,9 @@ func (ingredient *IngredientDB) Create(db *sqlx.DB) *error_handler.APIError {
 	_, err = tx.NamedExec(query, ingredient.Rating)
 	if err != nil {
 		tx.Rollback()
-		return error_handler.New("Error inserting recipe: " + err.Error(), http.StatusInternalServerError, err)
+		return error_handler.New("Error inserting recipe: "+err.Error(), http.StatusInternalServerError, err)
 	}
-	
+
 	tx.Commit()
 	return nil
 }
@@ -60,7 +64,7 @@ func GetIngIDByName(tx *sqlx.Tx, name string) (string, *error_handler.APIError) 
 	err := tx.QueryRow("SELECT id FROM ingredient WHERE LOWER(name) = LOWER($1)", name).Scan(&id)
 	if err != nil {
 		tx.Rollback()
-		return "", error_handler.New("database error getting " + name + " : "+err.Error(), http.StatusInternalServerError, err)
+		return "", error_handler.New("database error getting "+name+" : "+err.Error(), http.StatusInternalServerError, err)
 	}
 
 	return id, nil

@@ -1,18 +1,11 @@
 package models
 
-type DietSchema struct {
-	ID         uint   `gorm:"primarykey"`
-	OwnerTitle string `json:"owner_title"`
-	OwnerID    string
-	OwnerType  string
+import "time"
 
-	Vegetarien    bool `json:"vegetarien"`
-	Vegan         bool `json:"vegan"`
-	LowCal        bool `json:"lowcal"`
-	LowCarb       bool `json:"lowcarb"`
-	Keto          bool `json:"keto"`
-	Paleo         bool `json:"paleo"`
-	LowFat        bool `json:"lowfat"`
-	FoodCombining bool `json:"food_combining"`
-	WholeFood     bool `json:"whole_food"`
+type DietSchema struct {
+	ID            string     `db:"id" json:"id"`
+	CreatedAt     time.Time  `db:"created_at" json:"created_at"`
+	Name          string     `db:"name" json:"name"`
+	Description   string     `db:"description" json:"description"`
+	ExIngCategory []Category `json:"exingcategory"`
 }

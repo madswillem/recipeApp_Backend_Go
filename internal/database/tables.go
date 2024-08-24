@@ -164,6 +164,7 @@ const schema = `
 			ON DELETE CASCADE,
 		CONSTRAINT rating_check CHECK (((ingredient_id IS NOT NULL)::integer + (recipe_id IS NOT NULL)::integer) = 1)
 	);
+
 	CREATE TABLE IF NOT EXISTS public."user"
 	(
 		id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -173,4 +174,29 @@ const schema = `
 		CONSTRAINT user_pkey PRIMARY KEY (id)
 	);
 
+	CREATE TABLE IF NOT EXISTS public.diet
+	(
+	    id uuid NOT NULL DEFAULT gen_random_uuid(),
+	    created_at timestamp without time zone DEFAULT (now())::timestamp without time zone,
+	    name text COLLATE pg_catalog."default" NOT NULL,
+	    description text COLLATE pg_catalog."default" NOT NULL,
+	    CONSTRAINT diet_pkey PRIMARY KEY (id),
+	    CONSTRAINT diet_unique UNIQUE (name)
+	);
+
+	CREATE TABLE IF NOT EXISTS public.rel_diet_recipe
+	(
+	    id uuid NOT NULL DEFAULT gen_random_uuid(),
+	    recipe_id uuid,
+	    diet_id uuid,
+	    CONSTRAINT rel_diet_recipe_pkey PRIMARY KEY (id),
+	    CONSTRAINT fk_diet_rel_recipe FOREIGN KEY (diet_id)
+	        REFERENCES public.diet (id) MATCH SIMPLE
+	        ON UPDATE CASCADE
+	        ON DELETE CASCADE,
+	    CONSTRAINT fk_recipe_rel_diet FOREIGN KEY (recipe_id)
+	        REFERENCES public.recipes (id) MATCH SIMPLE
+	        ON UPDATE CASCADE
+	        ON DELETE CASCADE
+    )
 `
