@@ -24,7 +24,7 @@ type RecipeSchema struct {
 	Selected         int       `db:"selected"`
 	Version          int64     `db:"version"`
 	Ingredients      []IngredientsSchema
-	Diet             DietSchema
+	Diet             []DietSchema
 	NutritionalValue NutritionalValue
 	Rating           RatingStruct `db:"rating"`
 	Steps            []StepsStruct
@@ -169,11 +169,6 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 		recipe.Ingredients[i].Rating.DefaultRatingStruct(nil, &recipe.Ingredients[i].ID)
 	}
 
-	//err = recipe.AddNutritionalValue(db)
-	//if err != nil {
-	//	return err
-	//}
-
 	tx := db.MustBegin()
 	// Insert recipe
 	query := `INSERT INTO recipes (author, name, cuisine, yield, yield_unit, prep_time, cooking_time, selected, version)
@@ -221,6 +216,25 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 		if err != nil {
 			tx.Rollback()
 			return err
+		}
+	}
+
+	//Insert Diets
+	for _, d := range recipe.Diet {
+		var exists bool
+		err = tx.Get(exists, "SELECT EXISTS (SELECT 1 FROM diet WHERE id = $1);", d.ID)
+		if err != nil {
+			tx.Rollback()
+			return error_handler.New("error while checking if diet exists", http.StatusInternalServerError, err)
+		}
+		if !exists {
+			tx.Rollback()
+			return error_handler.New("couldn't find diet "+d.ID, http.StatusNotFound, errors.New("couldn't find diet "+d.ID))
+		}
+		_, err = tx.Exec("INSERT INTO rel_diet_recipe (recipe_id, diet_id) VALUES ($1, $2)", recipe.ID, d.ID)
+		if err != nil {
+			tx.Rollback()
+			return error_handler.New("error while inserting the relationship between diet and recipe", http.StatusInternalServerError, err)
 		}
 	}
 
