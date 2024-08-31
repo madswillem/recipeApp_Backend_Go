@@ -15,8 +15,6 @@ import (
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/server"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {

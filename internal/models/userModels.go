@@ -9,7 +9,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/tools"
-	"gorm.io/gorm"
 )
 
 type UserModel struct {
@@ -146,6 +145,6 @@ func (user *UserModel) AddToGroup(db *sqlx.DB, r *RecipeSchema) *error_handler.A
 }
 
 // Using db to extend an existing db like a search to show recipes similar to your intrests
-func (user *UserModel) GetRecomendation(db *gorm.DB) (*error_handler.APIError, []RecipeSchema) {
+func (user *UserModel) GetRecomendation(db *sqlx.DB) (*error_handler.APIError, []RecipeSchema) {
 	return nil, nil
 }

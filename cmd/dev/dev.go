@@ -5,7 +5,6 @@ import (
 
 	"github.com/madswillem/recipeApp_Backend_Go/internal/initializers"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/server"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -15,8 +14,7 @@ func init() {
 func main() {
 
 	config := server.Config{
-		Innit:  []server.InnitFuncs{initializers.InitDBonDev},
-		DBConf: gorm.Config{},
+		//Innit:  []server.InnitFuncs{initializers.InitDBonDev},
 	}
 	server := server.NewServer(&config)
 	err := server.ListenAndServe()
