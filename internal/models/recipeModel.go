@@ -8,7 +8,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
-	"gorm.io/gorm"
 )
 
 type RecipeSchema struct {
@@ -28,29 +27,6 @@ type RecipeSchema struct {
 	NutritionalValue NutritionalValue
 	Rating           RatingStruct `db:"rating"`
 	Steps            []StepsStruct
-}
-
-func (recipe *RecipeSchema) CheckIfExistsByTitle(db *gorm.DB) (bool, *error_handler.APIError) {
-	var result struct {
-		Found bool
-	}
-	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE title = ?) AS found;", recipe.Name).Scan(&result).Error
-	return result.Found, error_handler.New("database error", http.StatusInternalServerError, err)
-}
-
-func (recipe *RecipeSchema) CheckIfExistsByID(db *gorm.DB) (bool, *error_handler.APIError) {
-	var result struct {
-		Found bool
-	}
-	err := db.Raw("SELECT EXISTS(SELECT * FROM recipe_schemas WHERE id = ?) AS found;", recipe.ID).Scan(&result).Error
-	if err != nil {
-		return false, error_handler.New("database error", http.StatusInternalServerError, err)
-	}
-	return result.Found, nil
-}
-
-func (recipe *RecipeSchema) GetRecipeByIDGORM(db *gorm.DB, reqData map[string]bool) *error_handler.APIError {
-	return nil
 }
 
 func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB) *error_handler.APIError {

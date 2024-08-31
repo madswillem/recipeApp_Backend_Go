@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
-	"gorm.io/gorm"
 )
 
 const MethodGET = "GET"
@@ -28,12 +27,10 @@ type ExtraControllers struct {
 type Config struct {
 	Innit       []InnitFuncs
 	Controllers []ExtraControllers
-	DBConf      gorm.Config
 }
 
 type Server struct {
 	port   int
-	DB     *gorm.DB
 	NewDB  *sqlx.DB
 	config *Config
 }
@@ -42,7 +39,6 @@ func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port:   port,
-		DB:     database.ConnectToGORMDB(&config.DBConf),
 		NewDB:  database.ConnectToDB(&sqlx.Conn{}),
 		config: config,
 	}
@@ -50,10 +46,6 @@ func NewServer(config *Config) *http.Server {
 	for _, fnc := range NewServer.config.Innit {
 		err := fnc(NewServer)
 		fmt.Println(err)
-	}
-
-	if NewServer.DB == nil {
-		panic("db is nil")
 	}
 
 	// Declare Server config
@@ -98,22 +90,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/deselect/:id", s.UserMiddleware, s.Deselect)
 	r.GET("/colormode/:type", s.Colormode)
 
-	r.PATCH("/account/update", s.UserMiddleware, s.UpadateUser)
 	r.GET("/creategroup", s.UserMiddleware, s.CreateGroup)
 	r.GET("/recommendation", s.UserMiddleware, s.GetRecommendation)
-
-	r.GET("/", s.RenderHome)
-	r.GET("/account", s.RenderAcount)
-	r.GET("/tutorials", s.RenderTutorial)
-	r.GET("/recipe/:id", s.RenderProductpage)
-
-	r.GET("/get/home", s.GetHome)
-	r.GET("/get/account", s.GetAccount)
-	r.GET("/get/recipe/:id", s.GetRecipe)
-
-	r.GET("/style/:filename", s.GetStyles)
-	r.GET("/imgs/:filename", s.GetImgs)
-	r.GET("/scripts/:filename", s.GetScripts)
 
 	return r
 }
