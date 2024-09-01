@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/error_handler"
@@ -44,6 +45,23 @@ func (s *Server) GetAll(c *gin.Context) {
 		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting nutritional values", []error{err})
 		return
 	}
+	var recipeDiets []struct {
+		RecipeID      string            `db:"recipe_id"`
+		ID            string            `db:"id" json:"id"`
+		CreatedAt     time.Time         `db:"created_at" json:"created_at"`
+		Name          string            `db:"name" json:"name"`
+		Description   string            `db:"description" json:"description"`
+		ExIngCategory []models.Category `json:"exingcategory"`
+	}
+	err = s.NewDB.Select(&recipeDiets, `
+		SELECT diet.*, rel.recipe_id
+		FROM rel_diet_recipe rel
+		JOIN diet ON rel.diet_id = diet.id
+	`)
+	if err != nil {
+		error_handler.HandleError(c, http.StatusBadRequest, "Error while getting diets", []error{err})
+		return
+	}
 
 	recipeMap := make(map[string]*models.RecipeSchema)
 	for i := range recipes {
@@ -58,6 +76,16 @@ func (s *Server) GetAll(c *gin.Context) {
 	for _, step := range steps {
 		if recipe, found := recipeMap[step.RecipeID]; found {
 			recipe.Steps = append(recipe.Steps, step)
+		}
+	}
+	for _, rd := range recipeDiets {
+		if recipe, exists := recipeMap[rd.RecipeID]; exists {
+			recipe.Diet = append(recipe.Diet, models.DietSchema{
+				ID:          rd.ID,
+				CreatedAt:   rd.CreatedAt,
+				Name:        rd.Name,
+				Description: rd.Description,
+			})
 		}
 	}
 	c.JSON(http.StatusOK, recipes)
