@@ -21,7 +21,7 @@ func New(message string, code int, errors error) *APIError {
 
 func HandleError(c *gin.Context, statusCode int, errorMessage string, err []error) {
 	c.AbortWithStatusJSON(statusCode, gin.H{
-		"errors":     err,
+		"errors":     err[0].Error(),
 		"errMessage": errorMessage,
 	})
 }

@@ -59,6 +59,16 @@ func (recipe *RecipeSchema) GetRecipeByID(db *sqlx.DB) *error_handler.APIError {
 		return error_handler.New("An error ocurred fetching the ingredients: "+err.Error(), http.StatusInternalServerError, err)
 	}
 
+	err = db.Select(&recipe.Diet, `
+		SELECT diet.*
+		FROM rel_diet_recipe rel
+		JOIN diet  ON rel.diet_id = diet.id
+		WHERE rel.recipe_id = $1
+	`, recipe.ID)
+	if err != nil {
+		return error_handler.New("Error while getting nutritional values", http.StatusBadRequest, err)
+	}
+
 	return nil
 }
 
@@ -198,7 +208,7 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 	//Insert Diets
 	for _, d := range recipe.Diet {
 		var exists bool
-		err = tx.Get(exists, "SELECT EXISTS (SELECT 1 FROM diet WHERE id = $1);", d.ID)
+		err = tx.Get(&exists, "SELECT EXISTS (SELECT 1 FROM diet WHERE id = $1);", d.ID)
 		if err != nil {
 			tx.Rollback()
 			return error_handler.New("error while checking if diet exists", http.StatusInternalServerError, err)
