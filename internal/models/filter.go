@@ -54,15 +54,10 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 		}
 	}
 	if f.Diet != nil {
-		where = append(where, `AND diet.vegetarien = :vegetarien
-								AND diet.vegan = :vegan
-								AND diet.lowcal = :lowcal
-								AND diet.lowcarb = :lowcarb
-								AND diet.keto = :keto
-								AND diet.paleo = :paleo
-								AND diet.lowfat = :lowfat
-								AND diet.food_combining = :food_combining
-								AND diet.whole_food = :whole_food;`)
+		for _, ing := range *f.Ingredients {
+			args = append(args, ing)
+			where = append(where, fmt.Sprintf(`ingredient.name = $%d`, len(args)))
+		}
 	}
 
 	query := `SELECT DISTINCT recipes.*

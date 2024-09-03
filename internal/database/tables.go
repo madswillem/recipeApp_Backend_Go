@@ -198,5 +198,22 @@ const schema = `
 	        REFERENCES public.recipes (id) MATCH SIMPLE
 	        ON UPDATE CASCADE
 	        ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS public.rel_diet_user
+    (
+        id uuid NOT NULL DEFAULT gen_random_uuid(),
+        user_id uuid NOT NULL,
+        diet_id uuid NOT NULL,
+        CONSTRAINT rel_diet_user_pkey PRIMARY KEY (id),
+        CONSTRAINT fk_diet_rel_user FOREIGN KEY (diet_id)
+            REFERENCES public.diet (id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION,
+        CONSTRAINT fk_user_rel_diet FOREIGN KEY (user_id)
+            REFERENCES public."user" (id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+            NOT VALID
     )
 `
