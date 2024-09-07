@@ -222,13 +222,32 @@ func (s *Server) GetById(c *gin.Context) {
 }
 
 func (s *Server) Filter(c *gin.Context) {
+	middleware_user, _ := c.Get("user")
+	user, ok := middleware_user.(models.UserModel)
+	if !ok {
+		fmt.Println("type assertion failed")
+	}
 
 	var body models.Filter
 	err := c.ShouldBindJSON(&body)
-
 	if err != nil {
 		error_handler.HandleError(c, http.StatusBadRequest, "Failed to read body", []error{err})
 		return
+	}
+
+	if body.Diets == nil && ok {
+		var diets []string
+		err := s.NewDB.Select(&diets, `
+			SELECT d.diet_id
+			FROM rel_user_diet rel
+			JOIN diet ON rel.diet_id = diet.diet_id
+			WHERE rek.user_id = $1
+		`, user.ID)
+		if err != nil {
+			print(err.Error())
+		} else {
+			body.Diets = &diets
+		}
 	}
 
 	recipes, apiErr := body.Filter(s.NewDB)
