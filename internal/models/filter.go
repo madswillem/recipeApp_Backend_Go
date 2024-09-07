@@ -17,7 +17,7 @@ type Filter struct {
 	PrepTime    *string   `db:"prep_time" json:"prep_time"`
 	CookingTime *string   `db:"cooking_time" json:"cooking_time"`
 	Ingredients *[]string `json:"ingredients"`
-	Diet        *DietSchema
+	Diets       *[]string `json:"diets"`
 }
 
 func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) {
@@ -53,10 +53,10 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 			where = append(where, fmt.Sprintf(`ingredient.name = $%d`, len(args)))
 		}
 	}
-	if f.Diet != nil {
-		for _, ing := range *f.Ingredients {
-			args = append(args, ing)
-			where = append(where, fmt.Sprintf(`ingredient.name = $%d`, len(args)))
+	if f.Diets != nil {
+		for _, d := range *f.Diets {
+			args = append(args, d)
+			where = append(where, fmt.Sprintf(`diet.id = $%d`, len(args)))
 		}
 	}
 
@@ -66,6 +66,8 @@ func (f *Filter) Filter(db *sqlx.DB) (*[]RecipeSchema, *error_handler.APIError) 
 				LEFT JOIN ingredient ON ingredient.id = recipe_ingredient.ingredient_id
 				LEFT JOIN nutritional_value ON recipes.id = nutritional_value.recipe_id
 				LEFT JOIN step ON recipes.id = step.recipe_id
+				JOIN rel_diet_recipe rel ON recipes.id = rel.recipe_id
+				JOIN diet ON rel.diet_id = diet.id
 				WHERE ` + strings.Join(where, " AND ")
 
 	err := db.Select(&recipes, query, args...)
