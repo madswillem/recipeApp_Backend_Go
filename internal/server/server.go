@@ -39,7 +39,7 @@ func NewServer(config *Config) *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port:   port,
-		NewDB:  database.ConnectToDB(&sqlx.Conn{}),
+		NewDB:  database.ConnectToDB(&sqlx.Conn{}, "user=mads password=1234 database=test_unexpected_behavior sslmode=disable"),
 		config: config,
 	}
 

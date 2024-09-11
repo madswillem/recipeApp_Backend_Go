@@ -22,7 +22,7 @@ func parseDuration(durationStr string) (time.Duration, error) {
 
 func TestSimilarity(t *testing.T) {
 	t.Run("test similarity recipe_group recipe", func(t *testing.T) {
-		db := database.ConnectToDB(&sqlx.Conn{})
+		db := database.ConnectToDB(&sqlx.Conn{}, "user=mads password=1234 database=test_unexpected_behavior sslmode=disable")
 		r := models.RecipeSchema{ID: "aa85daf1-dbc5-462d-a6fe-3fbb358b08dd"}
 		r.GetRecipeByID(db)
 		rp := models.RecipeGroupSchema{}
@@ -499,7 +499,7 @@ func TestMerge(t *testing.T) {
 }
 func TestUser_Add(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
-		db := database.ConnectToDB(&sqlx.Conn{})
+		db := database.ConnectToDB(&sqlx.Conn{}, "user=mads password=1234 database=test_unexpected_behavior sslmode=disable")
 		r := models.RecipeSchema{ID: "aa85daf1-dbc5-462d-a6fe-3fbb358b08dd"}
 		r.GetRecipeByID(db)
 		user := models.UserModel{ID: "a5e4a4fb-1b70-4cfc-8350-55decee258ab"}
@@ -512,7 +512,7 @@ func TestUser_Add(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	t.Run("by cookie", func(t *testing.T) {
-		db := database.ConnectToDB(&sqlx.Conn{})
+		db := database.ConnectToDB(&sqlx.Conn{}, "user=mads password=1234 database=test_unexpected_behavior sslmode=disable")
 		u := models.UserModel{Cookie: "A2H0PFDRIuj5G8YC6qdq"}
 		err := u.GetByCookie(db)
 		if err != nil {

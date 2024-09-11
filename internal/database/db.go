@@ -7,8 +7,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func ConnectToDB(conf *sqlx.Conn) *sqlx.DB {
-	db, err := sqlx.Connect("postgres", "user=mads password=1234 database=test_unexpected_behavior sslmode=disable")
+func ConnectToDB(conf *sqlx.Conn, connection_string string) *sqlx.DB {
+	db, err := sqlx.Connect("postgres", connection_string)
 	if err != nil {
 		log.Fatalln(err)
 	}
