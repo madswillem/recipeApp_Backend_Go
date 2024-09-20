@@ -1,0 +1,95 @@
+{
+  "author": "f85a98f8-2572-420a-9ae5-2c997ad96b6d",
+  "name": "Classic Spaghetti Carbonara 2",
+  "ingredients": [
+    {
+      "name": "Spaghetti",
+      "amount": 400,
+      "unit": "g"
+    },
+    {
+      "name": "Pancetta",
+      "amount": 150,
+      "unit": "g"
+    },
+    {
+      "name": "Egg",
+      "amount": 4,
+      "unit": "large"
+    },
+    {
+      "name": "Parmesan cheese",
+      "amount": 100,
+      "unit": "g"
+    },
+    {
+      "name": "Garlic",
+      "amount": 2,
+      "unit": "cloves"
+    },
+    {
+      "name": "Salt",
+      "amount": 1,
+      "unit": "tsp"
+    },
+    {
+      "name": "Black pepper",
+      "amount": 1,
+      "unit": "tsp"
+    }
+  ],
+  "steps": [
+    {
+      "ID": "1",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "Cook the spaghetti according to package directions until al dente. Reserve 1 cup of pasta water, then drain the pasta.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "2",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "While the pasta cooks, heat a large skillet over medium heat and add the pancetta. Cook until crispy, then remove from heat and set aside.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "3",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "In a bowl, whisk together the eggs and grated Parmesan cheese until well combined.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "4",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "Return the skillet with pancetta to low heat. Add the minced garlic and cook until fragrant, about 1 minute.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "5",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "Add the cooked pasta to the skillet and toss to combine with the pancetta and garlic.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "6",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "Remove the skillet from heat and quickly pour in the egg and cheese mixture, tossing rapidly to create a creamy sauce. If the sauce is too thick, add a little reserved pasta water until desired consistency is reached.",
+      "RecipeID": "12345"
+    },
+    {
+      "ID": "7",
+      "CreatedAt": "2024-06-27T00:00:00Z",
+      "Step": "Season with salt and freshly ground black pepper to taste. Serve immediately with extra Parmesan cheese on top, if desired.",
+      "RecipeID": "12345"
+    }
+  ],
+  "diet": [
+    {
+      "id": "bbadd945-5557-459f-951e-9ad3ad277059"
+    }
+  ],
+  "yield": 500,
+  "yield_unit": "g",
+  "prepTime": "1h",
+  "cookingTime": "1h",
+  "cuisine": "italian"
+}
