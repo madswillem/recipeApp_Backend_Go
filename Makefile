@@ -1,6 +1,9 @@
 run_db:
 	sudo systemctl start postgresql
 
+run_docker:
+    sudo systemctl start docker
+
 run:
 	go run cmd/main/main.go
 

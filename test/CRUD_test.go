@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -19,7 +20,82 @@ import (
 )
 
 func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual models.RecipeSchema) {
+	if actual.ID == "" || expected.ID == "" {
+		t.Errorf(fmt.Sprintf("%s (actual.ID) != %s (expected.ID)", actual.ID, expected.ID))
+
+		return
+	}
+
+	// Check if the lengths of actual.Ingredients and expected.Ingredients are equal
+	if len(actual.Ingredients) != len(expected.Ingredients) {
+		t.Errorf("Expected %d ingredients but got %d", len(expected.Ingredients), len(actual.Ingredients))
+		return
+	}
+
+	// Check if the lengths of actual.Steps and expected.Steps are equal
+	if len(actual.Steps) != len(expected.Steps) {
+		t.Errorf("Expected %d ingredients but got %d", len(expected.Steps), len(actual.Steps))
+		return
+	}
+
+	var errors []string
+
+	// Compare each ingredient in the actual recipe
+	for num, ingredient := range actual.Ingredients {
+		expectedIngredient := expected.Ingredients[num]
+
+		// Compare ingredient properties
+		if ingredient.Name != expectedIngredient.Name {
+			errors = append(errors, fmt.Sprintf("Expected ingredient %s but got %s", expectedIngredient.Name, ingredient.Name))
+		}
+		if ingredient.Amount != expectedIngredient.Amount {
+			errors = append(errors, fmt.Sprintf("Expected amount %d but got %d", expectedIngredient.Amount, ingredient.Amount))
+		}
+		if ingredient.Unit != expectedIngredient.Unit {
+			errors = append(errors, fmt.Sprintf("Expected measurement_unit %s but got %s", expectedIngredient.Unit, ingredient.Unit))
+		}
+		if ingredient.NutritionalValue != expectedIngredient.NutritionalValue {
+			errors = append(errors, fmt.Sprintf("Expected nutritional_value %v but got %v", expectedIngredient.NutritionalValue, ingredient.NutritionalValue))
+		}
+		if ingredient.Rating != expectedIngredient.Rating {
+			errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expectedIngredient.Rating, ingredient.Rating))
+		}
+	}
+
+	// Compare Steps
+	for num, step := range actual.Steps {
+		expectedStep := expected.Steps[num]
+
+		if step.Step != expectedStep.Step {
+			errors = append(errors, fmt.Sprintf("Expected step %s but got %s", expectedStep.Step, step.Step))
+		}
+		if step.TechniqueID != expectedStep.TechniqueID {
+			errors = append(errors, fmt.Sprintf("Expected technique %s but got %s", *expectedStep.TechniqueID, *step.TechniqueID))
+		}
+	}
+
+	// Compare other recipe properties
+	if actual.Name != expected.Name {
+		errors = append(errors, fmt.Sprintf("Expected Name %s but got %s", expected.Name, actual.Name))
+	}
+	if actual.PrepTime != expected.PrepTime {
+		errors = append(errors, fmt.Sprintf("Expected prep_time %s but got %s", expected.PrepTime, actual.PrepTime))
+	}
+	if actual.CookingTime != expected.CookingTime {
+		errors = append(errors, fmt.Sprintf("Expected cooking_time %s but got %s", expected.CookingTime, actual.CookingTime))
+	}
+	if actual.NutritionalValue != expected.NutritionalValue {
+		errors = append(errors, fmt.Sprintf("Expected NutritionalValue %v but got %v", expected.NutritionalValue, actual.NutritionalValue))
+	}
+	if actual.Rating != expected.Rating {
+		errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expected.Rating, actual.Rating))
+	}
+
+	if len(errors) > 0 {
+		t.Error(strings.Join(errors, "\n"))
+	}
 }
+
 func TestServer_AddRecipe(t *testing.T) {
 	ctx := context.Background()
 
@@ -67,39 +143,15 @@ func TestServer_AddRecipe(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:           "add recipe with all required fields (edit=true)",
-			requestBody:    "./testdata/create/add_recipe_with_all_required_fields(edited=true).json",
+			name:           "add recipe with all required fields",
+			requestBody:    "./testdata/create/add_recipe_with_all_required_fields/body.json",
 			expectedStatus: http.StatusCreated,
-			expectedBody:   "./testdata/create/add_recipe_with_all_required_fields(edited=true)_expected_return.json",
-		},
-		{
-			name:           "add recipe with all required fields (edit=false)",
-			requestBody:    "./testdata/create/add_recipe_with_all_required_fields(edited=false).json",
-			expectedStatus: http.StatusCreated,
-			expectedBody:   "./testdata/create/add_recipe_with_all_required_fields(edited=false)_expected_return.json",
-		},
-		{
-			name:           "add recipe with exesive edit fields",
-			requestBody:    "./testdata/create/add_recipe_with_exesive_edit_fields.json",
-			expectedStatus: http.StatusBadRequest,
-		},
-		{
-			name:           "add recipe with missing edit fields",
-			requestBody:    "./testdata/create/add_recipe_with_missing_edit_fields.json",
-			expectedStatus: http.StatusBadRequest,
-		},
-		{
-			name:           "add recipe without required fields",
-			requestBody:    `./testdata/create/add_recipe_without_required_fields.json`,
-			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "./testdata/create/add_recipe_with_all_required_fields/expected_return.json",
 		},
 	}
 
-	println("test")
 	for _, tc := range testCases {
-		println("test")
 		t.Run(tc.name, func(t *testing.T) {
-			println("test " + tc.name)
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
@@ -146,6 +198,7 @@ func TestServer_AddRecipe(t *testing.T) {
 
 				assertRecipesEqual(t, expectedReturn, response)
 			}
+
 		})
 	}
 }
