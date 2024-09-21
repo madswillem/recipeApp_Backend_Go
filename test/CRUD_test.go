@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -57,8 +58,8 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 		if ingredient.NutritionalValue != expectedIngredient.NutritionalValue {
 			errors = append(errors, fmt.Sprintf("Expected nutritional_value %v but got %v", expectedIngredient.NutritionalValue, ingredient.NutritionalValue))
 		}
-		if ingredient.Rating != expectedIngredient.Rating {
-			errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expectedIngredient.Rating, ingredient.Rating))
+		if !reflect.DeepEqual(ingredient.Rating, expectedIngredient.Rating) {
+			errors = append(errors, fmt.Sprintf("Expected ingredient rating %v but got %v", expectedIngredient.Rating, ingredient.Rating))
 		}
 	}
 
@@ -87,8 +88,8 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 	if actual.NutritionalValue != expected.NutritionalValue {
 		errors = append(errors, fmt.Sprintf("Expected NutritionalValue %v but got %v", expected.NutritionalValue, actual.NutritionalValue))
 	}
-	if actual.Rating != expected.Rating {
-		errors = append(errors, fmt.Sprintf("Expected rating %v but got %v", expected.Rating, actual.Rating))
+	if actual.Rating.Overall != expected.Rating.Overall {
+		errors = append(errors, fmt.Sprintf("Expected recipe rating %v but got %v", expected.Rating, actual.Rating))
 	}
 
 	if len(errors) > 0 {
@@ -99,7 +100,6 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 func TestServer_AddRecipe(t *testing.T) {
 	ctx := context.Background()
 
-	// 1. Start the postgres container and run any migrations on it
 	container, err := postgres.Run(
 		ctx,
 		"docker.io/postgres:16-alpine",
@@ -113,19 +113,10 @@ func TestServer_AddRecipe(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// 2. Create a snapshot of the database to restore later
 	err = container.Snapshot(ctx, postgres.WithSnapshotName("test-snapshot"))
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Clean up the container after the test is complete
-	t.Cleanup(func() {
-		if err := container.Terminate(ctx); err != nil {
-			t.Fatalf("failed to terminate container: %s", err)
-		}
-	})
 
 	dbURL, err := container.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
@@ -153,6 +144,7 @@ func TestServer_AddRecipe(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
 			c, _ := gin.CreateTestContext(w)
 
 			completeRequestFilePath, err := filepath.Abs(tc.requestBody)
@@ -198,7 +190,12 @@ func TestServer_AddRecipe(t *testing.T) {
 
 				assertRecipesEqual(t, expectedReturn, response)
 			}
-
+			t.Cleanup(func() {
+				err = container.Restore(ctx)
+				if err != nil {
+					fmt.Printf("Error restoring container: %s\n", err.Error())
+				}
+			})
 		})
 	}
 }

@@ -1,5 +1,5 @@
 run_db:
-	sudo systemctl start postgresql
+    sudo systemctl start postgresql
 
 run_docker:
     sudo systemctl start docker

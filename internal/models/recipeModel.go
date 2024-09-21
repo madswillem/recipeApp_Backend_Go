@@ -228,7 +228,6 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 	if err != nil {
 		return error_handler.New("Error creating recipe", http.StatusInternalServerError, err)
 	}
-	fmt.Println(recipe.ID)
 
 	return nil
 }
