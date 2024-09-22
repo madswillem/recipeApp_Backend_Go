@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
-	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/jmoiron/sqlx"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/database"
 	"github.com/madswillem/recipeApp_Backend_Go/internal/models"
@@ -43,25 +44,19 @@ func assertRecipesEqual(t *testing.T, expected models.RecipeSchema, actual model
 	var errors []string
 
 	// Compare each ingredient in the actual recipe
-	for num, ingredient := range actual.Ingredients {
-		expectedIngredient := expected.Ingredients[num]
+	less := func(a, b models.IngredientsSchema) bool {
+		return a.ID < b.ID // Sorting by Name (you can add more criteria if needed)
+	}
 
-		// Compare ingredient properties
-		if ingredient.Name != expectedIngredient.Name {
-			errors = append(errors, fmt.Sprintf("Expected ingredient %s but got %s", expectedIngredient.Name, ingredient.Name))
-		}
-		if ingredient.Amount != expectedIngredient.Amount {
-			errors = append(errors, fmt.Sprintf("Expected amount %d but got %d", expectedIngredient.Amount, ingredient.Amount))
-		}
-		if ingredient.Unit != expectedIngredient.Unit {
-			errors = append(errors, fmt.Sprintf("Expected measurement_unit %s but got %s", expectedIngredient.Unit, ingredient.Unit))
-		}
-		if ingredient.NutritionalValue != expectedIngredient.NutritionalValue {
-			errors = append(errors, fmt.Sprintf("Expected nutritional_value %v but got %v", expectedIngredient.NutritionalValue, ingredient.NutritionalValue))
-		}
-		if !reflect.DeepEqual(ingredient.Rating, expectedIngredient.Rating) {
-			errors = append(errors, fmt.Sprintf("Expected ingredient rating %v but got %v", expectedIngredient.Rating, ingredient.Rating))
-		}
+	// Sort both lists
+	sort.Slice(actual.Ingredients, func(i, j int) bool { return less(actual.Ingredients[i], actual.Ingredients[j]) })
+	sort.Slice(expected.Ingredients, func(i, j int) bool { return less(actual.Ingredients[i], actual.Ingredients[j]) })
+
+	// Compare the sorted lists
+	diff := cmp.Diff(actual.Ingredients, actual.Ingredients, cmpopts.SortSlices(less))
+
+	if diff != "" {
+		t.Errorf("Ingredients are not the same: %s", diff)
 	}
 
 	// Compare Steps
@@ -289,13 +284,7 @@ func TestServer_GetById(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if !reflect.DeepEqual(expectedBody, response) {
-					err := os.WriteFile("./testdata/unexpected_output/unexpected_getbyid.json", []byte(fmt.Sprintf("%+v\n%+v", response, expectedReturn)), 0644)
-					if err != nil {
-						fmt.Printf("Couldn't create file: %e", err)
-					}
-					t.Errorf("Body not as expected, for more information ./test/testdata/unexpected_output/unexpected_getbyid.json")
-				}
+				assertRecipesEqual(t, expectedReturn, response)
 			}
 			t.Cleanup(func() {
 				err = container.Restore(ctx)
