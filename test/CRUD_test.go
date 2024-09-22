@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -110,6 +111,11 @@ func TestServer_AddRecipe(t *testing.T) {
 		postgres.WithInitScripts("./testdata/innit-db.sql"),
 		postgres.WithSQLDriver("pgx"),
 	)
+	t.Cleanup(func() {
+		if err := container.Terminate(ctx); err != nil {
+			t.Fatalf("failed to terminate container: %s", err)
+		}
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -189,6 +195,107 @@ func TestServer_AddRecipe(t *testing.T) {
 				}
 
 				assertRecipesEqual(t, expectedReturn, response)
+			}
+			t.Cleanup(func() {
+				err = container.Restore(ctx)
+				if err != nil {
+					fmt.Printf("Error restoring container: %s\n", err.Error())
+				}
+			})
+		})
+	}
+}
+
+func TestServer_GetById(t *testing.T) {
+	ctx := context.Background()
+
+	container, err := postgres.Run(
+		ctx,
+		"docker.io/postgres:16-alpine",
+		postgres.WithDatabase("test"),
+		postgres.WithUsername("mads"),
+		postgres.WithPassword("1234"),
+		postgres.BasicWaitStrategies(),
+		postgres.WithInitScripts("./testdata/innit-db.sql"),
+		postgres.WithSQLDriver("pgx"),
+	)
+	t.Cleanup(func() {
+		if err := container.Terminate(ctx); err != nil {
+			t.Fatalf("failed to terminate container: %s", err)
+		}
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = container.Snapshot(ctx, postgres.WithSnapshotName("test-snapshot"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dbURL, err := container.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := server.Server{NewDB: database.ConnectToDB(&sqlx.Conn{}, dbURL)}
+
+	tests := []struct {
+		name           string
+		id             string
+		expectedStatus int
+		expectedBody   string
+	}{
+		{
+			name:           "get recipe by id: c4ef5707-1577-4f8c-99ef-0f492e82b895",
+			id:             "c4ef5707-1577-4f8c-99ef-0f492e82b895",
+			expectedStatus: http.StatusOK,
+			expectedBody:   "./testdata/get/getbyid.json",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			gin.SetMode(gin.TestMode)
+			c, _ := gin.CreateTestContext(w)
+
+			c.Request = httptest.NewRequest(http.MethodGet, "/getbyid", nil)
+			c.Params = gin.Params{gin.Param{Key: "id", Value: tt.id}}
+
+			s.GetById(c)
+
+			if w.Code != tt.expectedStatus {
+				t.Errorf("Expected status code %d but got %d. \n Body: %s", tt.expectedStatus, w.Code, w.Body.String())
+			}
+
+			if tt.expectedBody != "" {
+				var response models.RecipeSchema
+				err = json.NewDecoder(w.Body).Decode(&response)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				completeExpectedFilePath, err := filepath.Abs(tt.expectedBody)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				var expectedReturn models.RecipeSchema
+				expectedBody, err := tools.ReadFileAsString(completeExpectedFilePath)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = json.Unmarshal([]byte(expectedBody), &expectedReturn)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if !reflect.DeepEqual(expectedBody, response) {
+					err := os.WriteFile("./testdata/unexpected_output/unexpected_getbyid.json", []byte(fmt.Sprintf("%+v\n%+v", response, expectedReturn)), 0644)
+					if err != nil {
+						fmt.Printf("Couldn't create file: %e", err)
+					}
+					t.Errorf("Body not as expected, for more information ./test/testdata/unexpected_output/unexpected_getbyid.json")
+				}
 			}
 			t.Cleanup(func() {
 				err = container.Restore(ctx)
