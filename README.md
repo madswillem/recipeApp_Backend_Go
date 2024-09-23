@@ -1,22 +1,44 @@
-# Recipe App in Go 
-Frontend: \
-/             -to get Home page \
-/account      -to get Account page \
-/recipe/:id   -to get page of a Recipe \
-/tutorials    -to get the page of a tutorial (Currently it always shows the same video)\
+# RECIPEAPP
+Welcome to the **Recipe App** repository! This project is a user-friendly and foss application that allows users to browse, save,  share and search recipes. With the upcoming v1.0 release users will be able to get personalized recommendations
 
-/get/home     -to get content of Home page \
-/get/account  -to get content of Account page \
+## Table of Contents
 
-Routes: \
-GET    /get          -to get every Recipe \
-POST   /create       -to create a Recipe \
-GET    /getbyid/:id  -to get a Recipe by id \
-DELETE /delete/:id   -to delete a Recipe by id \
-GET    /select/:id   -to select a Recipe \
-GET    /deselect/:id -to deselect a Recipe \
-GET    /colormode    -to get/set the colormode(darkmode|lightmode) \
-POST   /filter       -to filter for recipes and cookingtime
+## Installation
+### Linux  with PostgreSQL
+#### Releases
+No releases yet wait until milestone #7
+#### Build from Source
+1. Dependencies:
+	- Download latest go version [Go](https://go.dev/dl/)
+	- Download and configure latest go version [PostgreSQL](https://www.postgresql.org/download/)
+2. Clone repo `git clone https://github.com/madswillem/recipeApp_Backend_Go.git`
+3. Go into the directory `cd recipeApp_Backend_Go`
+4. Add `.env` file and add `DB=(db connection string)` to it
+5. Download the dependencies `make tidy`
+6. Build `make build`
+7. Run the DB
+8. Run the app `./bin/main`
 
-# Next Update
-/recomendet   -better recomendation 
+#### Single executable
+Not yet available wait until milestone #7
+
+### Windows
+#### Releases
+No releases yet wait until milestone #7
+#### Build from Source
+1. Dependencies:
+	- Download latest go version [Go](https://go.dev/dl/)
+	- Download and configure latest go version [PostgreSQL](https://www.postgresql.org/download/)
+2. Clone repo `git clone https://github.com/madswillem/recipeApp_Backend_Go.git`
+3. Go into the directory `cd recipeApp_Backend_Go`
+4. Add `.env` file and add `DB=(db connection string)` to it
+5. Download the dependencies `make tidy`
+6. Build `make build`
+7. Run the DB
+8. Run the app `./bin/main.exe`
+
+### Single executable
+Not yet available wait until milestone #7
+
+### MacOS
+There is no official way to install the RecipeApp on MacOS. You might be able to build the app from source, I can't verify that though.
