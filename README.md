@@ -6,7 +6,7 @@ Welcome to the **Recipe App** repository! This project is a user-friendly and fo
 ## Installation
 ### Linux  with PostgreSQL
 #### Releases
-No releases yet wait until milestone #7
+No releases yet wait until milestone [Milestone V1.0](https://github.com/madswillem/recipeApp_Backend_Go/issues/7)
 #### Build from Source
 1. Dependencies:
 	- Download latest go version [Go](https://go.dev/dl/)
@@ -20,11 +20,11 @@ No releases yet wait until milestone #7
 8. Run the app `./bin/main`
 
 #### Single executable
-Not yet available wait until milestone #7
+Not yet available wait until milestone [Milestone V1.0](https://github.com/madswillem/recipeApp_Backend_Go/issues/7)
 
 ### Windows
 #### Releases
-No releases yet wait until milestone #7
+No releases yet wait until milestone [Milestone V1.0](https://github.com/madswillem/recipeApp_Backend_Go/issues/7)
 #### Build from Source
 1. Dependencies:
 	- Download latest go version [Go](https://go.dev/dl/)
@@ -38,7 +38,7 @@ No releases yet wait until milestone #7
 8. Run the app `./bin/main.exe`
 
 ### Single executable
-Not yet available wait until milestone #7
+Not yet available wait until milestone [Milestone V1.0](https://github.com/madswillem/recipeApp_Backend_Go/issues/7)
 
 ### MacOS
 There is no official way to install the RecipeApp on MacOS. You might be able to build the app from source, I can't verify that though.
