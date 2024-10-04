@@ -1,0 +1,208 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  version: 1.0.0
+  description: This is the official API Spec
+  license:
+    name: MIT
+    url: https://opensource.org/license/MIT
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+paths:
+  /get:
+    description: Get every recipe
+    get:
+      summary: The operation returns every recipe
+      description: ''
+      operationId: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        '500':
+          description: Internal Server Error
+      tags:
+        - recipe
+  /create:
+    summary: create a recipe
+    description: create a recipe
+    post:
+      summary: The operation creates a new recipe
+      description: ''
+      operationId: ''
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+                type: object
+                allOf:
+                  - $ref: '#/components/schemas/Recipe'
+                  - type: object
+                    properties:
+                      id: {}
+                    additionalProperties: false
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - recipe
+components:
+  schemas:
+    CreateRecipe:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: Time the recipe was created
+        author:
+          type: string
+          description: Author of the recipe
+        name:
+          type: string
+          description: Name of the recipe
+        cuisine:
+          type: string
+          description: Type of cuisine the recipe belongs to
+        yield:
+          type: integer
+          description: Number of servings or portions
+        yieldUnit:
+          type: string
+          description: Unit of measurement for yield (e.g., servings, cups)
+        prepTime:
+          type: string
+          description: Preparation time for the recipe (e.g., "20 minutes")
+        cookingTime:
+          type: string
+          description: Cooking time for the recipe (e.g., "45 minutes")
+        selected:
+          type: integer
+          description: Indicator of whether the recipe has been selected
+        version:
+          type: integer
+          format: int64
+          description: Version of the recipe
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientsSchema'
+          description: List of ingredients used in the recipe
+        diet:
+          type: array
+          items:
+            $ref: '#/components/schemas/DietSchema'
+          description: List of dietary classifications for the recipe
+        nutritionalValue:
+          $ref: '#/components/schemas/NutritionalValue'
+          description: Nutritional information of the recipe
+        rating:
+          $ref: '#/components/schemas/RatingStruct'
+          description: User rating for the recipe
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepsStruct'
+          description: List of steps to prepare the recipe
+    Recipe:
+      allOf: # Combines the BasicErrorModel and the inline model
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the recipe
+        - $ref: "#/components/schemas/CreateRecipe"
+    IngredientsSchema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the ingredient entry
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the ingredient was created
+        recipeId:
+          type: string
+          description: Identifier of the associated recipe
+        ingredientId:
+          type: string
+          description: Identifier of the ingredient
+        amount:
+          type: integer
+          format: int64
+          description: Amount of the ingredient
+        unit:
+          type: string
+          description: Unit of measurement for the ingredient (e.g., grams, cups)
+        name:
+          type: string
+          description: Name of the ingredient
+    DietSchema:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the diet
+        name:
+          type: string
+          description: Type of diet (e.g., vegan, gluten-free)
+        description:
+          type: string
+          description: Description of the diet
+    NutritionalValue:
+      type: object
+      properties:
+        calories:
+          type: number
+          description: Calories per serving
+        fat:
+          type: number
+          description: Amount of fat per serving (g)
+        carbs:
+          type: number
+          description: Amount of carbohydrates per serving (g)
+        protein:
+          type: number
+          description: Amount of protein per serving (g)
+    RatingStruct:
+      type: object
+      properties:
+        averageRating:
+          type: number
+          format: float
+          description: Average rating of the recipe
+        totalRatings:
+          type: integer
+          description: Total number of ratings
+    StepsStruct:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the step
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the step was created
+        step:
+          type: string
+          description: Description of the step in the recipe process
+        recipeId:
+          type: string
+          description: Identifier of the associated recipe
+        techniqueId:
+          type: string
+          nullable: true
+          description: >-
+            Identifier for the cooking technique used in this step, if
+            applicable
+        ingredientId:
+          type: string
+          nullable: true
+          description: Identifier for the ingredient used in this step, if applicable
