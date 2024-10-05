@@ -3,6 +3,9 @@ Welcome to the **Recipe App** repository! This project is a user-friendly and fo
 
 ## Table of Contents
 
+## API
+[API Spec](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/madswillem/recipeApp_Backend_Go/refs/heads/24-document-create/docs/OpenApiSpec.yaml)
+
 ## Installation
 ### Linux  with PostgreSQL
 #### Releases
