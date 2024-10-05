@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Swagger Petstore - OpenAPI 3.0
+  title: Recipe - OpenAPI 3.0
   version: 1.0.0
   description: This is the official API Spec
   license:
@@ -14,7 +14,7 @@ paths:
     get:
       summary: The operation returns every recipe
       description: ''
-      operationId: ''
+      operationId: '1'
       responses:
         '200':
           description: OK
@@ -32,23 +32,37 @@ paths:
     post:
       summary: The operation creates a new recipe
       description: ''
-      operationId: ''
+      operationId: '2'
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
             schema:
                 type: object
                 allOf:
-                  - $ref: '#/components/schemas/Recipe'
-                  - type: object
-                    properties:
-                      id: {}
-                    additionalProperties: false
+                  - $ref: '#/components/schemas/CreateRecipe'
       responses:
-        default:
-          description: Default error sample response
+        201:
+          description: "OK - recipe was created and should be returned"
+          content:
+            application/json:
+              schema:
+                  type: object
+                  allOf:
+                    - $ref: '#/components/schemas/Recipe'
+        400:
+          description: "Bad Request - pobably some missing field"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ErrMessage:
+                    type: string
+                    example: "missing recipe name"
+                  errors: 
+                    type: string
+                    example: "missing recipe name"
       tags:
         - recipe
 components:
@@ -56,58 +70,52 @@ components:
     CreateRecipe:
       type: object
       properties:
-        createdAt:
-          type: string
-          format: date-time
-          description: Time the recipe was created
         author:
           type: string
           description: Author of the recipe
+          example: "f85a98f8-2572-420a-9ae5-2c997ad96b6d"
         name:
           type: string
           description: Name of the recipe
+          example: "Classic Spaghetti Carbonara 2"
         cuisine:
           type: string
           description: Type of cuisine the recipe belongs to
+          example: "italian"
         yield:
           type: integer
           description: Number of servings or portions
+          example: 500
         yieldUnit:
           type: string
           description: Unit of measurement for yield (e.g., servings, cups)
+          example: "g"
         prepTime:
           type: string
           description: Preparation time for the recipe (e.g., "20 minutes")
+          example: "1h"
         cookingTime:
           type: string
           description: Cooking time for the recipe (e.g., "45 minutes")
+          example: "1h"
         selected:
           type: integer
           description: Indicator of whether the recipe has been selected
+          example: 0
         version:
           type: integer
           format: int64
           description: Version of the recipe
+          example: 1
         ingredients:
           type: array
           items:
-            $ref: '#/components/schemas/IngredientsSchema'
+            $ref: '#/components/schemas/CreateRecipeIngredient'
           description: List of ingredients used in the recipe
-        diet:
-          type: array
-          items:
-            $ref: '#/components/schemas/DietSchema'
-          description: List of dietary classifications for the recipe
-        nutritionalValue:
-          $ref: '#/components/schemas/NutritionalValue'
-          description: Nutritional information of the recipe
-        rating:
-          $ref: '#/components/schemas/RatingStruct'
-          description: User rating for the recipe
         steps:
           type: array
           items:
-            $ref: '#/components/schemas/StepsStruct'
+            $ref: '#/components/schemas/CreateRecipeStep'
           description: List of steps to prepare the recipe
     Recipe:
       allOf: # Combines the BasicErrorModel and the inline model
@@ -116,20 +124,35 @@ components:
             id:
               type: string
               description: Unique identifier for the recipe
+            createdAt:
+              type: string
+              format: date-time
+              description: Time the recipe was created
         - $ref: "#/components/schemas/CreateRecipe"
-    IngredientsSchema:
+        - type: object
+          properties:
+            diet:
+              type: array
+              items:
+                $ref: '#/components/schemas/DietSchema'
+              description: List of dietary classifications for the recipe
+            nutritionalValue:
+              $ref: '#/components/schemas/NutritionalValue'
+            rating:
+              $ref: '#/components/schemas/RatingStruct'
+            ingredients:
+              type: array
+              items:
+                $ref: '#/components/schemas/IngredientsSchema'
+              description: List of ingredients used in the recipe
+            steps:
+              type: array
+              items:
+                $ref: '#/components/schemas/StepsSchema'
+              description: List of steps to prepare the recipe
+    CreateRecipeIngredient:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the ingredient entry
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the ingredient was created
-        recipeId:
-          type: string
-          description: Identifier of the associated recipe
         ingredientId:
           type: string
           description: Identifier of the ingredient
@@ -140,9 +163,24 @@ components:
         unit:
           type: string
           description: Unit of measurement for the ingredient (e.g., grams, cups)
-        name:
-          type: string
-          description: Name of the ingredient
+    IngredientsSchema:
+      allOf: # Combines the BasicErrorModel and the inline model
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the ingredient entry
+            createdAt:
+              type: string
+              format: date-time
+              description: Timestamp when the ingredient was created
+            recipeId:
+              type: string
+              description: Identifier of the associated recipe
+            name:
+              type: string
+              description: Name of the ingredient
+        - $ref: "#/components/schemas/CreateRecipe"
     DietSchema:
       type: object
       properties:
@@ -180,22 +218,12 @@ components:
         totalRatings:
           type: integer
           description: Total number of ratings
-    StepsStruct:
+    CreateRecipeStep:
       type: object
       properties:
-        id:
-          type: string
-          description: Unique identifier for the step
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the step was created
         step:
           type: string
           description: Description of the step in the recipe process
-        recipeId:
-          type: string
-          description: Identifier of the associated recipe
         techniqueId:
           type: string
           nullable: true
@@ -206,3 +234,31 @@ components:
           type: string
           nullable: true
           description: Identifier for the ingredient used in this step, if applicable
+    StepsSchema:
+      allOf:
+      - $ref: "#/components/schemas/CreateRecipeStep"
+      - type: object
+        properties:
+          id:
+            type: string
+            description: Unique identifier for the step
+          createdAt:
+            type: string
+            format: date-time
+            description: Timestamp when the step was created
+          step:
+            type: string
+            description: Description of the step in the recipe process
+          recipeId:
+            type: string
+            description: Identifier of the associated recipe
+          techniqueId:
+            type: string
+            nullable: true
+            description: >-
+              Identifier for the cooking technique used in this step, if
+              applicable
+          ingredientId:
+            type: string
+            nullable: true
+            description: Identifier for the ingredient used in this step, if applicable
