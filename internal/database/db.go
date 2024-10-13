@@ -12,6 +12,5 @@ func ConnectToDB(conf *sqlx.Conn, connection_string string) *sqlx.DB {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	db.MustExec(schema)
 	return db
 }

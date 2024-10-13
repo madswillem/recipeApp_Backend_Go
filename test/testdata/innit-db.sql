@@ -124,6 +124,23 @@ CREATE TABLE public.recipe_ingredient (
 ALTER TABLE public.recipe_ingredient OWNER TO mads;
 
 --
+-- Name: recipe_selects_views_log; Type: TABLE; Schema: public; Owner: mads
+--
+
+CREATE TABLE public.recipe_selects_views_log (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    day timestamp without time zone DEFAULT (now())::timestamp without time zone,
+    selects bigint,
+    views bigint,
+    recipe_id uuid NOT NULL,
+    view_change bigint,
+    selects_change bigint
+);
+
+
+ALTER TABLE public.recipe_selects_views_log OWNER TO mads;
+
+--
 -- Name: recipes; Type: TABLE; Schema: public; Owner: mads
 --
 
@@ -138,7 +155,8 @@ CREATE TABLE public.recipes (
     prep_time interval,
     cooking_time interval,
     version bigint DEFAULT 0,
-    selected bigint DEFAULT 0
+    selects bigint DEFAULT 0,
+    views bigint DEFAULT 0
 );
 
 
@@ -287,12 +305,20 @@ d973f0cd-f55f-401d-ba65-7f9bafe5240e	2024-09-01 20:32:48.395312	c4ef5707-1577-4f
 
 
 --
+-- Data for Name: recipe_selects_views_log; Type: TABLE DATA; Schema: public; Owner: mads
+--
+
+COPY public.recipe_selects_views_log (id, day, selects, views, recipe_id, view_change, selects_change) FROM stdin;
+\.
+
+
+--
 -- Data for Name: recipes; Type: TABLE DATA; Schema: public; Owner: mads
 --
 
-COPY public.recipes (id, created_at, author, name, cuisine, yield, yield_unit, prep_time, cooking_time, version, selected) FROM stdin;
-aa85daf1-dbc5-462d-a6fe-3fbb358b08dd	2024-07-24 15:49:43.879625	f85a98f8-2572-420a-9ae5-2c997ad96b6d	Classic Spaghetti Carbonara	italian	500		01:00:00	01:00:00	9	9
-c4ef5707-1577-4f8c-99ef-0f492e82b895	2024-09-01 20:32:48.395312	f85a98f8-2572-420a-9ae5-2c997ad96b6d	Classic Spaghetti Carbonara 2	italian	500		01:00:00	01:00:00	0	0
+COPY public.recipes (id, created_at, author, name, cuisine, yield, yield_unit, prep_time, cooking_time, version, selects, views) FROM stdin;
+aa85daf1-dbc5-462d-a6fe-3fbb358b08dd	2024-07-24 15:49:43.879625	f85a98f8-2572-420a-9ae5-2c997ad96b6d	Classic Spaghetti Carbonara	italian	500		01:00:00	01:00:00	9	9	0
+c4ef5707-1577-4f8c-99ef-0f492e82b895	2024-09-01 20:32:48.395312	f85a98f8-2572-420a-9ae5-2c997ad96b6d	Classic Spaghetti Carbonara 2	italian	500		01:00:00	01:00:00	0	0	0
 \.
 
 
@@ -442,6 +468,14 @@ ALTER TABLE ONLY public.recipe_ingredient
 
 
 --
+-- Name: recipe_selects_views_log recipe_selected_view_log_pkey; Type: CONSTRAINT; Schema: public; Owner: mads
+--
+
+ALTER TABLE ONLY public.recipe_selects_views_log
+    ADD CONSTRAINT recipe_selected_view_log_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: recipes recipes_pkey; Type: CONSTRAINT; Schema: public; Owner: mads
 --
 
@@ -513,6 +547,14 @@ ALTER TABLE ONLY public.rel_diet_user
 
 
 --
+-- Name: recipe_selects_views_log fk_log_recipe; Type: FK CONSTRAINT; Schema: public; Owner: mads
+--
+
+ALTER TABLE ONLY public.recipe_selects_views_log
+    ADD CONSTRAINT fk_log_recipe FOREIGN KEY (recipe_id) REFERENCES public.recipes(id);
+
+
+--
 -- Name: nutritional_value fk_nutritional_value_ingredient; Type: FK CONSTRAINT; Schema: public; Owner: mads
 --
 
@@ -581,7 +623,7 @@ ALTER TABLE ONLY public.recipes
 --
 
 ALTER TABLE ONLY public.step
-    ADD CONSTRAINT fk_step_recipe FOREIGN KEY (recipe_id) REFERENCES public.recipes(id) MATCH FULL;
+    ADD CONSTRAINT fk_step_recipe FOREIGN KEY (recipe_id) REFERENCES public.recipes(id) ON UPDATE CASCADE ON DELETE CASCADE NOT VALID;
 
 
 --
@@ -589,7 +631,7 @@ ALTER TABLE ONLY public.step
 --
 
 ALTER TABLE ONLY public.step
-    ADD CONSTRAINT fk_step_recipe_ingredient FOREIGN KEY (ingredient_id) REFERENCES public.recipe_ingredient(id) MATCH FULL;
+    ADD CONSTRAINT fk_step_recipe_ingredient FOREIGN KEY (ingredient_id) REFERENCES public.recipe_ingredient(id) ON DELETE SET NULL NOT VALID;
 
 
 --
@@ -597,7 +639,7 @@ ALTER TABLE ONLY public.step
 --
 
 ALTER TABLE ONLY public.step
-    ADD CONSTRAINT fk_step_technique FOREIGN KEY (technique_id) REFERENCES public.technique(id);
+    ADD CONSTRAINT fk_step_technique FOREIGN KEY (technique_id) REFERENCES public.technique(id) ON DELETE SET NULL NOT VALID;
 
 
 --

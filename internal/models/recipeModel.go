@@ -20,7 +20,8 @@ type RecipeSchema struct {
 	YieldUnit        string    `db:"yield_unit"`
 	PrepTime         string    `db:"prep_time"`
 	CookingTime      string    `db:"cooking_time"`
-	Selected         int       `db:"selected"`
+	Selects          int       `db:"selects"`
+	Views            int       `db:"views"`
 	Version          int64     `db:"version"`
 	Ingredients      []IngredientsSchema
 	Diet             []DietSchema
@@ -85,11 +86,11 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx
 
 	fmt.Println(recipe.Rating.Overall)
 
-	recipe.Selected += change
+	recipe.Selects += change
 	recipe.Version += 1
 
 	tx := db.MustBegin()
-	tx.MustExec(`UPDATE "recipes" SET selected=$1, version=$2 WHERE id=$3`, recipe.Selected, recipe.Version, recipe.ID)
+	tx.MustExec(`UPDATE "recipes" SET selects=$1, version=$2 WHERE id=$3`, recipe.Selects, recipe.Version, recipe.ID)
 	query := `
     UPDATE rating
     SET
@@ -157,8 +158,8 @@ func (recipe *RecipeSchema) Create(db *sqlx.DB) *error_handler.APIError {
 
 	tx := db.MustBegin()
 	// Insert recipe
-	query := `INSERT INTO recipes (author, name, cuisine, yield, yield_unit, prep_time, cooking_time, selected, version)
-              VALUES (:author, :name, :cuisine, :yield, :yield_unit, :prep_time, :cooking_time, :selected, :version) RETURNING id`
+	query := `INSERT INTO recipes (author, name, cuisine, yield, yield_unit, prep_time, cooking_time, version)
+              VALUES (:author, :name, :cuisine, :yield, :yield_unit, :prep_time, :cooking_time, :version) RETURNING id`
 	stmt, err := tx.PrepareNamed(query)
 	if err != nil {
 		return error_handler.New("Query error: "+err.Error(), http.StatusInternalServerError, err)
