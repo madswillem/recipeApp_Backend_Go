@@ -214,10 +214,19 @@ func (s *Server) GetById(c *gin.Context) {
 
 	result := models.RecipeSchema{ID: i}
 	err := result.GetRecipeByID(s.NewDB)
-
 	if err != nil {
 		error_handler.HandleError(c, err.Code, err.Message, err.Errors)
 	}
+
+	// Move into GetById as soon as error handler has error types. Currently not
+	// because an error when updateing the views count would be escelated to the user
+	// and the user wouldnt get the recipe
+	_, update_err := s.NewDB.Exec("UPDATE recipes SET views = views + 1 WHERE id=$1", result.ID)
+	if err != nil {
+		// Use logger as soon as its implemented
+		fmt.Println(update_err)
+	}
+
 	c.JSON(http.StatusOK, result)
 }
 
