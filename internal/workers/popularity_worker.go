@@ -46,7 +46,7 @@ func CreateDiff(r1, r2 []r_log) []r_log {
 	for _, v1 := range r1 {
 		found := false
 		for _, v2 := range r2 {
-			if v1 == v2 {
+			if v1.ID == v2.ID {
 				d = append(d, r_log{ID: v1.ID, Selects: v1.Selects, Views: v1.Views, Selects_change: v1.Selects - v2.Selects, View_change: v1.Views - v2.Views})
 				found = true
 				break
