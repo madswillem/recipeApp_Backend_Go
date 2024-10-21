@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -78,38 +79,20 @@ func (recipe *RecipeSchema) UpdateSelected(change int, user *UserModel, db *sqlx
 		return apiErr
 	}
 
-	apiErr = recipe.Rating.Update(change)
+	var attributes []string
+	apiErr, attributes = UpdateRating(change)
 	if apiErr != nil {
 		return apiErr
 	}
 
 	fmt.Println(recipe.Rating.Overall)
 
-	recipe.Selected += change
-	recipe.Version += 1
-
 	tx := db.MustBegin()
 	tx.MustExec(`UPDATE "recipes" SET selected=$1, version=$2 WHERE id=$3`, recipe.Selected, recipe.Version, recipe.ID)
 	query := `
     UPDATE rating
     SET
-        overall = :overall,
-        mon = :mon,
-        tue = :tue,
-        wed = :wed,
-        thu = :thu,
-        fri = :fri,
-        sat = :sat,
-        sun = :sun,
-        win = :win,
-        spr = :spr,
-        sum = :sum,
-        aut = :aut,
-        thirtydegree = :thirtydegree,
-        twentiedegree = :twentiedegree,
-        tendegree = :tendegree,
-        zerodegree = :zerodegree,
-        subzerodegree = :subzerodegree
+    ` + strings.Join(attributes, ",") + `
     WHERE id = :id`
 	tx.NamedExec(query, recipe.Rating)
 	err := tx.Commit()
