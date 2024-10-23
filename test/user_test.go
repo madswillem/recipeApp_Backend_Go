@@ -43,7 +43,7 @@ func TestCreate(t *testing.T) {
 			YieldUnit:   "g",
 			PrepTime:    "01:00:00",
 			CookingTime: "01:00:00",
-			Selected:    0,
+			Selects:     0,
 			Version:     0,
 			Ingredients: []models.IngredientsSchema{
 				{
@@ -185,7 +185,7 @@ func TestAdd(t *testing.T) {
 			YieldUnit:   "g",
 			PrepTime:    "01:00:00",
 			CookingTime: "01:00:00",
-			Selected:    0,
+			Selects:     0,
 			Version:     0,
 			Ingredients: []models.IngredientsSchema{
 				{
